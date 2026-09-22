@@ -1,0 +1,50 @@
+// shared/ui/form-select.tsx
+import * as React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/Select';
+import { cn } from '@/shared/lib/cn';
+
+export interface FormSelectOption {
+  value: string;
+  label: string;
+}
+
+export interface FormSelectProps {
+  label?: string;
+  error?: string;
+  options: FormSelectOption[];
+  name?: string;
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  className?: string;
+}
+
+export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
+  ({ label, error, options, value, defaultValue, onChange, className }, ref) => {
+    return (
+      <div className="space-y-1">
+        {label && <label className="text-sm font-medium text-foreground">{label}</label>}
+        <Select value={value} defaultValue={defaultValue} onValueChange={onChange}>
+          <SelectTrigger ref={ref} className={cn(error && 'border-destructive', className)}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
+    );
+  }
+);
+FormSelect.displayName = 'FormSelect';
