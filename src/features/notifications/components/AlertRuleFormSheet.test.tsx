@@ -40,14 +40,14 @@ describe('AlertRuleFormSheet', () => {
 
     await user.type(screen.getByLabelText('Seuil (%)'), '3');
     expect(screen.getByText('Quand mon patrimoine total baisse de 3 % sur 1 jour')).toBeInTheDocument();
-    await user.click(screen.getByRole('switch', { name: 'Recevoir aussi par email' }));
+    await user.click(screen.getByRole('switch', { name: 'Email' }));
     await user.click(screen.getByRole('button', { name: "Créer l'alerte" }));
 
     expect(saveMutate.mock.calls[0][0]).toEqual({
       id: undefined,
       body: {
         scope: 'GLOBAL', portfolioId: null, symbol: null, condition: 'FALLS', threshold: 3, period: 'DAY',
-        notifyEmail: true, enabled: true,
+        notifyEmail: true, notifyPush: true, enabled: true, label: null, mutedUntil: null,
       },
     });
   });
@@ -67,11 +67,29 @@ describe('AlertRuleFormSheet', () => {
   it('modification : reprend la règle existante', () => {
     render(<AlertRuleFormSheet open onClose={vi.fn()} initial={{
       id: 'r1', scope: 'ASSET', portfolioId: null, portfolioName: null, symbol: 'BTC-EUR', assetName: 'Bitcoin EUR',
-      condition: 'ABOVE', threshold: 70000, period: null, notifyEmail: false, enabled: true, lastTriggeredAt: null,
+      condition: 'ABOVE', threshold: 70000, period: null, notifyEmail: false, notifyPush: true, enabled: true,
+      label: 'Objectif BTC', mutedUntil: null, lastTriggeredAt: null,
       description: 'Bitcoin EUR (BTC-EUR) passe au-dessus de 70 000,00 €',
     }} />);
     expect(screen.getByLabelText('Seuil (€)')).toHaveValue(70000);
     expect(screen.getByText('Quand BTC-EUR passe au-dessus de 70000 €')).toBeInTheDocument();
+    expect(screen.getByLabelText('Nom (facultatif)')).toHaveValue('Objectif BTC');
+  });
+
+  it("depuis la fiche d'un actif : nouveau plus haut sur 1 an, sans seuil", async () => {
+    const user = userEvent.setup();
+    render(<AlertRuleFormSheet open onClose={vi.fn()} preset={{
+      scope: 'ASSET', condition: 'NEW_HIGH', asset: { symbol: 'CW8.PA', name: 'MSCI World', exchange: 'Paris', assetType: 'ETF' },
+    }} />);
+
+    expect(screen.queryByLabelText(/Seuil/)).not.toBeInTheDocument();
+    expect(screen.getByText('Quand CW8.PA atteint un nouveau plus haut sur 1 an')).toBeInTheDocument();
+    await user.type(screen.getByLabelText('Nom (facultatif)'), 'Record MSCI');
+    await user.click(screen.getByRole('button', { name: "Créer l'alerte" }));
+
+    expect(saveMutate.mock.calls[0][0].body).toMatchObject({
+      scope: 'ASSET', symbol: 'CW8.PA', condition: 'NEW_HIGH', threshold: null, period: 'YEAR', label: 'Record MSCI',
+    });
   });
 });
 

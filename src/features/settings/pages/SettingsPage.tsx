@@ -13,6 +13,7 @@ import { useMe, useUpdateMe, useDeleteMe } from '@/features/settings/api/user.ap
 import type { UserUpdateRequest } from '@/features/settings/model/user.types';
 import { useLogout } from "@/features/auth/api/auth.api";
 import { SecuritySection } from "@/features/settings/components/SecuritySection";
+import { PushSettingsCard } from "@/features/notifications/components/PushSettingsCard";
 
 const THEME_ICON: Record<Theme, typeof Sun> = { system: Monitor, light: Sun, dark: Moon };
 
@@ -59,6 +60,11 @@ export default function SettingsPage() {
       <section className="space-y-2">
         <h2 className="text-sm font-medium">Apparence</h2>
         <Card className="p-4"><ThemePicker /></Card>
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-medium">Notifications</h2>
+        <PushSettingsCard />
       </section>
 
       <section className="space-y-2">

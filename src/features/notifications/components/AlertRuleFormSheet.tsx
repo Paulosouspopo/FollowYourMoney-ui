@@ -13,15 +13,20 @@ import type { AssetSearchResult } from '@/features/assets/model/asset.types';
 import { usePortfolios } from '@/features/portfolios/api/portfolio.api';
 import { useDeleteAlertRule, useSaveAlertRule } from '../api/notification.api';
 import {
-  CONDITION_LABEL, PERIOD_LABEL, SCOPE_LABEL, isPercentage,
+  CONDITIONS_BY_SCOPE, CONDITION_LABEL, PERIOD_LABEL, SCOPE_LABEL, hasThreshold, isExtreme, isPercentage,
+  isVariation, needsHolding, periodsFor,
   type AlertCondition, type AlertPeriod, type AlertRule, type AlertScope,
 } from '../model/notification.types';
 
 const SCOPES: AlertScope[] = ['GLOBAL', 'PORTFOLIO', 'ASSET'];
-const CONDITIONS: AlertCondition[] = ['FALLS', 'RISES', 'MOVES', 'ABOVE', 'BELOW'];
-const PERIODS: AlertPeriod[] = ['DAY', 'WEEK', 'MONTH'];
 
-interface Props { open: boolean; onClose: () => void; initial?: AlertRule; }
+/** Valeurs de départ d'une nouvelle alerte (ex : depuis la fiche d'un actif). */
+export interface AlertPreset {
+  scope?: AlertScope; portfolioId?: string; condition?: AlertCondition;
+  asset?: AssetSearchResult; period?: AlertPeriod;
+}
+
+interface Props { open: boolean; onClose: () => void; initial?: AlertRule; preset?: AlertPreset; }
 
 /** Monté uniquement quand la feuille est ouverte : chaque ouverture repart d'un état neuf. */
 export function AlertRuleFormSheet(props: Props) {
@@ -29,45 +34,68 @@ export function AlertRuleFormSheet(props: Props) {
   return <AlertRuleForm key={props.initial?.id ?? 'new'} {...props} />;
 }
 
+const defaultPeriod = (c: AlertCondition): AlertPeriod => (isExtreme(c) ? 'YEAR' : 'DAY');
+
 /**
  * Le « personnaliseur » : une phrase à compléter.
- * Quand [périmètre] [condition] [seuil] [période] → prévenir [app / email].
+ * Quand [périmètre] [condition] [seuil] [période] → prévenir [app / push / email].
  */
-function AlertRuleForm({ onClose, initial }: Props) {
+function AlertRuleForm({ onClose, initial, preset }: Props) {
   const portfolios = usePortfolios();
   const save = useSaveAlertRule();
   const remove = useDeleteAlertRule();
 
-  const [scope, setScope] = useState<AlertScope>(initial?.scope ?? 'GLOBAL');
-  const [portfolioId, setPortfolioId] = useState<string>(initial?.portfolioId ?? '');
+  const [scope, setScope] = useState<AlertScope>(initial?.scope ?? preset?.scope ?? 'GLOBAL');
+  const [portfolioId, setPortfolioId] = useState<string>(initial?.portfolioId ?? preset?.portfolioId ?? '');
   const [asset, setAsset] = useState<AssetSearchResult | null>(initial?.symbol
-    ? { symbol: initial.symbol, name: initial.assetName ?? initial.symbol, exchange: null, assetType: 'ACTION' } : null);
-  const [condition, setCondition] = useState<AlertCondition>(initial?.condition ?? 'FALLS');
-  const [threshold, setThreshold] = useState<string>(initial ? String(initial.threshold) : '');
-  const [period, setPeriod] = useState<AlertPeriod>(initial?.period ?? 'DAY');
+    ? { symbol: initial.symbol, name: initial.assetName ?? initial.symbol, exchange: null, assetType: 'ACTION' }
+    : preset?.asset ?? null);
+  const [condition, setCondition] = useState<AlertCondition>(initial?.condition ?? preset?.condition ?? 'FALLS');
+  const [threshold, setThreshold] = useState<string>(initial && hasThreshold(initial.condition) ? String(initial.threshold) : '');
+  const [period, setPeriod] = useState<AlertPeriod>(initial?.period ?? preset?.period ?? defaultPeriod(condition));
+  const [label, setLabel] = useState(initial?.label ?? '');
+  const [notifyPush, setNotifyPush] = useState(initial?.notifyPush ?? true);
   const [notifyEmail, setNotifyEmail] = useState(initial?.notifyEmail ?? false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  const conditions = CONDITIONS_BY_SCOPE[scope];
+  const changeScope = (s: AlertScope) => {
+    setScope(s);
+    if (!CONDITIONS_BY_SCOPE[s].includes(condition)) setCondition('FALLS');
+  };
+  const changeCondition = (c: AlertCondition) => {
+    setCondition(c);
+    if (!periodsFor(c).includes(period)) setPeriod(defaultPeriod(c));
+  };
+
   const percent = isPercentage(condition);
+  const withThreshold = hasThreshold(condition);
+  const periods = periodsFor(condition);
   const value = Number(threshold.replace(',', '.'));
+  const max = condition === 'WEIGHT_ABOVE' ? 100 : 1000;
   const subject = scope === 'GLOBAL' ? 'mon patrimoine total'
     : scope === 'PORTFOLIO' ? (portfolios.data?.find(p => p.id === portfolioId)?.name ?? 'le portefeuille')
     : (asset?.symbol ?? "l'actif");
-  const summary = `Quand ${subject} ${CONDITION_LABEL[condition].replace(' (hausse ou baisse)', '')} `
-    + `${threshold || '…'} ${percent ? `% ${PERIOD_LABEL[period]}` : '€'}`;
+  const summary = [
+    'Quand', subject, CONDITION_LABEL[condition].replace(/ \(.*\)$/, ''),
+    withThreshold ? `${threshold || '…'} ${percent ? '%' : '€'}` : '',
+    periods.length ? PERIOD_LABEL[period] : '',
+  ].filter(Boolean).join(' ');
 
   const submit = () => {
     if (scope === 'PORTFOLIO' && !portfolioId) return setError('Choisis le portefeuille');
     if (scope === 'ASSET' && !asset) return setError("Choisis l'actif");
-    if (!(value > 0)) return setError('Indique un seuil positif');
-    if (percent && value > 1000) return setError('Le seuil est en % (1000 maximum)');
+    if (withThreshold && !(value > 0)) return setError('Indique un seuil positif');
+    if (withThreshold && percent && value > max) return setError(`Le seuil est en % (${max} maximum)`);
     setError(null);
     save.mutate({
       id: initial?.id,
       body: {
         scope, portfolioId: scope === 'PORTFOLIO' ? portfolioId : null, symbol: scope === 'ASSET' ? asset!.symbol : null,
-        condition, threshold: value, period: percent ? period : null, notifyEmail, enabled: initial?.enabled ?? true,
+        condition, threshold: withThreshold ? value : null, period: periods.length ? period : null,
+        notifyEmail, notifyPush, enabled: initial?.enabled ?? true,
+        label: label.trim() || null, mutedUntil: initial?.mutedUntil ?? null,
       },
     }, {
       onSuccess: () => { toast.success(initial ? 'Alerte modifiée' : 'Alerte créée'); onClose(); },
@@ -78,7 +106,7 @@ function AlertRuleForm({ onClose, initial }: Props) {
   return (
     <BottomSheet open onClose={onClose} title={initial ? "Modifier l'alerte" : 'Nouvelle alerte'}>
       <div className="space-y-4">
-        <FormSelect label="Quand…" value={scope} onChange={v => setScope(v as AlertScope)}
+        <FormSelect label="Quand…" value={scope} onChange={v => changeScope(v as AlertScope)}
           options={SCOPES.map(s => ({ value: s, label: SCOPE_LABEL[s] }))} />
 
         {scope === 'PORTFOLIO' && (
@@ -92,26 +120,44 @@ function AlertRuleForm({ onClose, initial }: Props) {
           </div>
         )}
 
-        <FormSelect label="…" value={condition} onChange={v => setCondition(v as AlertCondition)}
-          options={CONDITIONS.map(c => ({ value: c, label: CONDITION_LABEL[c] }))} />
+        <FormSelect label="…" value={condition} onChange={v => changeCondition(v as AlertCondition)}
+          options={conditions.map(c => ({ value: c, label: CONDITION_LABEL[c] }))} />
 
-        <div className="grid grid-cols-2 gap-3">
-          <Input label={percent ? 'Seuil (%)' : 'Seuil (€)'} type="number" inputMode="decimal" step="any" min="0"
-            placeholder={percent ? '3' : '50000'} value={threshold} onChange={e => setThreshold(e.target.value)} />
-          {percent && (
-            <FormSelect label="Période" value={period} onChange={v => setPeriod(v as AlertPeriod)}
-              options={PERIODS.map(p => ({ value: p, label: PERIOD_LABEL[p] }))} />
-          )}
+        {(withThreshold || periods.length > 0) && (
+          <div className="grid grid-cols-2 gap-3">
+            {withThreshold && (
+              <Input label={percent ? 'Seuil (%)' : 'Seuil (€)'} type="number" inputMode="decimal" step="any" min="0"
+                placeholder={percent ? (condition === 'WEIGHT_ABOVE' ? '25' : '3') : '50000'}
+                value={threshold} onChange={e => setThreshold(e.target.value)} />
+            )}
+            {periods.length > 0 && (
+              <FormSelect label="Période" value={period} onChange={v => setPeriod(v as AlertPeriod)}
+                options={periods.map(p => ({ value: p, label: PERIOD_LABEL[p] }))} />
+            )}
+          </div>
+        )}
+
+        <Input label="Nom (facultatif)" placeholder="Ex : Achat BTC sous 50 k" maxLength={100}
+          value={label} onChange={e => setLabel(e.target.value)} />
+
+        <div className="space-y-3 rounded-xl border border-border p-3">
+          <Switch checked={notifyPush} onChange={setNotifyPush} label="Notification push"
+            description="Sur les appareils où tu as activé les notifications (Réglages)." />
+          <Switch checked={notifyEmail} onChange={setNotifyEmail} label="Email" />
+          <p className="text-[11px] text-muted-foreground">La notification arrive toujours dans l'onglet Alertes.</p>
         </div>
 
-        <Switch checked={notifyEmail} onChange={setNotifyEmail} label="Recevoir aussi par email"
-          description="La notification arrive toujours dans l'onglet Alertes." />
-
         <p className="rounded-xl bg-muted p-3 text-sm">{summary}</p>
-        {scope !== 'ASSET' && percent && (
+        {scope !== 'ASSET' && isVariation(condition) && (
           <p className="text-xs text-muted-foreground">
             La variation est mesurée sur ta plus-value : un versement ou un achat ne déclenche pas de fausse hausse.
           </p>
+        )}
+        {scope === 'ASSET' && needsHolding(condition) && (
+          <p className="text-xs text-muted-foreground">Mesuré sur tes positions : sans ligne détenue, l'alerte attend.</p>
+        )}
+        {isExtreme(condition) && (
+          <p className="text-xs text-muted-foreground">Comparé aux clôtures de la période, au plus une fois par jour.</p>
         )}
         <FormError message={error ?? undefined} />
 

@@ -93,6 +93,28 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   compléter), rapport périodique (`ReportSettingsCard`, aperçu).
 - Compteur de non-lues dans la barre du bas (`useUnreadCount`, rafraîchi
   chaque minute).
+- Formulaire d'alerte : conditions proposées selon le périmètre
+  (`CONDITIONS_BY_SCOPE`), seuil absent pour un record (NEW_HIGH/NEW_LOW),
+  périodes selon la condition (`periodsFor`), nom libre, canaux push/email,
+  préréglage `preset` (fiche d'un actif). Liste : sourdine 24 h, `toRequest`
+  pour renvoyer une règle existante.
+
+## Push et PWA
+- `public/sw.js` : service worker SANS cache (les chiffres viennent toujours
+  du serveur) : affiche le push `{ title, body, link, tag }`, clic = focus
+  d'un onglet + `postMessage` de navigation (routeur, `main.tsx`) ou
+  ouverture. `public/manifest.webmanifest` + icônes `public/icons/`.
+- `shared/pwa/push.ts` : support (iOS : app ajoutée à l'écran d'accueil
+  obligatoire), abonnement avec la clé VAPID du back. Réglages →
+  `PushSettingsCard` (cet appareil, test, tous les appareils, heures calmes).
+
+## Marchés
+- Onglet `/markets` (`features/markets`) : actifs suivis (détenus ou non),
+  mini-courbe 30 j (`Sparkline`), suggestions d'indices/cryptos.
+- Fiche `/markets/:symbol` (symbole encodé, `marketPath`) : cours, graphique
+  1M→5A (`MarketChart`), position dans le range 1 an (`RangeBar`), mes lignes,
+  alertes en un geste (−5 %, +5 %, plus haut 1 an) ou personnalisées.
+- Les mutations d'alerte invalident aussi `['markets']` (fiche et compteurs).
 
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
@@ -109,8 +131,9 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - En dev sans serveur mail, les liens des emails sont dans les logs du backend.
 
 ## Conventions de code à respecter
-- Un dossier par domaine dans `src/features/` (assets, auth, dashboard,
-  portfolios, positions, settings, transactions) avec `api/` (hooks React
+- Un dossier par domaine dans `src/features/` (assets, auth, cash, dashboard,
+  imports, markets, notifications, plans, portfolios, positions, settings,
+  transactions) avec `api/` (hooks React
   Query + query keys), `model/` (types), `components/`, `pages/`.
 - `src/shared/` : `api/` (client axios, erreurs normalisées en `ApiError`,
   `queryClient`), `ui/` (primitives), `components/data/` (affichage de

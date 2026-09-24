@@ -15,3 +15,9 @@ export const nowLocalDateTime = () => {
   const d = new Date();
   return `${todayLocal()}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
+
+/** Date locale "YYYY-MM-DDTHH:mm:ss" dans `hours` heures (LocalDateTime, ex : sourdine d'une alerte). */
+export const localDateTimeIn = (hours: number) => {
+  const d = new Date(Date.now() + hours * 3_600_000);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
