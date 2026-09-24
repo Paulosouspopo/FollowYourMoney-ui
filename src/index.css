@@ -50,6 +50,10 @@
   --color-negative: var(--negative);
   --color-positive-bg: var(--positive-bg);
   --color-negative-bg: var(--negative-bg);
+  /* Alias utilisés par les composants (text-gain, bg-loss/15, text-warning…) */
+  --color-gain: var(--positive);
+  --color-loss: var(--negative);
+  --color-warning: var(--warning);
 }
 
 :root {
@@ -93,6 +97,7 @@
   --positive-bg: oklch(0.62 0.17 150 / 12%);
   --negative: oklch(0.6 0.22 25);
   --negative-bg: oklch(0.6 0.22 25 / 12%);
+  --warning: oklch(0.7 0.16 70);
   --chart-1: oklch(0.55 0.2 264);
   --chart-2: oklch(0.7 0.15 190);
   --chart-3: oklch(0.75 0.16 80);
@@ -139,6 +144,7 @@
   --positive-bg: oklch(0.75 0.17 150 / 15%);
   --negative: oklch(0.7 0.2 25);
   --negative-bg: oklch(0.7 0.2 25 / 15%);
+  --warning: oklch(0.8 0.15 80);
 }
 
 @layer base {

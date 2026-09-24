@@ -5,15 +5,12 @@ export interface AssetResponse {
   longName: string | null; exchangeName: string | null;
   assetType: AssetType; currency: string; createdAt: string; updatedAt: string;
 }
-/** Renvoyé par GET /portfolios/{id}/transactions/available-assets */
-export interface AvailableAssetResponse { symbol: string; name: string; type: AssetType; currency: string; }
 export interface AssetCreateRequest { portfolioId: string; symbol: string; name: string; assetType: AssetType; currency?: string; }
 
+/** Renvoyé par GET /assets/search (proxy Yahoo). Seuls les types supportés (ACTION, ETF, CRYPTO) remontent. */
 export interface AssetSearchResult {
-  symbol: string;           // "BTC-EUR", "AAPL", "TOTAL.PA", etc.
-  name: string;             // "Bitcoin", "Apple Inc.", "TotalEnergies SE"
-  type: 'EQUITY' | 'CRYPTO' | 'ETF' | 'FUND' | 'FOREX' | 'UNKNOWN';
-  currency: string;         // "EUR", "USD", etc.
-  exchange: string;         // "CCC" (crypto), "Paris", "NasdaqGS", etc.
-  shortName?: string;       // "BTC", "AAPL" (optionnel, pour affichage)
+  symbol: string;           // symbole Yahoo canonique : "BTC-EUR", "AAPL", "TTE.PA"…
+  name: string;             // "Bitcoin EUR", "Apple Inc.", "TotalEnergies SE"
+  exchange: string | null;  // "Paris", "NASDAQ", "CCC"…
+  assetType: AssetType;
 }

@@ -73,7 +73,7 @@ export default function PositionDetailPage() {
         open={editing !== null}
         onClose={() => setEditing(null)}
         initial={editing === 'new' ? undefined : editing ?? undefined}
-        lockedSymbol={symbol}
+        lockedAsset={{ symbol, name: position?.name ?? symbol, currency: position?.priceCurrency }}
       />
     </div>
   );

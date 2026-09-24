@@ -7,15 +7,10 @@ export interface TransactionResponse {
   exchangeRateToEur: number; totalAmountEur: number; feesEur: number;
   transactionDate: string; notes: string | null; createdAt: string; updatedAt: string;
 }
-export interface TransactionHistoryResponse {
-  assetId: string; symbol: string; assetName: string;
-  totalQuantityHeld: number; averageCostPerUnitEur: number; totalInvestedEur: number;
-  totalFeesEur: number; totalDividendsReceivedEur: number; realizedGainLossEur: number;
-  transactions: TransactionResponse[]; page: number; size: number; totalElements: number; totalPages: number;
-}
 export interface TransactionCreateRequest {
-  symbol: string; type: TransactionType;
+  portfolioId: string; symbol: string; type: TransactionType;
   quantity: number; pricePerUnit: number; fees?: number; currency: string;
   transactionDate?: string; notes?: string;
 }
-export type TransactionUpdateRequest = Omit<TransactionCreateRequest, 'portfolioId' | 'symbol'>;
+/** La devise n'est pas modifiable côté back (taux historique figé) : supprimer puis recréer. */
+export type TransactionUpdateRequest = Omit<TransactionCreateRequest, 'portfolioId' | 'symbol' | 'currency'>;

@@ -1,9 +1,7 @@
-import axios from 'axios';
-import type { ApiError } from './types';
+import { isApiError } from './types';
 
+/** Les erreurs HTTP sont déjà normalisées en ApiError par l'intercepteur de `client.ts`. */
 export function getErrorMessage(error: unknown): string {
-  if (axios.isAxiosError<ApiError>(error)) {
-    return error.response?.data?.message ?? (error.response ? `Erreur ${error.response.status}` : 'Serveur injoignable');
-  }
+  if (isApiError(error)) return error.message || `Erreur ${error.status}`;
   return error instanceof Error ? error.message : 'Erreur inconnue';
 }

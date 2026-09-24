@@ -1,9 +1,7 @@
-// components/AssetSearchCombobox.tsx
-'use client';
-
-import { useState, useMemo } from 'react';
-import { useAssetSearch } from '@/features/transactions/api/transaction.api';
-import type{ AssetSearchResult } from '@/features/assets/model/asset.types';
+import { useEffect, useMemo, useState } from 'react';
+import { ASSET_SEARCH_MIN_LENGTH, useAssetSearch } from '@/features/transactions/api/transaction.api';
+import type { AssetSearchResult } from '@/features/assets/model/asset.types';
+import { ASSET_TYPE_LABEL, type AssetType } from '@/shared/model/enums';
 import {
   Command,
   CommandEmpty,
@@ -21,6 +19,8 @@ import { Button } from '@/shared/ui/button';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 
+const DEBOUNCE_MS = 300;
+
 interface Props {
   value?: AssetSearchResult | null;
   onChange: (asset: AssetSearchResult) => void;
@@ -36,29 +36,24 @@ export function AssetSearchCombobox({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [debounced, setDebounced] = useState('');
 
-  // Debounce simple : ne lance la requête que si la query a au moins 1 car
-  // (geré par useAssetSearch)
-  const { data: results = [], isLoading } = useAssetSearch(query, open);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(query.trim()), DEBOUNCE_MS);
+    return () => clearTimeout(id);
+  }, [query]);
+
+  const { data: results = [], isFetching } = useAssetSearch(debounced, open);
+  const tooShort = query.trim().length < ASSET_SEARCH_MIN_LENGTH;
+  // Pendant la frappe, la requête debouncée n'est pas encore partie : on considère que ça charge
+  const loading = !tooShort && (isFetching || debounced !== query.trim());
 
   // Groupe les résultats par type pour un affichage plus lisible
   const grouped = useMemo(() => {
-    const groups: Record<string, AssetSearchResult[]> = {};
-    results.forEach(r => {
-      if (!groups[r.type]) groups[r.type] = [];
-      groups[r.type].push(r);
-    });
-    return groups;
+    const groups = new Map<AssetType, AssetSearchResult[]>();
+    results.forEach(r => groups.set(r.assetType, [...(groups.get(r.assetType) ?? []), r]));
+    return [...groups.entries()];
   }, [results]);
-
-  const typeLabels: Record<string, string> = {
-    CRYPTO: '🪙 Cryptomonnaies',
-    EQUITY: '📈 Actions',
-    ETF: '🎯 ETF',
-    FUND: '💼 Fonds',
-    FOREX: '💱 Devises',
-    UNKNOWN: '❓ Autres',
-  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -82,7 +77,7 @@ export function AssetSearchCombobox({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={placeholder}
@@ -91,26 +86,23 @@ export function AssetSearchCombobox({
             disabled={disabled}
           />
           <CommandList>
-            {isLoading && (
+            {loading && (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               </div>
             )}
 
-            {!isLoading && query.trim().length === 0 && (
-              <CommandEmpty>Tape au moins 1 caractère...</CommandEmpty>
+            {tooShort && (
+              <CommandEmpty>Tape au moins {ASSET_SEARCH_MIN_LENGTH} caractères...</CommandEmpty>
             )}
 
-            {!isLoading && query.trim().length > 0 && results.length === 0 && (
+            {!tooShort && !loading && results.length === 0 && (
               <CommandEmpty>Aucun résultat pour "{query}"</CommandEmpty>
             )}
 
-            {!isLoading &&
-              Object.entries(grouped).map(([type, items]) => (
-                <CommandGroup
-                  key={type}
-                  heading={typeLabels[type] || type}
-                >
+            {!tooShort && !loading &&
+              grouped.map(([type, items]) => (
+                <CommandGroup key={type} heading={ASSET_TYPE_LABEL[type] ?? type}>
                   {items.map(item => (
                     <CommandItem
                       key={`${item.symbol}-${item.exchange}`}
