@@ -8,6 +8,7 @@ const Portfolios = lazy(() => import('@/features/portfolios/pages/PortfoliosPage
 const PortfolioDetail = lazy(() => import('@/features/portfolios/pages/PortfolioDetailPage'));
 const PositionDetail = lazy(() => import('@/features/positions/pages/PositionDetailPage'));
 const Settings = lazy(() => import('@/features/settings/pages/SettingsPage'));
+const Import = lazy(() => import('@/features/imports/pages/ImportPage'));
 const Login = lazy(() => import('@/features/auth/pages/LoginPage'));
 const Register = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const ForgotPassword = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
         { path: 'portfolios', element: <Portfolios /> },
         { path: 'portfolios/:portfolioId', element: <PortfolioDetail /> },
         { path: 'portfolios/:portfolioId/positions/:symbol', element: <PositionDetail /> },
+        { path: 'portfolios/:portfolioId/import', element: <Import /> },
         { path: 'settings', element: <Settings /> },
       ],
     }],

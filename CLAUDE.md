@@ -64,6 +64,18 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Dates : `shared/lib/dates` (`todayLocal`, `nowLocalDateTime`), jamais
   `toISOString()`.
 
+## Import de relevés
+- Page `/portfolios/:id/import` (`features/imports`), accès via l'icône
+  d'import du menu du portefeuille. Étapes : fichier → association des
+  colonnes si format inconnu (`ColumnMappingForm`) → aperçu → validation.
+- Aperçu : actifs à valider (`AssetMappingList` : REMEMBERED/CERTAIN acceptés
+  d'office, les autres à confirmer ou à choisir via `AssetSearchCombobox`),
+  lignes par statut (à importer, doublons, ignorées, erreurs), activation du
+  suivi des liquidités si le relevé contient des versements.
+- Erreur de validation : `fieldErrors` `row:<id>` → message sur la ligne.
+- L'aperçu et la validation peuvent être longs (Yahoo, recalcul) : timeouts
+  dédiés dans `import.api.ts`.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`
