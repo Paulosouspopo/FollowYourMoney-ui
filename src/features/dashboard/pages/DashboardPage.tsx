@@ -10,6 +10,7 @@ import { PerformanceBreakdown } from '@/features/dashboard/components/Performanc
 import { IncompletePricesBanner } from '../components/IncompletePricesBanner';
 import { QueryBoundary } from '@/shared/ui/QueryBoundary';
 import { DashboardSkeleton } from '../components/DashboardSkeleton';
+import { UpcomingPlansCard } from '@/features/plans/components/UpcomingPlansCard';
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<DashboardPeriod>('30d');
@@ -30,6 +31,7 @@ export default function DashboardPage() {
             <EvolutionChart points={d.curve} />
             <PerformanceBreakdown data={d} />
             <PortfoliosStrip portfolios={d.portfolios} />
+            <UpcomingPlansCard />
             <AllocationDonut slices={d.allocation} />
           </>
         )}

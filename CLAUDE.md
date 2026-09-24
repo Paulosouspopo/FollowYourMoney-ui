@@ -76,6 +76,16 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - L'aperçu et la validation peuvent être longs (Yahoo, recalcul) : timeouts
   dédiés dans `import.api.ts`.
 
+## Investissements programmés
+- `features/plans` : `PlansSection` sur la page portefeuille (budget mensuel,
+  liste, bouton « Programmer »), `UpcomingPlansCard` sur le dashboard.
+- `PlanFormSheet` : types possibles selon le compte (livret → versement ;
+  sans suivi des liquidités → achat), actif via `AssetSearchCombobox`,
+  avertissement si la 1re échéance est passée (historique recréé), champs
+  figés après une échéance, pause.
+- Une mutation de plan peut créer des transactions : invalider plans,
+  transactions, liquidités et dashboard.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

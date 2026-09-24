@@ -18,6 +18,7 @@ import { RecentTransactions } from "@/features/transactions/components/RecentTra
 import { CashSection } from "@/features/cash/components/CashSection";
 import { CashMovementFormSheet } from "@/features/cash/components/CashMovementFormSheet";
 import { LivretHero } from "@/features/cash/components/LivretHero";
+import { PlansSection } from "@/features/plans/components/PlansSection";
 import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkeleton";
 import { PortfolioMenu } from "@/features/portfolios/components/PortfolioMenu";
 import { AddEntrySheet, type EntryKind } from "@/features/portfolios/components/AddEntrySheet";
@@ -54,6 +55,7 @@ export default function PortfolioDetailPage() {
               <div className="flex justify-end"><PeriodSelector value={period} onChange={setPeriod} /></div>
               <EvolutionChart points={d.curve} />
               <KpiGrid items={livretKpis(pf)} />
+              <PlansSection portfolioId={portfolioId} portfolioType={pf.type} cashTracking />
               <CashSection portfolioId={portfolioId} balance={pf.cashEur} isLivret />
             </>
           ) : (
@@ -64,6 +66,7 @@ export default function PortfolioDetailPage() {
               <EvolutionChart points={d.curve} />
               <KpiGrid items={performanceKpis(pf)} />
               <PositionsList portfolioId={portfolioId} positions={pf.positions} />
+              <PlansSection portfolioId={portfolioId} portfolioType={pf.type} cashTracking={pf.cashTracking} />
               {pf.cashTracking && <CashSection portfolioId={portfolioId} balance={pf.cashEur} />}
               <AllocationDonut slices={d.allocation} />
             </>
