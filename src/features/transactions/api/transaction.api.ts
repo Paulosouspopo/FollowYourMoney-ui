@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.api';
 import { portfolioKeys } from '@/features/portfolios/api/portfolio.api';
-import type { AvailableAssetResponse } from '@/features/assets/model/asset.types';
 import type { TransactionCreateRequest, TransactionResponse, TransactionUpdateRequest, TransactionHistoryResponse } from '../model/transaction.types';
+import type { AssetSearchResult } from '@/features/assets/model/asset.types';
 
 export const transactionKeys = {
   all: ['transactions'] as const,
@@ -15,11 +15,20 @@ export const transactionKeys = {
 
 const base = (pid: string) => `/portfolios/${pid}/transactions`;
 
-export const useAvailableAssets = (portfolioId: string) =>
+export const assetSearchKeys = {
+  all: ['assets', 'search'] as const,
+  byQuery: (q: string) => [...assetSearchKeys.all, q] as const,
+};
+
+export const useAssetSearch = (query: string, enabled = true) =>
   useQuery({
-    queryKey: transactionKeys.availableAssets,
-    queryFn: () => api.get<AvailableAssetResponse[]>(`${base(portfolioId)}/available-assets`).then(r => r.data),
-    staleTime: 24 * 3600_000, // liste statique
+    queryKey: assetSearchKeys.byQuery(query),
+    queryFn: () =>
+      query.trim().length < 1
+        ? Promise.resolve([])  // pas de requête si vide
+        : api.get<AssetSearchResult[]>('/assets/search', { params: { query } }).then(r => r.data),
+    enabled: enabled && query.trim().length >= 1,
+    staleTime: 5 * 60_000, // 5 min, la liste Yahoo ne change pas souvent
   });
 
 /** Endpoint existant : transactions d'un symbole. */

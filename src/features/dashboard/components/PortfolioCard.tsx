@@ -3,8 +3,9 @@ import { MoneyValue } from "@/shared/components/data/MoneyValue";
 import { cn } from "@/shared/lib/cn";
 import { PORTFOLIO_TYPE_LABEL } from "@/shared/model/enums";
 import { Card } from "@/shared/ui/card";
-import { Link, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import type { PortfolioValuation } from "../model/dashboard.types";
+import { Link } from "react-router-dom";
 
 export function PortfolioCard({ valuation: v, className }: { valuation: PortfolioValuation; className?: string }) {
   return (

@@ -14,8 +14,8 @@ export interface TransactionHistoryResponse {
   transactions: TransactionResponse[]; page: number; size: number; totalElements: number; totalPages: number;
 }
 export interface TransactionCreateRequest {
-  portfolioId: string; symbol: string; type: TransactionType;
-  quantity: number; pricePerUnit: number; fees?: number; currency?: string;
+  symbol: string; type: TransactionType;
+  quantity: number; pricePerUnit: number; fees?: number; currency: string;
   transactionDate?: string; notes?: string;
 }
 export type TransactionUpdateRequest = Omit<TransactionCreateRequest, 'portfolioId' | 'symbol'>;

@@ -13,7 +13,7 @@ import { TRANSACTION_TYPES, TRANSACTION_TYPE_LABEL, type TransactionType } from 
 import { AssetPicker } from './AssetPicker';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/features/transactions/api/transaction.api';
 import type { TransactionResponse } from '../model/transaction.types';
-import type { AvailableAssetResponse } from '@/features/assets/model/asset.types';
+import type { AssetSearchResult, AvailableAssetResponse } from '@/features/assets/model/asset.types';
 
 const num = (msg: string) => z.coerce.number({ error: msg }).min(0, msg);
 
@@ -46,7 +46,7 @@ interface Props {
 
 export function TransactionFormSheet({ portfolioId, open, onClose, initial, lockedSymbol }: Props) {
   const isEdit = !!initial;
-  const [asset, setAsset] = useState<Pick<AvailableAssetResponse, 'symbol' | 'name' | 'currency'> | null>(null);
+  const [asset, setAsset] = useState<Pick<AssetSearchResult, 'symbol' | 'name' | 'currency'> | null>(null);
 
   type FormInput = z.input<typeof schema>;   // ce que react-hook-form manipule (avant coercion)
   type FormOutput = z.output<typeof schema>; // ce que tu reçois dans onSubmit (après coercion)
@@ -86,7 +86,7 @@ export function TransactionFormSheet({ portfolioId, open, onClose, initial, lock
   const onSubmit: SubmitHandler<FormInput> = (raw) => {
     const v = schema.parse(raw) as FormOutput;
     if (!asset) return;
-    const body = { ...v, transactionDate: toIso(v.transactionDate), notes: v.notes || undefined };
+    const body = { ...v, symbol: asset.symbol, transactionDate: toIso(v.transactionDate), notes: v.notes || undefined };
     const opts = { onSuccess: onClose, onError: applyServerErrors };
     isEdit
       ? update.mutate({ id: initial!.id, body }, opts)
