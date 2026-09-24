@@ -48,6 +48,22 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - `priceMissing` = pas de cours de marché, position estimée au prix de la
   dernière transaction (afficher « Prix estimé », pas 0).
 
+## Liquidités et livrets
+- `features/cash` : mouvements d'argent (versement, retrait, intérêts,
+  frais), API `/portfolios/{id}/cash-movements`, invalidation des mouvements
+  du portefeuille + `dashboardKeys.all`.
+- Page portefeuille en 3 formes : livret (`LivretHero`, `livretKpis`,
+  mouvements), compte avec `cashTracking` (positions + `CashSection`, le
+  bouton + propose opération ou mouvement via `AddEntrySheet`), compte sans
+  suivi (positions et opérations).
+- Livret : pas d'opération sur actif, solde jamais négatif (avertissement
+  avant envoi, le back refuse). Compte-titres : solde négatif affiché avec
+  une invitation à saisir les versements.
+- Répartition : `AllocationSliceDTO.category` (types d'actifs + `LIQUIDITES`),
+  libellés/couleurs `ALLOCATION_LABEL` / `ALLOCATION_COLOR`.
+- Dates : `shared/lib/dates` (`todayLocal`, `nowLocalDateTime`), jamais
+  `toISOString()`.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

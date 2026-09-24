@@ -9,5 +9,8 @@ export const formatPercent = (v: number | null | undefined) => v == null ? '—'
 export const formatDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso));
 export const formatShortDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' }).format(new Date(iso));
 
+/** Taux saisi en % (ex : 2.4 → « 2,4 % »), jusqu'à 3 décimales. */
+export const formatRate = (v: number) => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 }).format(v)} %`;
+
 export const formatQty = (v: number) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 8 }).format(v);
 export const gainTone = (v: number) => v > 0 ? 'text-gain' : v < 0 ? 'text-loss' : 'text-muted-foreground';

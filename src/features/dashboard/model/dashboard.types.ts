@@ -1,4 +1,4 @@
-import type { AssetType, PortfolioType } from '@/shared/model/enums';
+import type { AllocationCategory, AssetType, PortfolioType } from '@/shared/model/enums';
 
 export const DASHBOARD_PERIODS = ['7d', '30d', '90d', '1y', 'all'] as const;
 export type DashboardPeriod = typeof DASHBOARD_PERIODS[number];
@@ -13,17 +13,22 @@ export interface PositionValuation {
   priceMissing: boolean;
 }
 
+/**
+ * Avec le suivi des liquidités : valeur = positions + liquidités, investi =
+ * prix de revient + liquidités ; le % latent est sur le seul prix de revient.
+ */
 export interface PortfolioValuation {
   portfolioId: string; name: string; type: PortfolioType;
   currentValueEur: number; investedEur: number;
   unrealizedGainEur: number; unrealizedGainPercentage: number;
-  realizedGainEur: number; dividendsEur: number; totalFeesEur: number;
+  realizedGainEur: number; dividendsEur: number; interestEur: number; totalFeesEur: number;
+  cashTracking: boolean; cashEur: number; netDepositsEur: number; annualInterestRate: number | null;
   positions: PositionValuation[];
   openPositionCount: number;
   hasIncompletePrices: boolean;
 }
 
-export interface AllocationSliceDTO { assetType: AssetType; label: string; value: number; percentage: number; }
+export interface AllocationSliceDTO { category: AllocationCategory; value: number; percentage: number; }
 
 export interface CurvePointDTO {
   date: string; totalValueEur: number; totalInvestedEur: number; gainLossEur: number; gainLossPercentage: number;
@@ -33,6 +38,7 @@ export interface DashboardResponse {
   totalValueEur: number; totalInvestedEur: number;
   unrealizedGainEur: number; unrealizedGainPercentage: number;
   realizedGainEur: number; dividendsEur: number; totalFeesEur: number;
+  interestEur: number; cashEur: number; netDepositsEur: number;
   hasIncompletePrices: boolean;
   portfolios: PortfolioValuation[];
   allocation: AllocationSliceDTO[];

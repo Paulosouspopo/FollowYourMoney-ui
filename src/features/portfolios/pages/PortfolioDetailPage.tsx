@@ -9,46 +9,75 @@ import { PORTFOLIO_TYPE_LABEL } from "@/shared/model/enums";
 import { PeriodSelector } from "@/shared/components/data/PeriodSelector";
 import { EvolutionChart } from "@/features/dashboard/components/EvolutionChart";
 import { KpiGrid } from "@/shared/components/data/KpiGrid";
-import { performanceKpis } from "@/shared/components/data/kpis";
+import { livretKpis, performanceKpis } from "@/shared/components/data/kpis";
 import { PositionsList } from "@/features/positions/components/PositionsList";
 import { AllocationDonut } from "@/features/dashboard/components/AllocationDonut";
 import { Fab } from "@/shared/ui/Fab";
 import { TransactionFormSheet } from "@/features/transactions/components/TransactionFormSheet";
 import { RecentTransactions } from "@/features/transactions/components/RecentTransactions";
+import { CashSection } from "@/features/cash/components/CashSection";
+import { CashMovementFormSheet } from "@/features/cash/components/CashMovementFormSheet";
+import { LivretHero } from "@/features/cash/components/LivretHero";
 import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkeleton";
 import { PortfolioMenu } from "@/features/portfolios/components/PortfolioMenu";
+import { AddEntrySheet, type EntryKind } from "@/features/portfolios/components/AddEntrySheet";
 import type { DashboardPeriod } from "@/features/dashboard/model/dashboard.types";
 
+type Sheet = EntryKind | 'choose' | null;
+
+/**
+ * Trois formes selon le portefeuille :
+ * - livret : solde, intérêts, mouvements d'argent (pas d'actifs) ;
+ * - compte avec suivi des liquidités : positions + liquidités, deux types de saisie ;
+ * - compte sans suivi : positions et opérations uniquement.
+ */
 export default function PortfolioDetailPage() {
   const { portfolioId = '' } = useParams();
   const [period, setPeriod] = useState<DashboardPeriod>('30d');
-  const [txOpen, setTxOpen] = useState(false);
+  const [sheet, setSheet] = useState<Sheet>(null);
   const q = usePortfolioDashboard(portfolioId, period);
-  const positions = q.data?.portfolios[0]?.positions ?? [];
-  const heldQuantities = Object.fromEntries(positions.map(p => [p.symbol, p.quantity]));
+  const p = q.data?.portfolios[0]; // getPortfolioDashboard renvoie 1 seul portefeuille
+  const isLivret = p?.type === 'LIVRET';
+  const heldQuantities = Object.fromEntries((p?.positions ?? []).map(pos => [pos.symbol, pos.quantity]));
+
+  const onFab = () => setSheet(isLivret ? 'cash' : p?.cashTracking ? 'choose' : 'transaction');
 
   return (
     <div className="space-y-4">
-      <TopBar back title={q.data?.portfolios[0]?.name ?? 'Portefeuille'} right={<PortfolioMenu portfolioId={portfolioId} />} />
+      <TopBar back title={p?.name ?? 'Portefeuille'} right={<PortfolioMenu portfolioId={portfolioId} />} />
       <QueryBoundary query={q} skeleton={<DashboardSkeleton />}>
         {d => {
-          const p = d.portfolios[0]; // getPortfolioDashboard renvoie 1 seul portefeuille
-          return (
+          const pf = d.portfolios[0];
+          return pf.type === 'LIVRET' ? (
             <>
-              {p.hasIncompletePrices && <IncompletePricesBanner />}
-              <NetWorthHero data={d} label={PORTFOLIO_TYPE_LABEL[p.type]} />
+              <LivretHero portfolio={pf} />
               <div className="flex justify-end"><PeriodSelector value={period} onChange={setPeriod} /></div>
               <EvolutionChart points={d.curve} />
-              <KpiGrid items={performanceKpis(p)} />
-              <PositionsList portfolioId={portfolioId} positions={p.positions} />
+              <KpiGrid items={livretKpis(pf)} />
+              <CashSection portfolioId={portfolioId} balance={pf.cashEur} isLivret />
+            </>
+          ) : (
+            <>
+              {pf.hasIncompletePrices && <IncompletePricesBanner />}
+              <NetWorthHero data={d} label={PORTFOLIO_TYPE_LABEL[pf.type]} />
+              <div className="flex justify-end"><PeriodSelector value={period} onChange={setPeriod} /></div>
+              <EvolutionChart points={d.curve} />
+              <KpiGrid items={performanceKpis(pf)} />
+              <PositionsList portfolioId={portfolioId} positions={pf.positions} />
+              {pf.cashTracking && <CashSection portfolioId={portfolioId} balance={pf.cashEur} />}
               <AllocationDonut slices={d.allocation} />
             </>
           );
         }}
       </QueryBoundary>
-      <RecentTransactions portfolioId={portfolioId} heldQuantities={heldQuantities} />
-      <Fab onClick={() => setTxOpen(true)} label="Ajouter une transaction" />
-      <TransactionFormSheet portfolioId={portfolioId} open={txOpen} onClose={() => setTxOpen(false)} heldQuantities={heldQuantities} />
+      {p && !isLivret && <RecentTransactions portfolioId={portfolioId} heldQuantities={heldQuantities} />}
+
+      <Fab onClick={onFab} label={isLivret ? 'Ajouter un mouvement' : 'Ajouter'} />
+      <AddEntrySheet open={sheet === 'choose'} onClose={() => setSheet(null)} onChoose={setSheet} />
+      <TransactionFormSheet portfolioId={portfolioId} open={sheet === 'transaction'} onClose={() => setSheet(null)}
+        heldQuantities={heldQuantities} />
+      <CashMovementFormSheet portfolioId={portfolioId} open={sheet === 'cash'} onClose={() => setSheet(null)}
+        balance={p?.cashEur} noOverdraft={isLivret} />
     </div>
   );
 }

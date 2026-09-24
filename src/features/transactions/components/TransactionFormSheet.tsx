@@ -15,6 +15,7 @@ import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { TRANSACTION_TYPES, TRANSACTION_TYPE_LABEL, type TransactionType } from '@/shared/model/enums';
 import { CURRENCIES } from '@/shared/model/currencies';
 import { formatQty } from '@/shared/lib/format';
+import { nowLocalDateTime } from '@/shared/lib/dates';
 import type { ApiError } from '@/shared/api/types';
 import { AssetSearchCombobox } from '@/features/assets/components/AssetSearchCombobox';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/features/transactions/api/transaction.api';
@@ -41,12 +42,8 @@ type FormOutput = z.output<typeof schema>; // ce que reçoit onSubmit (après co
 const FORM_FIELDS = ['type', 'quantity', 'pricePerUnit', 'fees', 'currency', 'transactionDate', 'notes'] as const;
 
 // datetime-local attend "YYYY-MM-DDTHH:mm" en heure LOCALE ; le back attend un
-// LocalDateTime sans fuseau. Surtout pas toISOString() (UTC → décalage de date).
-const pad = (n: number) => String(n).padStart(2, '0');
-const nowLocalInput = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
+// LocalDateTime sans fuseau (voir shared/lib/dates).
+const nowLocalInput = nowLocalDateTime;
 const toLocalInput = (localDateTime: string) => localDateTime.slice(0, 16);
 const toIso = (local: string) => `${local}:00`;
 

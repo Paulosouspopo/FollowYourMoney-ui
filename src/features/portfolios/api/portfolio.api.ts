@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.api';
 import { transactionKeys } from '@/features/transactions/api/transaction.api';
+import { cashKeys } from '@/features/cash/api/cash.api';
 import type { PortfolioResponse, PortfolioDetailResponse, PortfolioCreateRequest, PortfolioUpdateRequest } from '@/features/portfolios/model/portfolio.types';
 
 export const portfolioKeys = {
@@ -54,6 +55,7 @@ export const useDeletePortfolio = () => {
       qc.removeQueries({ queryKey: portfolioKeys.detail(id) });
       qc.removeQueries({ queryKey: dashboardKeys.portfolioAll(id) });
       qc.removeQueries({ queryKey: transactionKeys.byPortfolio(id) });
+      qc.removeQueries({ queryKey: cashKeys.byPortfolio(id) });
     },
   });
 };

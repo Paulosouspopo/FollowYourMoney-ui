@@ -1,7 +1,7 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { Card } from '@/shared/ui/card';
 import { formatEur, formatPercent } from '@/shared/lib/format';
-import { ASSET_TYPE_COLOR, ASSET_TYPE_LABEL } from '@/shared/model/enums';
+import { ALLOCATION_COLOR, ALLOCATION_LABEL } from '@/shared/model/enums';
 import type { AllocationSliceDTO } from '../model/dashboard.types';
 
 export function AllocationDonut({ slices }: { slices: AllocationSliceDTO[] }) {
@@ -14,16 +14,16 @@ export function AllocationDonut({ slices }: { slices: AllocationSliceDTO[] }) {
         <ResponsiveContainer width={120} height={120}>
           <PieChart>
             <Pie data={visible} dataKey="value" innerRadius={40} outerRadius={56} paddingAngle={2} stroke="none">
-              {/* Même couleur par type partout (donut, icônes, badges) */}
-              {visible.map(s => <Cell key={s.assetType} fill={ASSET_TYPE_COLOR[s.assetType]} />)}
+              {/* Même couleur par type partout (donut, icônes, badges), liquidités comprises */}
+              {visible.map(s => <Cell key={s.category} fill={ALLOCATION_COLOR[s.category]} />)}
             </Pie>
           </PieChart>
         </ResponsiveContainer>
         <ul className="flex-1 space-y-1.5 text-sm">
           {visible.map(s => (
-            <li key={s.assetType} className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ background: ASSET_TYPE_COLOR[s.assetType] }} />
-              <span className="flex-1 truncate">{ASSET_TYPE_LABEL[s.assetType]}</span>
+            <li key={s.category} className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: ALLOCATION_COLOR[s.category] }} />
+              <span className="flex-1 truncate">{ALLOCATION_LABEL[s.category]}</span>
               <span className="text-muted-foreground tabular-nums">{formatPercent(s.percentage)}</span>
               <span className="tabular-nums w-20 text-right">{formatEur(s.value)}</span>
             </li>

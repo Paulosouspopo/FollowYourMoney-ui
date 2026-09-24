@@ -3,10 +3,13 @@ import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import type { DashboardResponse } from '@/features/dashboard/model/dashboard.types';
 
 const rows = (d: DashboardResponse) => [
-  { label: 'Plus-value latente', value: d.unrealizedGainEur, signed: true },
-  { label: 'Plus-value réalisée', value: d.realizedGainEur, signed: true },
-  { label: 'Dividendes perçus', value: d.dividendsEur, signed: false },
-  { label: 'Frais cumulés', value: -d.totalFeesEur, signed: true },
+  { label: 'Plus-value latente', value: d.unrealizedGainEur, signed: true, colored: true },
+  { label: 'Plus-value réalisée', value: d.realizedGainEur, signed: true, colored: true },
+  { label: 'Dividendes perçus', value: d.dividendsEur, signed: false, colored: true },
+  // Livrets et espèces rémunérées : lignes affichées seulement si utiles
+  ...(d.interestEur ? [{ label: 'Intérêts perçus', value: d.interestEur, signed: false, colored: true }] : []),
+  { label: 'Frais cumulés', value: -d.totalFeesEur, signed: true, colored: true },
+  ...(d.cashEur ? [{ label: 'Dont liquidités', value: d.cashEur, signed: false, colored: false }] : []),
 ];
 
 export function PerformanceBreakdown({ data }: { data: DashboardResponse }) {
@@ -15,7 +18,7 @@ export function PerformanceBreakdown({ data }: { data: DashboardResponse }) {
       {rows(data).map(r => (
         <div key={r.label} className="flex justify-between px-4 py-3 text-sm">
           <span className="text-muted-foreground">{r.label}</span>
-          <MoneyValue value={r.value} signed={r.signed} colored />
+          <MoneyValue value={r.value} signed={r.signed} colored={r.colored} />
         </div>
       ))}
     </Card>
