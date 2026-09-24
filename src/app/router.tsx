@@ -1,6 +1,6 @@
-import { createBrowserRouter } from 'react-router-dom';
-import { lazy } from 'react';
-import { RequireAuth } from '@/shared/auth/RequireAuth';
+import { createBrowserRouter, Outlet } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { GuestOnly, RequireAuth } from '@/shared/auth/RequireAuth';
 import { AppShell } from './layout/AppShell';
 
 const Dashboard = lazy(() => import('@/features/dashboard/pages/DashboardPage'));
@@ -10,10 +10,30 @@ const PositionDetail = lazy(() => import('@/features/positions/pages/PositionDet
 const Settings = lazy(() => import('@/features/settings/pages/SettingsPage'));
 const Login = lazy(() => import('@/features/auth/pages/LoginPage'));
 const Register = lazy(() => import('@/features/auth/pages/RegisterPage'));
+const ForgotPassword = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
+const VerifyEmail = lazy(() => import('@/features/auth/pages/VerifyEmailPage'));
+const ResetPassword = lazy(() => import('@/features/auth/pages/ResetPasswordPage'));
+
+/** Pages hors de l'app (auth) : chargement différé sans squelette. */
+const PublicLayout = () => <Suspense fallback={null}><Outlet /></Suspense>;
 
 export const router = createBrowserRouter([
-  { path: '/login', element: <Login /> },
-  { path: '/register', element: <Register /> },
+  {
+    element: <PublicLayout />,
+    children: [
+      {
+        element: <GuestOnly />,
+        children: [
+          { path: '/login', element: <Login /> },
+          { path: '/register', element: <Register /> },
+          { path: '/forgot-password', element: <ForgotPassword /> },
+        ],
+      },
+      // Liens reçus par email : accessibles connecté ou non
+      { path: '/verify-email', element: <VerifyEmail /> },
+      { path: '/reset-password', element: <ResetPassword /> },
+    ],
+  },
   {
     element: <RequireAuth />,
     children: [{

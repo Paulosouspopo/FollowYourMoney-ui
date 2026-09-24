@@ -12,6 +12,7 @@ import { THEMES, THEME_LABEL, useThemeStore, type Theme } from "@/shared/theme/t
 import { useMe, useUpdateMe, useDeleteMe } from '@/features/settings/api/user.api';
 import type { UserUpdateRequest } from '@/features/settings/model/user.types';
 import { useLogout } from "@/features/auth/api/auth.api";
+import { SecuritySection } from "@/features/settings/components/SecuritySection";
 
 const THEME_ICON: Record<Theme, typeof Sun> = { system: Monitor, light: Sun, dark: Moon };
 
@@ -74,6 +75,8 @@ export default function SettingsPage() {
           )}
         </QueryBoundary>
       </section>
+
+      <SecuritySection />
 
       <section className="space-y-2">
         <h2 className="text-sm font-medium">Compte</h2>

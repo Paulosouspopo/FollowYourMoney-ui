@@ -48,6 +48,20 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - `priceMissing` = pas de cours de marché, position estimée au prix de la
   dernière transaction (afficher « Prix estimé », pas 0).
 
+## Authentification
+- Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
+  jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`
+  géré par le navigateur (`withCredentials: true`).
+- Au démarrage, `RequireAuth` / `GuestOnly` appellent `refreshSession()`
+  (`shared/auth/session.ts`) : statut `loading` → `authenticated` / `anonymous`.
+- Sur 401, l'intercepteur axios renouvelle UNE fois (appel unique partagé
+  entre requêtes simultanées, second essai différé pour le cas multi-onglets)
+  puis rejoue la requête. Les appels `/auth/*` passent `skipAuthRefresh`.
+- Pages publiques : `/login`, `/register` (→ « vérifie ta boîte mail »),
+  `/forgot-password`, `/verify-email?token=`, `/reset-password?token=`.
+  Erreur `code === 'EMAIL_NOT_VERIFIED'` → proposer le renvoi de l'email.
+- En dev sans serveur mail, les liens des emails sont dans les logs du backend.
+
 ## Conventions de code à respecter
 - Un dossier par domaine dans `src/features/` (assets, auth, dashboard,
   portfolios, positions, settings, transactions) avec `api/` (hooks React
