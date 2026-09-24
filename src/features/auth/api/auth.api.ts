@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/shared/api/client';
 import { useAuthStore } from '@/shared/auth/auth.store';
-import type { AuthResponse, LoginRequest, UserCreateRequest, UserResponse } from '../model/auth.types';
+import type { AuthResponse, LoginRequest } from '../model/auth.types';
+import type { UserCreateRequest, UserResponse } from '@/features/settings/model/user.types';
 
 export const useLogin = () => {
   const setToken = useAuthStore(s => s.setToken);

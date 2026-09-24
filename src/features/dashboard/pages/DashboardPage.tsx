@@ -6,7 +6,7 @@ import { NetWorthHero } from '../components/NetWorthHero';
 import { EvolutionChart } from '@/features/dashboard/components/EvolutionChart';
 import { AllocationDonut } from '@/features/dashboard/components/AllocationDonut';
 import { PortfoliosStrip } from '../components/PortfoliosStrip';
-import { PerformanceBreakdown } from '@/features/dashboard/components/PerformanceBreakDown';
+import { PerformanceBreakdown } from '@/features/dashboard/components/PerformanceBreakdown';
 import { IncompletePricesBanner } from '../components/IncompletePricesBanner';
 import { QueryBoundary } from '@/shared/ui/QueryBoundary';
 import { DashboardSkeleton } from '../components/DashboardSkeleton';

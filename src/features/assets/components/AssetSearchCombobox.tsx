@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ASSET_SEARCH_MIN_LENGTH, useAssetSearch } from '@/features/transactions/api/transaction.api';
-import type { AssetSearchResult } from '@/features/assets/model/asset.types';
+import { ASSET_SEARCH_MIN_LENGTH, useAssetSearch } from '../api/assetSearch.api';
+import type { AssetSearchResult } from '../model/asset.types';
 import { ASSET_TYPE_LABEL, type AssetType } from '@/shared/model/enums';
 import {
   Command,

@@ -3,17 +3,18 @@ import { Button } from '@/shared/ui/button';
 import { FormError } from '@/shared/ui/FormError';
 import { PORTFOLIO_TYPE_LABEL, PORTFOLIO_TYPES } from '@/shared/model/enums';
 import { Input } from '@/shared/ui/Input';
-import z from 'zod';
+import { z } from 'zod';
 import type { PortfolioResponse } from '../model/portfolio.types';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCreatePortfolio, useUpdatePortfolio } from '../api/portfolio.api';
 import { FormSelect } from '@/shared/ui/form-select';
+import { toast } from '@/shared/ui/toast.store';
 
 const schema = z.object({
-  name: z.string().trim().min(1, 'Nom requis').max(100),
+  name: z.string().trim().min(1, 'Nom requis').max(100, '100 caractères max'),
   type: z.enum(PORTFOLIO_TYPES),
-  description: z.string().max(255).optional(),
+  description: z.string().max(500, '500 caractères max').optional(),
 });
 type Form = z.infer<typeof schema>;
 
@@ -30,7 +31,7 @@ export function PortfolioFormSheet({ open, onClose, initial }: Props) {
   const mutation = isEdit ? update : create;
 
   const onSubmit = (v: Form) => mutation.mutate(v, {
-    onSuccess: () => { reset(); onClose(); },
+    onSuccess: () => { toast.success(isEdit ? 'Portefeuille modifié' : 'Portefeuille créé'); reset(); onClose(); },
     onError: (e) => e.fieldErrors?.forEach(f => setError(f.field as keyof Form, { message: f.message })),
   });
 

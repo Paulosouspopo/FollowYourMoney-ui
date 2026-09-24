@@ -4,7 +4,8 @@ import { usePortfolioDashboard } from '@/features/dashboard/api/dashboard.api';
 import { useTransactionsBySymbol } from '@/features/transactions/api/transaction.api';
 import { TransactionFormSheet } from '@/features/transactions/components/TransactionFormSheet';
 import { TransactionRow } from '@/features/transactions/components/TransactionRow';
-import { KpiGrid, performanceKpis } from '@/shared/components/data/KpiGrid';
+import { KpiGrid } from '@/shared/components/data/KpiGrid';
+import { performanceKpis } from '@/shared/components/data/kpis';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { GainLine } from '@/shared/components/data/GainLine';
 import { QueryBoundary } from '@/shared/ui/QueryBoundary';
@@ -48,7 +49,7 @@ export default function PositionDetailPage() {
                     : '—'}
                 </dd>
                 <dt className="text-muted-foreground">Mis à jour</dt>
-                <dd className="text-right">{position.priceAsOf ? formatDate(position.priceAsOf) : '—'}</dd>
+                <dd className="text-right">{position.priceMissing ? 'Estimé (dernière transaction)' : position.priceAsOf ? formatDate(position.priceAsOf) : '—'}</dd>
               </dl>
             </Card>
             <KpiGrid items={performanceKpis(position)} />
@@ -74,6 +75,7 @@ export default function PositionDetailPage() {
         onClose={() => setEditing(null)}
         initial={editing === 'new' ? undefined : editing ?? undefined}
         lockedAsset={{ symbol, name: position?.name ?? symbol, currency: position?.priceCurrency }}
+        heldQuantities={{ [symbol]: position?.quantity ?? 0 }}
       />
     </div>
   );

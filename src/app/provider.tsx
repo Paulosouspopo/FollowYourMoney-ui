@@ -1,12 +1,14 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { ApiError } from '@/shared/api/types';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@/shared/api/queryClient';
+import { useApplyTheme } from '@/shared/theme/theme.store';
+import { Toaster } from '@/shared/ui/Toaster';
 
-declare module '@tanstack/react-query' { interface Register { defaultError: ApiError } }
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { staleTime: 60_000, retry: (n, e) => e.status >= 500 && n < 2, refetchOnWindowFocus: true },
-  },
-});
-export const Providers = ({ children }: { children: React.ReactNode }) =>
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+export const Providers = ({ children }: { children: React.ReactNode }) => {
+  useApplyTheme();
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <Toaster />
+    </QueryClientProvider>
+  );
+};

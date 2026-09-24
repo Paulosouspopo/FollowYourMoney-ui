@@ -1,5 +1,4 @@
-import type { AssetType } from '@/shared/model/enums';
-import { ASSET_TYPE_COLOR, ASSET_TYPE_LABEL } from '@/features/assets/model/asset.presentation';
+import { ASSET_TYPE_COLOR, ASSET_TYPE_LABEL, type AssetType } from '@/shared/model/enums';
 import { TypeBadge } from './TypeBadge';
 
 export function AssetIcon({ symbol, type }: { symbol: string; type: AssetType }) {

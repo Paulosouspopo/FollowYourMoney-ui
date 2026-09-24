@@ -1,7 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight, Coins } from 'lucide-react';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { TRANSACTION_TYPE_LABEL } from '@/shared/model/enums';
-import { formatDate, formatQty } from '@/shared/lib/format';
+import { formatDate, formatMoney, formatQty } from '@/shared/lib/format';
 import { cn } from '@/shared/lib/cn';
 import type { TransactionResponse } from '../model/transaction.types';
 
@@ -14,7 +14,7 @@ export function TransactionRow({ tx, onClick, showAsset = false }: { tx: Transac
   const cashFlow = tx.type === 'BUY' ? -(tx.totalAmountEur + tx.feesEur) : tx.totalAmountEur - tx.feesEur;
 
   return (
-    <button type="button" onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left -mx-2 px-2 rounded-xl active:bg-card/60">
+    <button type="button" onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left -mx-2 px-2 rounded-xl active:bg-muted/60">
       <span className={cn('h-9 w-9 rounded-full grid place-items-center shrink-0', TONE[tx.type])}><Icon size={16} /></span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate">
@@ -22,7 +22,7 @@ export function TransactionRow({ tx, onClick, showAsset = false }: { tx: Transac
         </p>
         <p className="text-xs text-muted-foreground">
           {formatDate(tx.transactionDate)}
-          {tx.type !== 'DIVIDEND' && ` · ${formatQty(tx.quantity)} × ${tx.pricePerUnit} ${tx.currency}`}
+          {tx.type !== 'DIVIDEND' && ` · ${formatQty(tx.quantity)} × ${formatMoney(tx.pricePerUnit, tx.currency)}`}
         </p>
       </div>
       <div className="text-right shrink-0">

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { SegmentedControl } from '@/shared/ui/SegmentedControl';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { PositionRow } from '@/features/positions/components/PositionRow';
-import type { PositionValuation } from '@/features/positions/model/positions.types';
+import type { PositionValuation } from '@/features/dashboard/model/dashboard.types';
 
 type Sort = 'value' | 'gain' | 'name';
 const SORTERS: Record<Sort, (a: PositionValuation, b: PositionValuation) => number> = {
@@ -11,15 +11,15 @@ const SORTERS: Record<Sort, (a: PositionValuation, b: PositionValuation) => numb
   name:  (a, b) => a.name.localeCompare(b.name, 'fr'),
 };
 
-interface Props { portfolioId: string; positions: PositionValuation[]; showClosed?: boolean; }
+interface Props { portfolioId: string; positions: PositionValuation[]; }
 
-export function PositionsList({ portfolioId, positions, showClosed = false }: Props) {
+export function PositionsList({ portfolioId, positions }: Props) {
   const [sort, setSort] = useState<Sort>('value');
-  const [closed, setClosed] = useState(showClosed);
+  const [showClosed, setShowClosed] = useState(false);
 
   const rows = useMemo(() =>
-    positions.filter(p => closed || p.quantity > 0).sort(SORTERS[sort]),
-  [positions, sort, closed]);
+    positions.filter(p => showClosed || p.quantity > 0).sort(SORTERS[sort]),
+  [positions, sort, showClosed]);
 
   if (!positions.length) {
     return <EmptyState title="Aucune position" description="Ajoute une première transaction avec le bouton +" />;
@@ -36,8 +36,8 @@ export function PositionsList({ portfolioId, positions, showClosed = false }: Pr
         {rows.map(p => <PositionRow key={p.assetId} portfolioId={portfolioId} position={p} />)}
       </div>
       {positions.some(p => p.quantity <= 0) && (
-        <button type="button" onClick={() => setClosed(c => !c)} className="mt-2 text-xs text-primary">
-          {closed ? 'Masquer' : 'Afficher'} les positions clôturées
+        <button type="button" onClick={() => setShowClosed(c => !c)} className="mt-2 text-xs text-primary">
+          {showClosed ? 'Masquer' : 'Afficher'} les positions clôturées
         </button>
       )}
     </section>

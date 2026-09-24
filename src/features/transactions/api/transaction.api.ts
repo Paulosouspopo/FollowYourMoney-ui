@@ -3,11 +3,11 @@ import { api } from '@/shared/api/client';
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.api';
 import { portfolioKeys } from '@/features/portfolios/api/portfolio.api';
 import type { TransactionCreateRequest, TransactionResponse, TransactionUpdateRequest } from '../model/transaction.types';
-import type { AssetSearchResult } from '@/features/assets/model/asset.types';
 
 export const transactionKeys = {
   all: ['transactions'] as const,
   byPortfolio: (pid: string) => [...transactionKeys.all, pid] as const,
+  list: (pid: string) => [...transactionKeys.byPortfolio(pid), 'list'] as const,
   bySymbol: (pid: string, symbol: string) => [...transactionKeys.byPortfolio(pid), 'symbol', symbol] as const,
 };
 
@@ -21,24 +21,13 @@ const base = (pid: string) => `/portfolios/${pid}/transactions`;
  */
 const MUTATION_TIMEOUT = 120_000;
 
-/** Longueur minimale acceptée par le back (AssetSearchService). */
-export const ASSET_SEARCH_MIN_LENGTH = 2;
-
-export const assetSearchKeys = {
-  all: ['assets', 'search'] as const,
-  byQuery: (q: string) => [...assetSearchKeys.all, q] as const,
-};
-
-/** `query` doit déjà être debouncée par l'appelant. */
-export const useAssetSearch = (query: string, enabled = true) => {
-  const q = query.trim();
-  return useQuery({
-    queryKey: assetSearchKeys.byQuery(q),
-    queryFn: () => api.get<AssetSearchResult[]>('/assets/search', { params: { query: q } }).then(r => r.data),
-    enabled: enabled && q.length >= ASSET_SEARCH_MIN_LENGTH,
-    staleTime: 5 * 60_000, // 5 min, la liste Yahoo ne change pas souvent
+/** Toutes les transactions du portefeuille, plus récentes d'abord. */
+export const usePortfolioTransactions = (portfolioId: string) =>
+  useQuery({
+    queryKey: transactionKeys.list(portfolioId),
+    queryFn: () => api.get<TransactionResponse[]>(base(portfolioId)).then(r => r.data),
+    enabled: !!portfolioId,
   });
-};
 
 /** Transactions d'un actif du portefeuille (GET ?assetSymbol=). */
 export const useTransactionsBySymbol = (portfolioId: string, symbol: string) =>
@@ -61,9 +50,8 @@ function useInvalidateAfterTransaction(portfolioId: string) {
 export const useCreateTransaction = (portfolioId: string) => {
   const invalidate = useInvalidateAfterTransaction(portfolioId);
   return useMutation({
-    // portfolioId est aussi exigé dans le body par TransactionCreateRequest (@NotNull)
-    mutationFn: (b: Omit<TransactionCreateRequest, 'portfolioId'>) =>
-      api.post<TransactionResponse>(base(portfolioId), { ...b, portfolioId }, { timeout: MUTATION_TIMEOUT }).then(r => r.data),
+    mutationFn: (b: TransactionCreateRequest) =>
+      api.post<TransactionResponse>(base(portfolioId), b, { timeout: MUTATION_TIMEOUT }).then(r => r.data),
     onSuccess: invalidate,
   });
 };

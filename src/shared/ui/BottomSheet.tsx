@@ -12,7 +12,7 @@ export function BottomSheet({ open, onClose, title, children }: Props) {
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{title}</h2>
-          <button onClick={onClose} className="p-2 -mr-2 text-muted" aria-label="Fermer"><X size={20} /></button>
+          <button onClick={onClose} className="p-2 -mr-2 text-muted-foreground" aria-label="Fermer"><X size={20} /></button>
         </div>
         {children}
       </div>

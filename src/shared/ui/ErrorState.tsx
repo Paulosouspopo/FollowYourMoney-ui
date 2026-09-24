@@ -11,7 +11,7 @@ export function ErrorState({ error, onRetry }: Props) {
         <AlertCircle size={26} className="text-loss" />
       </div>
       <p className="font-medium">Une erreur est survenue</p>
-      <p className="text-sm text-muted mt-1 max-w-xs">{getErrorMessage(error)}</p>
+      <p className="text-sm text-muted-foreground mt-1 max-w-xs">{getErrorMessage(error)}</p>
       {onRetry && <Button variant="secondary" size="sm" className="mt-5" onClick={onRetry}>Réessayer</Button>}
     </div>
   );

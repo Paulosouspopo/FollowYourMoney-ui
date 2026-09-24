@@ -10,4 +10,4 @@ export const formatDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { da
 export const formatShortDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' }).format(new Date(iso));
 
 export const formatQty = (v: number) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 8 }).format(v);
-export const gainTone = (v: number) => v > 0 ? 'text-gain' : v < 0 ? 'text-loss' : 'text-muted';
+export const gainTone = (v: number) => v > 0 ? 'text-gain' : v < 0 ? 'text-loss' : 'text-muted-foreground';

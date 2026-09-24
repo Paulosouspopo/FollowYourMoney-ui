@@ -9,6 +9,7 @@ import { ListSkeleton } from '@/shared/components/data/ListSkeleton';
 import { EmptyState } from '@/shared/ui/EmptyState'; 
 
 export default function PortfoliosPage() {
+  // Même clé de cache que la page Accueil (période par défaut) : pas de requête en plus
   const q = useDashboard('30d');
   const [sheet, setSheet] = useState<'create' | null>(null);
   return (

@@ -23,15 +23,17 @@ export interface FormSelectProps {
   defaultValue?: string;
   onChange?: (value: string) => void;
   className?: string;
+  disabled?: boolean;
+  hint?: string;
 }
 
 export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
-  ({ label, error, options, value, defaultValue, onChange, className }, ref) => {
+  ({ label, error, options, value, defaultValue, onChange, className, disabled, hint }, ref) => {
     return (
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {label && <label className="text-sm font-medium text-foreground">{label}</label>}
-        <Select value={value} defaultValue={defaultValue} onValueChange={onChange}>
-          <SelectTrigger ref={ref} className={cn(error && 'border-destructive', className)}>
+        <Select value={value} defaultValue={defaultValue} onValueChange={onChange} disabled={disabled}>
+          <SelectTrigger ref={ref} className={cn('w-full', error && 'border-destructive', className)}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -43,6 +45,7 @@ export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
           </SelectContent>
         </Select>
         {error && <p className="text-xs text-destructive">{error}</p>}
+        {!error && hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       </div>
     );
   }

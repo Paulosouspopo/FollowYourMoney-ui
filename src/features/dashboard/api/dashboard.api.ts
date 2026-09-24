@@ -5,7 +5,8 @@ import type { DashboardResponse, DashboardPeriod } from '@/features/dashboard/mo
 export const dashboardKeys = {
   all: ['dashboard'] as const,
   global: (p: DashboardPeriod) => [...dashboardKeys.all, 'global', p] as const,
-  portfolio: (id: string, p: DashboardPeriod) => [...dashboardKeys.all, 'portfolio', id, p] as const,
+  portfolioAll: (id: string) => [...dashboardKeys.all, 'portfolio', id] as const,
+  portfolio: (id: string, p: DashboardPeriod) => [...dashboardKeys.portfolioAll(id), p] as const,
 };
 
 export const useDashboard = (period: DashboardPeriod) =>

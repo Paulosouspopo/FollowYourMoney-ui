@@ -5,7 +5,18 @@ import { formatEur, formatShortDate } from '@/shared/lib/format';
 import type { CurvePointDTO } from '@/features/dashboard/model/dashboard.types';
 
 export function EvolutionChart({ points }: { points: CurvePointDTO[] }) {
-  if (points.length < 2) return <EmptyState title="Pas encore d'historique" description="La courbe apparaîtra dès qu'il y aura au moins deux jours d'historique." />;
+  if (points.length < 2) {
+    return (
+      <Card className="p-0">
+        <EmptyState
+          title="Pas encore d'historique"
+          description={points.length === 0
+            ? 'La courbe apparaîtra après ta première transaction.'
+            : "Une seule journée pour l'instant : la courbe se dessine dès demain, ou tout de suite si tu saisis une opération plus ancienne."}
+        />
+      </Card>
+    );
+  }
 
   const data = points.map(p => ({
     date: p.date,
@@ -23,10 +34,12 @@ export function EvolutionChart({ points }: { points: CurvePointDTO[] }) {
               <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis dataKey="date" tickFormatter={formatShortDate} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={32} />
+          <XAxis dataKey="date" tickFormatter={formatShortDate} tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+            axisLine={false} tickLine={false} minTickGap={32} />
           <YAxis hide domain={['auto', 'auto']} />
           <Tooltip
-            contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12 }}
+            contentStyle={{ background: 'var(--popover)', color: 'var(--popover-foreground)', border: '1px solid var(--border)', borderRadius: 12 }}
+            itemStyle={{ color: 'var(--popover-foreground)' }}
             formatter={(v, name) => [formatEur(Number(v ?? 0)), name === 'value' ? 'Valeur' : 'Investi']}
             labelFormatter={(l) => formatShortDate(String(l))}
           />
@@ -34,6 +47,10 @@ export function EvolutionChart({ points }: { points: CurvePointDTO[] }) {
           <Area type="monotone" dataKey="value" stroke="var(--primary)" fill="url(#fym-area)" strokeWidth={2} />
         </AreaChart>
       </ResponsiveContainer>
+      <div className="flex gap-4 mt-2 text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1.5"><span className="h-0.5 w-4 bg-primary rounded" /> Valeur</span>
+        <span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t border-dashed border-muted-foreground" /> Investi</span>
+      </div>
     </Card>
   );
 }

@@ -7,10 +7,11 @@ export interface TransactionResponse {
   exchangeRateToEur: number; totalAmountEur: number; feesEur: number;
   transactionDate: string; notes: string | null; createdAt: string; updatedAt: string;
 }
+/** portfolioId est dans l'URL, pas dans le body. */
 export interface TransactionCreateRequest {
-  portfolioId: string; symbol: string; type: TransactionType;
+  symbol: string; type: TransactionType;
   quantity: number; pricePerUnit: number; fees?: number; currency: string;
   transactionDate?: string; notes?: string;
 }
 /** La devise n'est pas modifiable côté back (taux historique figé) : supprimer puis recréer. */
-export type TransactionUpdateRequest = Omit<TransactionCreateRequest, 'portfolioId' | 'symbol' | 'currency'>;
+export type TransactionUpdateRequest = Omit<TransactionCreateRequest, 'symbol' | 'currency'>;

@@ -9,11 +9,12 @@ import { PORTFOLIO_TYPE_LABEL } from "@/shared/model/enums";
 import { PeriodSelector } from "@/shared/components/data/PeriodSelector";
 import { EvolutionChart } from "@/features/dashboard/components/EvolutionChart";
 import { KpiGrid } from "@/shared/components/data/KpiGrid";
-import { performanceKpis } from "@/shared/components/data/KpiGrid";
+import { performanceKpis } from "@/shared/components/data/kpis";
 import { PositionsList } from "@/features/positions/components/PositionsList";
 import { AllocationDonut } from "@/features/dashboard/components/AllocationDonut";
 import { Fab } from "@/shared/ui/Fab";
 import { TransactionFormSheet } from "@/features/transactions/components/TransactionFormSheet";
+import { RecentTransactions } from "@/features/transactions/components/RecentTransactions";
 import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkeleton";
 import { PortfolioMenu } from "@/features/portfolios/components/PortfolioMenu";
 import type { DashboardPeriod } from "@/features/dashboard/model/dashboard.types";
@@ -23,6 +24,8 @@ export default function PortfolioDetailPage() {
   const [period, setPeriod] = useState<DashboardPeriod>('30d');
   const [txOpen, setTxOpen] = useState(false);
   const q = usePortfolioDashboard(portfolioId, period);
+  const positions = q.data?.portfolios[0]?.positions ?? [];
+  const heldQuantities = Object.fromEntries(positions.map(p => [p.symbol, p.quantity]));
 
   return (
     <div className="space-y-4">
@@ -43,8 +46,9 @@ export default function PortfolioDetailPage() {
           );
         }}
       </QueryBoundary>
+      <RecentTransactions portfolioId={portfolioId} heldQuantities={heldQuantities} />
       <Fab onClick={() => setTxOpen(true)} label="Ajouter une transaction" />
-      <TransactionFormSheet portfolioId={portfolioId} open={txOpen} onClose={() => setTxOpen(false)} />
+      <TransactionFormSheet portfolioId={portfolioId} open={txOpen} onClose={() => setTxOpen(false)} heldQuantities={heldQuantities} />
     </div>
   );
 }

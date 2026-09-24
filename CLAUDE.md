@@ -35,19 +35,34 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   les transactions du portefeuille, le détail portefeuille, **et** tout le
   dashboard (`dashboardKeys.all`) — la valorisation dépend de tout.
 
-## Points sensibles en cours
-- Après l'ajout d'une transaction ancienne (ex: achat BTC en 2023), le
-  backend déclenche un backfill de prix + recalcul des snapshots qui peut
-  prendre plusieurs secondes. Le front doit gérer cet état (loading /
-  refetch après un court délai) plutôt que supposer que le dashboard est
-  à jour immédiatement après la mutation.
-- Vérifier que le formulaire de transaction n'autorise pas de date future,
-  et que le format envoyé au back correspond bien à un `LocalDateTime` ISO
-  sans fuseau (`YYYY-MM-DDTHH:mm:ss`).
+## Contrat avec le back (points non évidents)
+- Une mutation de transaction attend, AVANT la réponse, le backfill Yahoo +
+  la reconstruction des snapshots : timeout dédié (`MUTATION_TIMEOUT`,
+  120 s) et message d'attente dans le formulaire. À la réponse, le dashboard
+  est à jour : une simple invalidation suffit.
+- Dates : `LocalDateTime` sans fuseau (`YYYY-MM-DDTHH:mm:ss`) construit en
+  heure LOCALE — jamais `toISOString()` (UTC, décale le jour).
+- Dividende : le formulaire saisit le montant total et envoie
+  `quantity = 1` (le back calcule `totalAmount = quantity × pricePerUnit`).
+- La devise d'une transaction n'est pas modifiable après création.
+- `priceMissing` = pas de cours de marché, position estimée au prix de la
+  dernière transaction (afficher « Prix estimé », pas 0).
 
 ## Conventions de code à respecter
-- Un dossier par domaine (transactions, portfolios, dashboard, assets),
-  avec `hooks/`, `types/`, composants dédiés.
+- Un dossier par domaine dans `src/features/` (assets, auth, dashboard,
+  portfolios, positions, settings, transactions) avec `api/` (hooks React
+  Query + query keys), `model/` (types), `components/`, `pages/`.
+- `src/shared/` : `api/` (client axios, erreurs normalisées en `ApiError`,
+  `queryClient`), `ui/` (primitives), `components/data/` (affichage de
+  montants), `model/` (enums, libellés, couleurs par type — source unique),
+  `theme/` (clair/sombre/système).
+- Feedback : `toast` (`shared/ui/toast.store`) après une mutation,
+  `ConfirmDialog` pour toute action destructive (pas de `window.confirm`).
+- Couleurs : tokens CSS (`text-muted-foreground`, `text-gain`, `text-loss`,
+  `text-warning`, `bg-primary text-primary-foreground`…), jamais de couleur
+  en dur ni `hsl(var(--x))` (le thème est en oklch : `var(--x)`).
+- Champs numériques de formulaire : valeur par défaut vide + placeholder
+  `0` (sinon taper « 1 » donne « 01 »).
 - Query keys structurées en objets `xxxKeys` (`all`, `byPortfolio`,
   `bySymbol`, etc.) — garder ce pattern pour toute nouvelle feature.
 - Formulaires : Zod schema + `zodResolver`, gestion des erreurs serveur via
@@ -56,8 +71,8 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 ## Ce qu'il ne faut PAS faire
 - Ne pas réintroduire de liste d'actifs statique/whitelist.
 - Ne pas laisser l'utilisateur taper un symbole libre dans un champ texte.
-- Ne pas dupliquer `portfolioId` dans le body des requêtes s'il est déjà
-  dans l'URL.
+- Ne pas dupliquer `portfolioId` dans le body des requêtes : il est dans
+  l'URL (le back ne l'accepte plus dans `TransactionCreateRequest`).
 - Ne pas proposer de composants nécessitant des libs non installées
   (vérifier `package.json` avant de suggérer `cmdk`, `Combobox` shadcn, etc.)
 
