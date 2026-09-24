@@ -42,5 +42,7 @@ export interface DashboardResponse {
   hasIncompletePrices: boolean;
   portfolios: PortfolioValuation[];
   allocation: AllocationSliceDTO[];
+  /** Montants de `curve` dans cette devise (taux historique de chaque jour), EUR par défaut. */
   curve: CurvePointDTO[];
+  curveCurrency?: string;
 }

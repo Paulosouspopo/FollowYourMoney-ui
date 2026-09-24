@@ -11,6 +11,7 @@ import { IncompletePricesBanner } from '../components/IncompletePricesBanner';
 import { QueryBoundary } from '@/shared/ui/QueryBoundary';
 import { DashboardSkeleton } from '../components/DashboardSkeleton';
 import { UpcomingPlansCard } from '@/features/plans/components/UpcomingPlansCard';
+import { PerformanceCard } from '@/features/performance/components/PerformanceCard';
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<DashboardPeriod>('30d');
@@ -28,7 +29,8 @@ export default function DashboardPage() {
           <>
             {d.hasIncompletePrices && <IncompletePricesBanner />}
             <NetWorthHero data={d} />
-            <EvolutionChart points={d.curve} />
+            <EvolutionChart points={d.curve} currency={d.curveCurrency} />
+            {d.portfolios.length > 0 && <PerformanceCard portfolioId={null} />}
             <PerformanceBreakdown data={d} />
             <PortfoliosStrip portfolios={d.portfolios} />
             <UpcomingPlansCard />

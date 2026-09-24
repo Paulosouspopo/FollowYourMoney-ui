@@ -1,10 +1,11 @@
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Card } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { formatEur, formatShortDate } from '@/shared/lib/format';
+import { formatMoney, formatShortDate } from '@/shared/lib/format';
 import type { CurvePointDTO } from '@/features/dashboard/model/dashboard.types';
 
-export function EvolutionChart({ points }: { points: CurvePointDTO[] }) {
+/** `currency` : devise des montants de la courbe (déjà convertis par le back). */
+export function EvolutionChart({ points, currency = 'EUR' }: { points: CurvePointDTO[]; currency?: string }) {
   if (points.length < 2) {
     return (
       <Card className="p-0">
@@ -40,7 +41,7 @@ export function EvolutionChart({ points }: { points: CurvePointDTO[] }) {
           <Tooltip
             contentStyle={{ background: 'var(--popover)', color: 'var(--popover-foreground)', border: '1px solid var(--border)', borderRadius: 12 }}
             itemStyle={{ color: 'var(--popover-foreground)' }}
-            formatter={(v, name) => [formatEur(Number(v ?? 0)), name === 'value' ? 'Valeur' : 'Investi']}
+            formatter={(v, name) => [formatMoney(Number(v ?? 0), currency), name === 'value' ? 'Valeur' : 'Investi']}
             labelFormatter={(l) => formatShortDate(String(l))}
           />
           <Area type="monotone" dataKey="invested" stroke="var(--muted-foreground)" strokeDasharray="4 4" fill="none" strokeWidth={1.5} />

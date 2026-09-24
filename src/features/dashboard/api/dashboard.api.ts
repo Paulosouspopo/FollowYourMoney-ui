@@ -1,25 +1,32 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
+import { useEffectiveDisplayCurrency } from '@/shared/currency/displayRates.api';
 import type { DashboardResponse, DashboardPeriod } from '@/features/dashboard/model/dashboard.types';
 
 export const dashboardKeys = {
   all: ['dashboard'] as const,
-  global: (p: DashboardPeriod) => [...dashboardKeys.all, 'global', p] as const,
+  global: (p: DashboardPeriod, currency = 'EUR') => [...dashboardKeys.all, 'global', p, currency] as const,
   portfolioAll: (id: string) => [...dashboardKeys.all, 'portfolio', id] as const,
-  portfolio: (id: string, p: DashboardPeriod) => [...dashboardKeys.portfolioAll(id), p] as const,
+  portfolio: (id: string, p: DashboardPeriod, currency = 'EUR') => [...dashboardKeys.portfolioAll(id), p, currency] as const,
 };
 
-export const useDashboard = (period: DashboardPeriod) =>
-  useQuery({
-    queryKey: dashboardKeys.global(period),
-    queryFn: () => api.get<DashboardResponse>('/dashboard', { params: { period } }).then(r => r.data),
+/** La courbe arrive convertie par le back (taux historique de chaque jour) : `curveCurrency`. */
+export const useDashboard = (period: DashboardPeriod) => {
+  const { currency } = useEffectiveDisplayCurrency();
+  return useQuery({
+    queryKey: dashboardKeys.global(period, currency),
+    queryFn: () => api.get<DashboardResponse>('/dashboard', { params: { period, currency } }).then(r => r.data),
     placeholderData: prev => prev,
   });
+};
 
-export const usePortfolioDashboard = (portfolioId: string, period: DashboardPeriod) =>
-  useQuery({
-    queryKey: dashboardKeys.portfolio(portfolioId, period),
-    queryFn: () => api.get<DashboardResponse>(`/dashboard/portfolios/${portfolioId}`, { params: { period } }).then(r => r.data),
+export const usePortfolioDashboard = (portfolioId: string, period: DashboardPeriod) => {
+  const { currency } = useEffectiveDisplayCurrency();
+  return useQuery({
+    queryKey: dashboardKeys.portfolio(portfolioId, period, currency),
+    queryFn: () => api.get<DashboardResponse>(`/dashboard/portfolios/${portfolioId}`, { params: { period, currency } })
+      .then(r => r.data),
     placeholderData: prev => prev,
     enabled: !!portfolioId,
   });
+};

@@ -23,6 +23,7 @@ import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkel
 import { PortfolioMenu } from "@/features/portfolios/components/PortfolioMenu";
 import { AddEntrySheet, type EntryKind } from "@/features/portfolios/components/AddEntrySheet";
 import type { DashboardPeriod } from "@/features/dashboard/model/dashboard.types";
+import { PerformanceCard } from "@/features/performance/components/PerformanceCard";
 
 type Sheet = EntryKind | 'choose' | null;
 
@@ -53,7 +54,7 @@ export default function PortfolioDetailPage() {
             <>
               <LivretHero portfolio={pf} />
               <div className="flex justify-end"><PeriodSelector value={period} onChange={setPeriod} /></div>
-              <EvolutionChart points={d.curve} />
+              <EvolutionChart points={d.curve} currency={d.curveCurrency} />
               <KpiGrid items={livretKpis(pf)} />
               <PlansSection portfolioId={portfolioId} portfolioType={pf.type} cashTracking />
               <CashSection portfolioId={portfolioId} balance={pf.cashEur} isLivret />
@@ -63,8 +64,9 @@ export default function PortfolioDetailPage() {
               {pf.hasIncompletePrices && <IncompletePricesBanner />}
               <NetWorthHero data={d} label={PORTFOLIO_TYPE_LABEL[pf.type]} />
               <div className="flex justify-end"><PeriodSelector value={period} onChange={setPeriod} /></div>
-              <EvolutionChart points={d.curve} />
+              <EvolutionChart points={d.curve} currency={d.curveCurrency} />
               <KpiGrid items={performanceKpis(pf)} />
+              {d.curve.length > 0 && <PerformanceCard portfolioId={portfolioId} />}
               <PositionsList portfolioId={portfolioId} positions={pf.positions} />
               <PlansSection portfolioId={portfolioId} portfolioType={pf.type} cashTracking={pf.cashTracking} />
               {pf.cashTracking && <CashSection portfolioId={portfolioId} balance={pf.cashEur} />}

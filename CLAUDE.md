@@ -116,6 +116,19 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   alertes en un geste (−5 %, +5 %, plus haut 1 an) ou personnalisées.
 - Les mutations d'alerte invalident aussi `['markets']` (fiche et compteurs).
 
+## Performance et devise d'affichage
+- `features/performance` : `PerformanceCard` (dashboard et portefeuille) :
+  TWR, rendement de l'argent (XIRR au-delà d'un an), gain, apports nets,
+  courbe comparée à un indice (`BenchmarkPicker` : raccourcis ou recherche,
+  choix mémorisé par `useBenchmarkStore`), classement des portefeuilles.
+  Clés sous `dashboardKeys.all` : les invalidations existantes suffisent.
+- Devise d'affichage (`shared/currency`) : préférence de l'appareil,
+  `DisplayCurrencyScope` règle `formatEur` (montant EUR converti au taux du
+  jour) et remonte l'arbre au changement. `MoneyValue` SANS `currency` =
+  montant EUR converti ; AVEC `currency` = affiché tel quel (cours, saisie).
+  La courbe arrive convertie du back (`curveCurrency`, taux historiques) :
+  `EvolutionChart` la formate avec `formatMoney`, sans reconvertir.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`
