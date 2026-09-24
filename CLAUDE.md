@@ -86,6 +86,14 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Une mutation de plan peut créer des transactions : invalider plans,
   transactions, liquidités et dashboard.
 
+## Notifications
+- Onglet « Alertes » (`/alerts`, `features/notifications`) : notifications
+  reçues (`InboxList`, clic = lu + ouverture du lien), règles
+  (`AlertRulesList`, `AlertRuleFormSheet` : la phrase « Quand … » à
+  compléter), rapport périodique (`ReportSettingsCard`, aperçu).
+- Compteur de non-lues dans la barre du bas (`useUnreadCount`, rafraîchi
+  chaque minute).
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

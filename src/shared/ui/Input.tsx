@@ -10,7 +10,10 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, hint, leading, id, ...props }, ref) => {
-    const inputId = id ?? props.name;
+    // Sans id ni name (champ contrôlé hors react-hook-form), un id généré relie
+    // quand même le libellé au champ (accessibilité, clic sur le libellé).
+    const generatedId = React.useId();
+    const inputId = id ?? props.name ?? generatedId;
     return (
       <div className="space-y-1.5">
         {label && (

@@ -7,14 +7,16 @@ interface Props {
   label: string;
   description?: string;
   disabled?: boolean;
+  /** Libellé lu par les lecteurs d'écran mais non affiché (liste compacte). */
+  labelHidden?: boolean;
 }
 
 /** Interrupteur accessible (role="switch") avec libellé et description. */
-export function Switch({ checked, onChange, label, description, disabled }: Props) {
+export function Switch({ checked, onChange, label, description, disabled, labelHidden }: Props) {
   const id = useId();
   return (
     <div className="flex items-start justify-between gap-3">
-      <div>
+      <div className={cn(labelHidden && 'sr-only')}>
         <label htmlFor={id} className="text-sm font-medium text-foreground">{label}</label>
         {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
       </div>
