@@ -63,6 +63,11 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   en dur ni `hsl(var(--x))` (le thème est en oklch : `var(--x)`).
 - Champs numériques de formulaire : valeur par défaut vide + placeholder
   `0` (sinon taper « 1 » donne « 01 »).
+- Tests : Vitest + Testing Library (`npm test`, `npm run test:watch`),
+  fichiers `*.test.ts(x)` à côté du code testé. Les hooks d'API sont
+  mockés (`vi.mock`) : on teste le body envoyé au back et la gestion de ses
+  réponses. Fuseau forcé à `Europe/Paris` (vite.config.ts) pour les dates.
+- CI : GitHub Actions (`.github/workflows/ci.yml`) : lint, tests, build.
 - Query keys structurées en objets `xxxKeys` (`all`, `byPortfolio`,
   `bySymbol`, etc.) — garder ce pattern pour toute nouvelle feature.
 - Formulaires : Zod schema + `zodResolver`, gestion des erreurs serveur via
