@@ -2,7 +2,8 @@ import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useLocation } from 'react-router-dom';
-import { useDemo, useLogin } from '@/features/auth/api/auth.api';
+import { useDemo, useLogin, useVerifyTwoFactor } from '@/features/auth/api/auth.api';
+import { useState } from 'react';
 import { AuthLayout } from '@/features/auth/layout/AuthLayout';
 import { ResendVerification } from '@/features/auth/components/ResendVerification';
 import { Input } from '@/shared/ui/Input';
@@ -25,6 +26,8 @@ export default function LoginPage() {
   const login = useLogin(from);
   const demo = useDemo();
   const notVerified = login.error?.code === 'EMAIL_NOT_VERIFIED';
+  const challenge = login.data?.twoFactorToken;
+  if (challenge) return <TwoFactorStep token={challenge} redirectTo={from} onBack={() => login.reset()} />;
 
   return (
     <AuthLayout title="Bon retour 👋" subtitle="Connecte-toi pour suivre ton patrimoine">
@@ -49,6 +52,30 @@ export default function LoginPage() {
             : 'Un patrimoine fictif sur trois ans, à explorer librement. Effacé après 24 h.'}
         </p>
         {demo.isError && <FormError message={demo.error.message} />}
+      </div>
+    </AuthLayout>
+  );
+}
+
+/** Deuxième étape : code de l'application d'authentification, ou code de secours. */
+function TwoFactorStep({ token, redirectTo, onBack }: { token: string; redirectTo: string; onBack: () => void }) {
+  const verify = useVerifyTwoFactor(redirectTo);
+  const [code, setCode] = useState('');
+  const [recovery, setRecovery] = useState(false);
+  return (
+    <AuthLayout title="Vérification 🔐" subtitle={recovery ? 'Saisis un de tes codes de secours' : 'Saisis le code à 6 chiffres de ton application'}>
+      <form className="space-y-4" noValidate onSubmit={e => { e.preventDefault(); verify.mutate({ token, code: code.trim() }); }}>
+        <Input label={recovery ? 'Code de secours' : 'Code'} autoFocus autoComplete="one-time-code"
+          inputMode={recovery ? 'text' : 'numeric'} placeholder={recovery ? 'abcde-fghij' : '123 456'}
+          value={code} onChange={e => setCode(e.target.value)} />
+        {verify.isError && <FormError message={verify.error.message} />}
+        <Button type="submit" className="w-full" loading={verify.isPending} disabled={!code.trim()}>Valider</Button>
+      </form>
+      <div className="mt-4 flex justify-between text-xs">
+        <button type="button" onClick={onBack} className="text-muted-foreground">Retour</button>
+        <button type="button" onClick={() => { setRecovery(r => !r); setCode(''); }} className="text-primary">
+          {recovery ? 'Utiliser le code de l\u2019application' : 'Téléphone perdu ? Code de secours'}
+        </button>
       </div>
     </AuthLayout>
   );

@@ -15,6 +15,7 @@ import { useMe, useUpdateMe, useDeleteMe } from '@/features/settings/api/user.ap
 import type { UserUpdateRequest } from '@/features/settings/model/user.types';
 import { useLogout } from "@/features/auth/api/auth.api";
 import { SecuritySection } from "@/features/settings/components/SecuritySection";
+import { ExportCard } from "@/features/account/components/ExportCard";
 import { PushSettingsCard } from "@/features/notifications/components/PushSettingsCard";
 import { usePrivacyStore } from "@/shared/privacy/privacy.store";
 import { Switch } from "@/shared/ui/Switch";
@@ -116,6 +117,11 @@ export default function SettingsPage() {
       </section>
 
       <SecuritySection />
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold tracking-tight">Mes données</h2>
+        <ExportCard />
+      </section>
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold tracking-tight">Aide</h2>

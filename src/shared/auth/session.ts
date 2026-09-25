@@ -1,7 +1,11 @@
 import { api } from '@/shared/api/client';
 import { useAuthStore } from './auth.store';
 
-export interface AuthResponse { accessToken: string; expiresIn: number; }
+export interface AuthResponse {
+  accessToken: string; expiresIn: number;
+  /** Double authentification active : pas encore de session, ce jeton (5 min) accompagne le code. */
+  twoFactorToken?: string | null;
+}
 
 /**
  * Deux onglets peuvent renouveler en même temps avec le même cookie : le

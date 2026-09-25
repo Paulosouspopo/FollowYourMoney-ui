@@ -6,12 +6,15 @@ import type { ApiError } from '@/shared/api/types';
 import LoginPage from './LoginPage';
 
 type MutateOpts = { onSuccess?: () => void; onError?: (e: ApiError) => void };
-const state: { error: ApiError | null } = { error: null };
+const state: { error: ApiError | null; challenge: string | null } = { error: null, challenge: null };
+const verifyMutate = vi.fn();
 const loginMutate = vi.fn();
 const resendMutate = vi.fn<(email: string, opts?: MutateOpts) => void>();
 
 vi.mock('@/features/auth/api/auth.api', () => ({
-  useLogin: () => ({ mutate: loginMutate, isPending: false, isError: state.error !== null, error: state.error }),
+  useLogin: () => ({ mutate: loginMutate, isPending: false, isError: state.error !== null, error: state.error,
+    data: state.challenge ? { accessToken: null, expiresIn: 0, twoFactorToken: state.challenge } : undefined, reset: vi.fn() }),
+  useVerifyTwoFactor: () => ({ mutate: verifyMutate, isPending: false, isError: false, error: null }),
   useResendVerification: () => ({ mutate: resendMutate, isPending: false }),
   useDemo: () => ({ mutate: vi.fn(), isPending: false, isError: false, error: null }),
 }));
@@ -24,6 +27,7 @@ const renderPage = () => {
 describe('LoginPage', () => {
   beforeEach(() => {
     state.error = null;
+    state.challenge = null;
     loginMutate.mockReset();
     resendMutate.mockReset();
   });
@@ -51,5 +55,17 @@ describe('LoginPage', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Confirme ton adresse email');
     expect(resendMutate.mock.calls[0][0]).toBe('paul@fym.io');
+  });
+
+  it('double authentification : étape du code après le mot de passe, code de secours possible', async () => {
+    state.challenge = 'defi-123';
+    const user = renderPage();
+    expect(screen.getByText(/code à 6 chiffres/)).toBeInTheDocument();
+    await user.type(screen.getByLabelText('Code'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Valider' }));
+    expect(verifyMutate).toHaveBeenCalledWith({ token: 'defi-123', code: '123456' });
+
+    await user.click(screen.getByRole('button', { name: /Code de secours/ }));
+    expect(screen.getByLabelText('Code de secours')).toBeInTheDocument();
   });
 });

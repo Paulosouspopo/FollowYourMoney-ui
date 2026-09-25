@@ -11,6 +11,8 @@ import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { toast } from '@/shared/ui/toast.store';
 import { useChangePassword, useLogoutEverywhere } from '@/features/auth/api/auth.api';
 import { newPasswordFields, passwordsMatch, PASSWORDS_DIFFER } from '@/features/auth/model/password';
+import { TwoFactorCard } from '@/features/account/components/TwoFactorCard';
+import { SessionsCard } from '@/features/account/components/SessionsCard';
 
 const schema = z.object({
   currentPassword: z.string().min(1, 'Mot de passe actuel requis'),
@@ -46,6 +48,8 @@ export function SecuritySection() {
   return (
     <section className="space-y-2">
       <h2 className="text-sm font-semibold tracking-tight">Sécurité</h2>
+      <TwoFactorCard />
+      <SessionsCard />
       <Card className="p-4 space-y-4">
         <ChangePasswordForm />
         <div className="border-t border-border pt-4">

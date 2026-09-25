@@ -269,6 +269,16 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Tests : délai porté à 15 s (`testTimeout`) — les tests de formulaires
   dépassaient 5 s sur une machine chargée.
 
+## Sécurité du compte et RGPD (v5, lot D)
+- `features/account` : `TwoFactorCard` (QR code via `qrcode-generator`,
+  seule dépendance ajoutée, rendu en SVG noir sur blanc ; clé à saisir ;
+  codes de secours à copier/télécharger), `SessionsCard` (appareils,
+  `describeDevice` testé, déconnexion à distance), `ExportCard`
+  (téléchargement authentifié via `download`). Dans Réglages → Sécurité /
+  Mes données.
+- Connexion : réponse avec `twoFactorToken` → `TwoFactorStep` (code de
+  l'application ou code de secours, `useVerifyTwoFactor`).
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`
