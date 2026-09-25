@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { TimeSeriesChart, type ChartSeries } from '@/shared/charts/TimeSeriesChart';
-import { formatEur, formatLongDate, formatMoney, formatPercent } from '@/shared/lib/format';
+import { formatEur, formatLongDate, formatPercent, formatPrivateMoney } from '@/shared/lib/format';
+import { PrivacyToggle } from '@/shared/privacy/PrivacyToggle';
 import { useCountUp } from '@/shared/lib/useCountUp';
 import { cn } from '@/shared/lib/cn';
 import type { CurvePointDTO } from '../model/dashboard.types';
@@ -46,17 +47,20 @@ export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', perio
 
   return (
     <section className="glow -mx-4 px-4 md:mx-0 md:px-0 md:rounded-3xl pt-4 lg:pt-2">
-      <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground h-4">
-        {scrub != null && point ? formatLongDate(point.date) : label}
-      </p>
+      <div className="flex items-center justify-between gap-2 h-5">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          {scrub != null && point ? formatLongDate(point.date) : label}
+        </p>
+        <PrivacyToggle className="-mr-1.5" />
+      </div>
       <p className="text-display mt-2" aria-live="polite">
-        {scrub != null && point ? formatMoney(point.totalValueEur, curveCurrency) : formatEur(animated)}
+        {scrub != null && point ? formatPrivateMoney(point.totalValueEur, curveCurrency) : formatEur(animated)}
       </p>
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm min-h-6">
         {delta != null && (
           <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-medium tabular-nums',
             delta >= 0 ? 'bg-positive-bg text-gain' : 'bg-negative-bg text-loss')}>
-            {delta >= 0 ? '▲' : '▼'} {delta >= 0 ? '+' : '−'}{formatMoney(Math.abs(delta), curveCurrency)}
+            {delta >= 0 ? '▲' : '▼'} {delta >= 0 ? '+' : '−'}{formatPrivateMoney(Math.abs(delta), curveCurrency)}
             {deltaPct != null && <span className="opacity-80">({formatPercent(Math.abs(deltaPct))})</span>}
           </span>
         )}

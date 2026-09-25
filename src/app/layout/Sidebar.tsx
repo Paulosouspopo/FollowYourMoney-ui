@@ -3,6 +3,7 @@ import { cn } from '@/shared/lib/cn';
 import { useUnreadCount } from '@/features/notifications/api/notification.api';
 import { NAV_ITEMS, unreadLabel } from './nav';
 import { Logo } from './Logo';
+import { PrivacyToggle } from '@/shared/privacy/PrivacyToggle';
 
 /** Barre latérale sur grand écran (≥ lg). */
 export function Sidebar() {
@@ -33,7 +34,8 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <p className="mt-auto px-3 text-[11px] leading-relaxed text-muted-foreground">
+      <PrivacyToggle withLabel className="mt-auto justify-start rounded-xl" />
+      <p className="mt-3 px-3 text-[11px] leading-relaxed text-muted-foreground">
         Cours mis à jour chaque heure · Yahoo Finance
       </p>
     </aside>
