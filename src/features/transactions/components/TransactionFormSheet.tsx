@@ -20,6 +20,7 @@ import type { ApiError } from '@/shared/api/types';
 import { AssetSearchCombobox } from '@/features/assets/components/AssetSearchCombobox';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/features/transactions/api/transaction.api';
 import type { TransactionResponse } from '../model/transaction.types';
+import { TransactionCheckHint } from '@/features/quality/components/TransactionCheckHint';
 
 const num = (msg: string) => z.coerce.number({ error: msg }).min(0, msg);
 
@@ -103,7 +104,7 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
   const remove = useDeleteTransaction(portfolioId);
   const mutation = isEdit ? update : create;
 
-  const [type, quantity, price, fees, currency] = useWatch({ control, name: ['type', 'quantity', 'pricePerUnit', 'fees', 'currency'] });
+  const [type, quantity, price, fees, currency, transactionDate] = useWatch({ control, name: ['type', 'quantity', 'pricePerUnit', 'fees', 'currency', 'transactionDate'] });
   const total = type === 'DIVIDEND' ? Number(price) || 0 : (Number(quantity) || 0) * (Number(price) || 0);
   const held = asset ? heldQuantities?.[asset.symbol] ?? 0 : 0;
   const oversell = !isEdit && type === 'SELL' && heldQuantities !== undefined && (Number(quantity) || 0) > held;
@@ -185,6 +186,8 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
           )}
 
           <Input label="Date" type="datetime-local" max={nowLocalInput()} {...register('transactionDate')} error={errors.transactionDate?.message} />
+          <TransactionCheckHint portfolioId={portfolioId} symbol={asset.symbol} type={type} dateTime={transactionDate}
+            price={String(price ?? '')} currency={currency} onUsePrice={p => setValue('pricePerUnit', String(p), { shouldValidate: true })} />
           <Input label="Notes (optionnel)" {...register('notes')} error={errors.notes?.message} />
 
           <div className="flex justify-between text-sm border-t border-border pt-3">

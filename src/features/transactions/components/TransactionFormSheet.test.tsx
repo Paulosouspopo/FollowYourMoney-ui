@@ -16,6 +16,10 @@ vi.mock('@/features/transactions/api/transaction.api', () => ({
   useDeleteTransaction: () => mutation(vi.fn()),
 }));
 
+// Contrôle de cohérence du prix (réseau) : simulé, aucun avertissement par défaut
+const checkWarnings = vi.fn(() => [] as unknown[]);
+vi.mock('@/features/quality/api/quality.api', () => ({ useTransactionCheck: () => ({ data: checkWarnings() }) }));
+
 const AAPL = { symbol: 'AAPL', name: 'Apple Inc.', currency: 'USD' };
 
 function renderForm(props: Partial<Parameters<typeof TransactionFormSheet>[0]> = {}) {
@@ -130,5 +134,17 @@ describe('TransactionFormSheet', () => {
     await submit(user);
 
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it('prix loin du cours du jour : avertissement et « Utiliser » remplace le prix saisi', async () => {
+    checkWarnings.mockReturnValue([{ code: 'PRICE_MISMATCH', message: 'Cours de clôture du 14/03/2026 : 200,00 $US. Ton prix s’en écarte de −75 %.',
+      suggestedPrice: 200, currency: 'USD', marketDate: '2026-03-14' }]);
+    const { user } = renderForm();
+    await user.type(screen.getByLabelText('Prix unitaire'), '50');
+    expect(await screen.findByText(/Erreur de saisie \?/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Utiliser 200,00/ }));
+    expect(screen.getByLabelText('Prix unitaire')).toHaveValue(200);
+    checkWarnings.mockReturnValue([]);
   });
 });

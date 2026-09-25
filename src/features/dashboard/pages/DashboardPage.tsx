@@ -13,6 +13,7 @@ import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { DashboardSkeleton } from '../components/DashboardSkeleton';
 import { UpcomingPlansCard } from '@/features/plans/components/UpcomingPlansCard';
 import { PerformanceCard } from '@/features/performance/components/PerformanceCard';
+import { DataQualityBanner } from '@/features/quality/components/DataQualityBanner';
 
 /**
  * Accueil. Mobile : une colonne, l'essentiel en haut. Grand écran : le
@@ -28,6 +29,7 @@ export default function DashboardPage() {
         <div className="space-y-6 lg:grid lg:grid-cols-12 lg:gap-8 lg:space-y-0">
           <div className="space-y-6 lg:col-span-8 min-w-0">
             {d.hasIncompletePrices && <IncompletePricesBanner />}
+            <DataQualityBanner />
             <ValueHero label="Patrimoine" valueEur={d.totalValueEur} curve={d.curve} curveCurrency={d.curveCurrency}
               periodLabel={PERIOD_SENTENCE[period]}
               aside={<>Investi <MoneyValue value={d.totalInvestedEur} className="text-foreground font-medium" /></>}
