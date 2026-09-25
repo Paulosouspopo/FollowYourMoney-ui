@@ -4,6 +4,19 @@ import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 import { toast } from '@/shared/ui/toast.store';
 import { useDataIssues, useDismissIssue } from '../api/quality.api';
+import type { DataIssue } from '../model/quality.types';
+
+const ACTION_LABEL: Record<DataIssue['code'], string> = {
+  PRICE_MISMATCH: "Corriger l'opération",
+  SPLIT_SUSPECTED: 'Voir la position',
+  PEA_INELIGIBLE: "Changer d'actif",
+};
+
+/** Fiche de la position ; pour un actif mal choisi, fenêtre « Changer d'actif » ouverte d'emblée. */
+const issueLink = (i: DataIssue) => {
+  const position = `/portfolios/${i.portfolioId}/positions/${encodeURIComponent(i.symbol)}`;
+  return i.code === 'PEA_INELIGIBLE' ? `${position}?changer=1` : position;
+};
 
 /**
  * Accueil : opérations qui ressemblent à des erreurs de saisie (prix loin du
@@ -31,9 +44,9 @@ export function DataQualityBanner() {
             <li key={i.key} className="space-y-2 px-4 py-3">
               <p className="text-foreground">{i.message}</p>
               <div className="flex flex-wrap gap-2 text-xs">
-                <Link to={i.transactionId ? `/portfolios/${i.portfolioId}/positions/${encodeURIComponent(i.symbol)}` : `/portfolios/${i.portfolioId}`}
+                <Link to={issueLink(i)}
                   className="rounded-full bg-warning/20 px-2.5 py-1 font-medium text-warning hover:bg-warning/30">
-                  {!i.transactionId ? 'Voir le portefeuille' : i.code === 'SPLIT_SUSPECTED' ? 'Voir la position' : "Corriger l'opération"}
+                  {ACTION_LABEL[i.code]}
                 </Link>
                 <button type="button" disabled={dismiss.isPending}
                   onClick={() => dismiss.mutate(i.key, { onError: e => toast.error(e.message) })}
