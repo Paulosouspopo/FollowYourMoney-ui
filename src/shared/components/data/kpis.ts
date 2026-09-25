@@ -7,11 +7,11 @@ interface PerformanceFields {
 /** Une seule fonction pour dériver les KPI, que ce soit d'un DashboardResponse ou d'un PortfolioValuation (ils partagent ces champs). */
 export const performanceKpis = (d: PerformanceFields): Kpi[] => [
   { label: 'Latent', value: d.unrealizedGainEur, signed: true, colored: true },
-  { label: 'Réalisé', value: d.realizedGainEur, signed: true, colored: true },
-  { label: 'Dividendes', value: d.dividendsEur },
-  // Intérêts : seulement quand il y en a (rémunération des espèces d'un compte suivi)
+  // Les autres seulement quand ils existent : pas de tuile « 0,00 € »
+  ...(d.realizedGainEur ? [{ label: 'Réalisé', value: d.realizedGainEur, signed: true, colored: true }] : []),
+  ...(d.dividendsEur ? [{ label: 'Dividendes', value: d.dividendsEur }] : []),
   ...(d.interestEur ? [{ label: 'Intérêts', value: d.interestEur }] : []),
-  { label: 'Frais', value: -d.totalFeesEur, signed: true, colored: true },
+  ...(d.totalFeesEur ? [{ label: 'Frais', value: -d.totalFeesEur, signed: true, colored: true }] : []),
 ];
 
 /** Livret : ni plus-value ni dividende, seulement des versements et des intérêts. */

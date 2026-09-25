@@ -26,19 +26,23 @@ export default function MarketDetailPage() {
   const q = useMarketDetail(symbol);
 
   return (
-    <div className="space-y-4">
+    <div>
       <TopBar back title={q.data?.name ?? symbol} right={q.data && <FollowButton detail={q.data} />} />
       <QueryBoundary query={q}>
         {d => (
-          <>
-            <Hero detail={d} />
-            <MarketChart symbol={d.symbol} currency={d.currency} />
-            {d.low52w != null && d.high52w != null && (
-              <Card className="p-4"><RangeBar low={d.low52w} high={d.high52w} price={d.price} currency={d.currency} /></Card>
-            )}
-            <Holdings detail={d} />
-            <Alerts detail={d} />
-          </>
+          <div className="space-y-6 lg:grid lg:grid-cols-12 lg:gap-8 lg:space-y-0">
+            <div className="space-y-6 lg:col-span-8 min-w-0">
+              <Hero detail={d} />
+              <MarketChart symbol={d.symbol} currency={d.currency} />
+            </div>
+            <aside className="space-y-6 lg:col-span-4 min-w-0 lg:pt-4">
+              {d.low52w != null && d.high52w != null && (
+                <Card className="p-4"><RangeBar low={d.low52w} high={d.high52w} price={d.price} currency={d.currency} /></Card>
+              )}
+              <Holdings detail={d} />
+              <Alerts detail={d} />
+            </aside>
+          </div>
         )}
       </QueryBoundary>
     </div>
@@ -68,20 +72,19 @@ function FollowButton({ detail }: { detail: MarketDetail }) {
 
 function Hero({ detail: d }: { detail: MarketDetail }) {
   return (
-    <Card className="p-4 space-y-2">
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+    <section className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
+      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
         <span>{d.symbol}{d.exchange && ` · ${d.exchange}`}</span>
         {d.assetType && <AssetTypeBadge type={d.assetType} />}
       </div>
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <span className="text-3xl font-semibold tabular-nums">{formatMoney(d.price, d.currency)}</span>
+      <p className="text-display mt-2">{formatMoney(d.price, d.currency)}</p>
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
         <PercentBadge value={d.dayChangePct} />
+        <span className="text-muted-foreground">
+          {d.currency !== 'EUR' && `≈ ${formatEur(d.priceEur)} · `}séance du {formatDate(d.marketDate)}
+        </span>
       </div>
-      <p className="text-xs text-muted-foreground">
-        {d.currency !== 'EUR' && `≈ ${formatEur(d.priceEur)} · `}
-        {d.dayChangePct != null ? 'vs clôture précédente · ' : ''}séance du {formatDate(d.marketDate)}
-      </p>
-    </Card>
+    </section>
   );
 }
 
@@ -89,7 +92,7 @@ function Holdings({ detail: d }: { detail: MarketDetail }) {
   if (!d.holdings.length) return null;
   return (
     <section className="space-y-2">
-      <h2 className="text-sm font-medium">Mes lignes</h2>
+      <h2 className="text-sm font-semibold tracking-tight">Mes lignes</h2>
       <Card className="divide-y divide-border p-0">
         {d.holdings.map(h => (
           <Link key={h.portfolioId} to={`/portfolios/${h.portfolioId}/positions/${encodeURIComponent(d.symbol)}`}
@@ -127,7 +130,7 @@ function Alerts({ detail: d }: { detail: MarketDetail }) {
 
   return (
     <section className="space-y-2">
-      <h2 className="text-sm font-medium">Mes alertes</h2>
+      <h2 className="text-sm font-semibold tracking-tight">Mes alertes</h2>
       {d.alerts.length > 0 && (
         <Card className="px-4 py-0">
           <ul className="divide-y divide-border">

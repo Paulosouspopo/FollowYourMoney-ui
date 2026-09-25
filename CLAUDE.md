@@ -129,6 +129,37 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   La courbe arrive convertie du back (`curveCurrency`, taux historiques) :
   `EvolutionChart` la formate avec `formatMoney`, sans reconvertir.
 
+## Interface (système visuel)
+- Tokens dans `src/index.css` (oklch) : neutres bleutés, UN accent
+  (`--primary`, indigo), `--positive` / `--negative`, `--glow`. Aucune
+  couleur en dur (sauf les couleurs de catégories dans `shared/model/enums`).
+- Signature : `ValueHero` (dashboard, portefeuille) = montant en
+  `.text-display` animé (`useCountUp`) + courbe ; glisser sur la courbe met à
+  jour l'en-tête (date, valeur, variation de plus-value depuis le début de la
+  période). Halo : classe `.glow` (pseudo-élément, une seule par écran).
+- Graphiques maison, sans librairie (recharts retiré, −100 Ko gzip) :
+  `shared/charts/TimeSeriesChart` (aire / ligne / pointillés, curseur
+  souris-doigt-clavier, bulle optionnelle, axe % optionnel), `DonutChart`,
+  géométrie testée dans `geometry.ts` (courbe monotone : pas de faux pic).
+  Tracé animé via `pathLength` + `.chart-draw` ; l'animation se termine sans
+  tirets (robuste si `pathLength` est ignoré). Mémoriser `series`/`dates`
+  (`useMemo`) : le composant est `memo`.
+- Mise en page : mobile une colonne + dock flottant (`BottomNav`) ; ≥ lg
+  barre latérale (`Sidebar`, liste commune `app/layout/nav.ts`) et grille
+  12 colonnes (8 + 4) sur l'accueil, un portefeuille, une fiche actif. Pages
+  de formulaire bornées (`lg:max-w-2xl` / `3xl`). `BottomSheet` = fenêtre
+  centrée sur grand écran.
+- Titres de page `text-2xl font-semibold tracking-tight`, de section
+  `SectionHeader` ; tuiles de chiffres sans « 0,00 € » inutiles.
+- Premier lancement (aucun portefeuille) : `Welcome`. Démarrage : écran de
+  marque dans `index.html` puis `Splash` (même rendu).
+- Perf : pages préchargées à l'inactivité (`app/pages.ts`), données d'un
+  portefeuille préchargées au survol (`usePrefetchPortfolio`).
+- Vérifier visuellement : captures Playwright (Chrome installé) en mobile
+  390 px et bureau 1440 px, thèmes clair et sombre. Attention : la connexion
+  est limitée (10 / email, 20 / IP par 15 min) et le cookie de session
+  tourne à chaque renouvellement (ne pas le rejouer entre contextes).
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

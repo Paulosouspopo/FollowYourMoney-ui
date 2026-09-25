@@ -30,7 +30,7 @@ export function AssetMappingList({ assets, choices, onChange }: Props) {
   return (
     <section className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-sm font-medium">Actifs ({assets.length})</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Actifs ({assets.length})</h2>
         {pending > 0 && <span className="text-xs text-warning">{pending} à valider</span>}
       </div>
       <Card className="divide-y divide-border p-0 gap-0">

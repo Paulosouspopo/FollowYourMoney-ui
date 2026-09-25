@@ -75,21 +75,21 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="space-y-6 pt-2">
-      <h1 className="text-lg font-semibold">Réglages</h1>
+    <div className="space-y-6 pt-4 lg:max-w-2xl">
+      <h1 className="text-2xl font-semibold tracking-tight">Réglages</h1>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">Apparence</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Apparence</h2>
         <Card className="p-4 space-y-4"><ThemePicker /><CurrencyPicker /></Card>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">Notifications</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Notifications</h2>
         <PushSettingsCard />
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">Profil</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Profil</h2>
         <QueryBoundary query={me}>
           {u => (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
@@ -106,7 +106,7 @@ export default function SettingsPage() {
       <SecuritySection />
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">Compte</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Compte</h2>
         <Card className="p-4 space-y-3">
           <Button variant="outline" className="w-full" onClick={logout}><LogOut size={16} /> Se déconnecter</Button>
           <Button variant="destructive" className="w-full" onClick={() => setConfirmDelete(true)}>Supprimer mon compte</Button>

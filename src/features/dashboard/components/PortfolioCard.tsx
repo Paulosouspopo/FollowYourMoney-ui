@@ -7,11 +7,14 @@ import { Card } from "@/shared/ui/card";
 import { AlertTriangle } from "lucide-react";
 import type { PortfolioValuation } from "../model/dashboard.types";
 import { Link } from "react-router-dom";
+import { usePrefetchPortfolio } from "../api/dashboard.api";
 
 export function PortfolioCard({ valuation: v, className }: { valuation: PortfolioValuation; className?: string }) {
   const isLivret = v.type === 'LIVRET';
+  const prefetch = usePrefetchPortfolio();
   return (
-    <Link to={`/portfolios/${v.portfolioId}`} className={cn('block', className)}>
+    <Link to={`/portfolios/${v.portfolioId}`} className={cn('block', className)}
+      onPointerEnter={() => void prefetch(v.portfolioId)} onTouchStart={() => void prefetch(v.portfolioId)}>
       <Card className="p-4 h-full">
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">

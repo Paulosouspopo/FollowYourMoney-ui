@@ -45,7 +45,7 @@ export function SecuritySection() {
 
   return (
     <section className="space-y-2">
-      <h2 className="text-sm font-medium">Sécurité</h2>
+      <h2 className="text-sm font-semibold tracking-tight">Sécurité</h2>
       <Card className="p-4 space-y-4">
         <ChangePasswordForm />
         <div className="border-t border-border pt-4">

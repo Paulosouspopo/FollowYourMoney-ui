@@ -1,53 +1,50 @@
-import { useState } from 'react';
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useCallback, useMemo, useState } from 'react';
 import { Card } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { SegmentedControl } from '@/shared/ui/SegmentedControl';
 import { PercentBadge } from '@/shared/components/data/PercentBadge';
-import { formatMoney, formatShortDate } from '@/shared/lib/format';
+import { TimeSeriesChart, type ChartSeries } from '@/shared/charts/TimeSeriesChart';
+import { formatLongDate, formatMoney } from '@/shared/lib/format';
 import { useMarketHistory } from '../api/market.api';
 import { MARKET_RANGES, type MarketRange } from '../model/market.types';
 
-/** Cours de clôture d'un actif sur la période choisie (devise de cotation). */
+/**
+ * Cours de clôture sur la période choisie (devise de cotation). Glisser sur la
+ * courbe affiche le cours du jour survolé et la variation depuis le début.
+ */
 export function MarketChart({ symbol, currency }: { symbol: string; currency: string }) {
   const [range, setRange] = useState<MarketRange>('1Y');
+  const [scrub, setScrub] = useState<number | null>(null);
+  const onScrub = useCallback((i: number | null) => setScrub(i), []);
   const q = useMarketHistory(symbol, range);
-  const points = q.data ?? [];
+  const points = useMemo(() => q.data ?? [], [q.data]);
   const first = points[0]?.close;
-  const last = points[points.length - 1]?.close;
-  const change = first && last ? ((last - first) / first) * 100 : null;
-  const color = change == null || change >= 0 ? 'var(--positive)' : 'var(--negative)';
+  const current = points[scrub ?? points.length - 1];
+  const change = first && current ? ((current.close - first) / first) * 100 : null;
+  const up = change == null || change >= 0;
+
+  const dates = useMemo(() => points.map(p => p.date), [points]);
+  const series = useMemo<ChartSeries[]>(() => [
+    { key: 'close', values: points.map(p => p.close), color: up ? 'var(--positive)' : 'var(--negative)', variant: 'area' },
+  ], [points, up]);
 
   return (
     <Card className="p-4 space-y-3">
-      <div className="flex items-center justify-between gap-2">
-        <SegmentedControl<MarketRange> value={range} onChange={setRange} options={MARKET_RANGES} />
+      <div className="flex items-center justify-between gap-2 min-h-7">
+        <p className="text-xs text-muted-foreground tabular-nums">
+          {scrub != null && current
+            ? <><span className="font-semibold text-foreground">{formatMoney(current.close, currency)}</span> · {formatLongDate(current.date)}</>
+            : 'Sur la période'}
+        </p>
         <PercentBadge value={change} />
       </div>
-      {q.isPending ? <Skeleton className="h-[200px] w-full" /> : points.length < 2 ? (
-        <p className="h-[200px] grid place-items-center text-sm text-muted-foreground">Pas d'historique sur cette période</p>
+      {q.isPending ? <Skeleton className="h-[220px] w-full" /> : points.length < 2 ? (
+        <p className="h-[220px] grid place-items-center text-sm text-muted-foreground">Pas d'historique sur cette période</p>
       ) : (
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={points} margin={{ left: 0, right: 0, top: 8, bottom: 0 }}>
-            <defs>
-              <linearGradient id="fym-market-area" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.3} />
-                <stop offset="100%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <XAxis dataKey="date" tickFormatter={formatShortDate} tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-              axisLine={false} tickLine={false} minTickGap={32} />
-            <YAxis hide domain={['auto', 'auto']} />
-            <Tooltip
-              contentStyle={{ background: 'var(--popover)', color: 'var(--popover-foreground)', border: '1px solid var(--border)', borderRadius: 12 }}
-              itemStyle={{ color: 'var(--popover-foreground)' }}
-              formatter={v => [formatMoney(Number(v ?? 0), currency), 'Clôture']}
-              labelFormatter={l => formatShortDate(String(l))}
-            />
-            <Area type="monotone" dataKey="close" stroke={color} fill="url(#fym-market-area)" strokeWidth={2} />
-          </AreaChart>
-        </ResponsiveContainer>
+        <TimeSeriesChart key={range} dates={dates} series={series} height={220} onScrub={onScrub}
+          ariaLabel={`Cours de ${symbol}`} />
       )}
+      <SegmentedControl<MarketRange> fullWidth value={range} onChange={setRange} options={MARKET_RANGES} />
     </Card>
   );
 }

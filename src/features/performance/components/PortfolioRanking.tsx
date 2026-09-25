@@ -12,8 +12,8 @@ const signed = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${formatPercen
 export function PortfolioRanking({ portfolios }: { portfolios: PortfolioPerformance[] }) {
   const ranked = [...portfolios].sort((a, b) => b.twrPct - a.twrPct);
   return (
-    <Card className="p-0">
-      <div className="flex justify-between px-4 pt-3 pb-1 text-[11px] text-muted-foreground">
+    <Card className="p-0 gap-0">
+      <div className="flex justify-between px-4 pt-3 pb-2 text-[11px] text-muted-foreground border-b border-border">
         <span>Portefeuille</span><span>Performance · gain</span>
       </div>
       <ul className="divide-y divide-border">

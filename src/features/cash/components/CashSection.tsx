@@ -27,7 +27,7 @@ export function CashSection({ portfolioId, balance, isLivret = false }: Props) {
   return (
     <section className="space-y-2">
       {isLivret ? (
-        <h2 className="text-sm font-medium">Mouvements</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Mouvements</h2>
       ) : (
         <Card className="p-4 flex-row items-center gap-3">
           <span className="h-9 w-9 rounded-full bg-muted grid place-items-center shrink-0"><Wallet size={16} /></span>

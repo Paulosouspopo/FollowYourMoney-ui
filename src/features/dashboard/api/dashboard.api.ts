@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { useEffectiveDisplayCurrency } from '@/shared/currency/displayRates.api';
 import type { DashboardResponse, DashboardPeriod } from '@/features/dashboard/model/dashboard.types';
@@ -28,5 +28,16 @@ export const usePortfolioDashboard = (portfolioId: string, period: DashboardPeri
       .then(r => r.data),
     placeholderData: prev => prev,
     enabled: !!portfolioId,
+  });
+};
+/** Survol / appui d'un lien de portefeuille : ses données arrivent avant le clic. */
+export const usePrefetchPortfolio = () => {
+  const qc = useQueryClient();
+  const { currency } = useEffectiveDisplayCurrency();
+  return (portfolioId: string, period: DashboardPeriod = '30d') => qc.prefetchQuery({
+    queryKey: dashboardKeys.portfolio(portfolioId, period, currency),
+    queryFn: () => api.get<DashboardResponse>(`/dashboard/portfolios/${portfolioId}`, { params: { period, currency } })
+      .then(r => r.data),
+    staleTime: 30_000,
   });
 };

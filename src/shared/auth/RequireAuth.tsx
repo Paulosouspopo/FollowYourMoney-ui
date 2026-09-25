@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Logo } from '@/app/layout/Logo';
 import { useAuthStore } from './auth.store';
 import { refreshSession } from './session';
 
@@ -13,10 +13,11 @@ function useRestoreSession() {
   return status;
 }
 
-function Splash() {
+/** Même rendu que l'écran de démarrage d'index.html : aucune transition visible. */
+export function Splash() {
   return (
-    <div className="min-h-dvh grid place-items-center bg-background" aria-busy="true">
-      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-label="Chargement" />
+    <div className="min-h-dvh grid place-items-center bg-background" aria-busy="true" aria-label="Chargement">
+      <Logo className="h-14 w-14 animate-pulse" />
     </div>
   );
 }

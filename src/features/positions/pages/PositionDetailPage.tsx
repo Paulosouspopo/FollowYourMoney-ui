@@ -26,7 +26,7 @@ export default function PositionDetailPage() {
   const position = dash.data?.portfolios[0]?.positions.find(p => p.symbol === symbol);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 lg:max-w-3xl">
       <TopBar back title={position?.name ?? symbol} />
 
       <QueryBoundary query={dash}>
@@ -58,7 +58,7 @@ export default function PositionDetailPage() {
       </QueryBoundary>
 
       <section>
-        <h2 className="text-sm font-medium mb-1">Historique</h2>
+        <h2 className="text-sm font-semibold tracking-tight mb-1">Historique</h2>
         <QueryBoundary query={txs}>
           {list => list.length
             ? <div className="divide-y divide-border">

@@ -22,7 +22,7 @@ export function PlansSection({ portfolioId, portfolioType, cashTracking }: Props
     <section className="space-y-1">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-medium">Investissements programmés</h2>
+          <h2 className="text-sm font-semibold tracking-tight">Investissements programmés</h2>
           {monthly > 0 && <p className="text-xs text-muted-foreground">≈ <MoneyValue value={monthly} /> par mois</p>}
         </div>
         <Button size="sm" variant="outline" onClick={() => setEditing('new')}><Plus size={14} /> Programmer</Button>

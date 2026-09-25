@@ -28,7 +28,7 @@ export function PositionsList({ portfolioId, positions }: Props) {
   return (
     <section>
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-sm font-medium">Positions ({rows.length})</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Positions ({rows.length})</h2>
         <SegmentedControl value={sort} onChange={setSort}
           options={[{ value: 'value', label: 'Valeur' }, { value: 'gain', label: '%' }, { value: 'name', label: 'A‑Z' }]} />
       </div>

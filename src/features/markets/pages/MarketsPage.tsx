@@ -35,9 +35,9 @@ export default function MarketsPage() {
   const suggestions = SUGGESTIONS.filter(s => !followed.has(s.symbol));
 
   return (
-    <div className="space-y-4 pt-2">
+    <div className="space-y-4 pt-4 lg:max-w-3xl">
       <header className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Marchés</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Marchés</h1>
         <Button size="sm" onClick={() => setAdding(true)}><Plus size={16} /> Suivre</Button>
       </header>
 

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/shared/ui/card';
+import { SectionHeader } from '@/shared/ui/SectionHeader';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { useMyPlans } from '../api/plan.api';
 import { PlanRow } from './PlanRow';
@@ -15,16 +16,16 @@ export function UpcomingPlansCard() {
   const monthly = running.reduce((s, p) => s + p.monthlyAmount, 0);
 
   return (
-    <Card className="p-4 gap-1">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-sm font-medium">Investissements programmés</h2>
-        <span className="text-xs text-muted-foreground">≈ <MoneyValue value={monthly} /> / mois</span>
-      </div>
-      <div className="divide-y divide-border">
-        {running.slice(0, SHOWN).map(p => (
-          <PlanRow key={p.id} plan={p} showPortfolio onClick={() => nav(`/portfolios/${p.portfolioId}`)} />
-        ))}
-      </div>
-    </Card>
+    <section>
+      <SectionHeader title="Investissements programmés"
+        action={<span className="text-xs text-muted-foreground">≈ <MoneyValue value={monthly} /> / mois</span>} />
+      <Card className="px-4 py-1 gap-0">
+        <div className="divide-y divide-border">
+          {running.slice(0, SHOWN).map(p => (
+            <PlanRow key={p.id} plan={p} showPortfolio onClick={() => nav(`/portfolios/${p.portfolioId}`)} />
+          ))}
+        </div>
+      </Card>
+    </section>
   );
 }

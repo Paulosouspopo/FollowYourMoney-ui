@@ -12,11 +12,6 @@ vi.mock('@/features/assets/api/assetSearch.api', () => ({
   ASSET_SEARCH_MIN_LENGTH: 2,
   useAssetSearch: () => ({ data: [], isFetching: false }),
 }));
-// Recharts mesure le conteneur : sans mise en page dans jsdom, on ne teste pas le tracé
-vi.mock('recharts', async orig => ({
-  ...(await orig<typeof import('recharts')>()),
-  ResponsiveContainer: () => <div data-testid="chart" />,
-}));
 
 const data: PerformanceResponse = {
   period: '1y', from: '2025-09-25', to: '2026-09-24',
@@ -46,7 +41,8 @@ describe('PerformanceCard', () => {
     expect(screen.getAllByText(/\+8,50/)[0]).toBeInTheDocument();
     expect(screen.getByText(/\+7,90/)).toBeInTheDocument();
     expect(screen.getByText('par an (XIRR)')).toBeInTheDocument();
-    expect(screen.getByText(/Devant Amundi MSCI World de 2,00/)).toBeInTheDocument();
+    // Libellé court choisi, pas le nom Yahoo complet
+    expect(screen.getByText(/Devant MSCI World de 2,00/)).toBeInTheDocument();
 
     const rows = screen.getAllByRole('link');
     expect(rows[0]).toHaveTextContent('Crypto'); // +20 % : premier malgré la plus petite valeur

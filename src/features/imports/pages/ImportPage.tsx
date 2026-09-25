@@ -119,7 +119,7 @@ export default function ImportPage() {
   const title = portfolio.data ? `Importer · ${portfolio.data.name}` : 'Importer un relevé';
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-4 pb-24 lg:max-w-3xl">
       <TopBar back title={title} />
 
       {step === 'upload' && (

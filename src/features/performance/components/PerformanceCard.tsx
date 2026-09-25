@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Info } from 'lucide-react';
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { TimeSeriesChart, type ChartSeries } from '@/shared/charts/TimeSeriesChart';
 import { Card } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
-import { formatPercent, formatShortDate, gainTone } from '@/shared/lib/format';
+import { formatPercent, gainTone } from '@/shared/lib/format';
 import { cn } from '@/shared/lib/cn';
 import { usePerformance } from '../api/performance.api';
 import { useBenchmarkStore } from '../model/benchmark.store';
@@ -33,7 +33,7 @@ export function PerformanceCard({ portfolioId }: { portfolioId: string | null })
   return (
     <section className="space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium flex items-center gap-1.5">
+        <h2 className="text-sm font-semibold tracking-tight flex items-center gap-1.5">
           Performance
           <button type="button" onClick={() => setHelp(h => !h)} aria-expanded={help}
             aria-label="Comment la performance est calculée" className="text-muted-foreground">
@@ -82,12 +82,22 @@ function PeriodPills({ value, onChange }: { value: PerformancePeriod; onChange: 
   );
 }
 
+/** Nom court de l'indice : celui choisi (« MSCI World ») plutôt que le nom Yahoo complet. */
+function useBenchmarkName(d: PerformanceResponse) {
+  const chosen = useBenchmarkStore(s => s.benchmark);
+  return chosen?.symbol === d.benchmark?.symbol ? chosen?.label : d.benchmark?.name;
+}
+
 function Kpis({ data: d }: { data: PerformanceResponse }) {
   const vsIndex = d.benchmark?.returnPct != null ? d.twrPct - d.benchmark.returnPct : null;
+  const benchmarkName = useBenchmarkName(d);
+  // Sur 1 an pile, l'annualisé répète le cumulé : on ne l'affiche que s'il diffère
+  const annualized = d.twrAnnualizedPct != null && Math.abs(d.twrAnnualizedPct - d.twrPct) >= 0.05
+    ? d.twrAnnualizedPct : null;
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
       <Kpi label="Performance" value={signedPercent(d.twrPct)} tone={d.twrPct}
-        sub={d.twrAnnualizedPct != null ? `${signedPercent(d.twrAnnualizedPct)} par an` : undefined} />
+        sub={annualized != null ? `${signedPercent(annualized)} par an` : 'sur la période'} />
       <Kpi label="Rendement de ton argent" value={signedPercent(d.xirrPct ?? d.mwrPct)} tone={d.xirrPct ?? d.mwrPct}
         sub={d.xirrPct != null ? 'par an (XIRR)' : 'sur la période'} />
       <div>
@@ -100,7 +110,7 @@ function Kpis({ data: d }: { data: PerformanceResponse }) {
       </div>
       {vsIndex != null && d.benchmark && (
         <p className={cn('col-span-2 text-xs', gainTone(vsIndex))}>
-          {vsIndex >= 0 ? 'Devant' : 'Derrière'} {d.benchmark.name} de {formatPercent(Math.abs(vsIndex))}
+          {vsIndex >= 0 ? 'Devant' : 'Derrière'} {benchmarkName} de {formatPercent(Math.abs(vsIndex))}
           <span className="text-muted-foreground"> ({signedPercent(d.benchmark.returnPct)} pour l'indice)</span>
         </p>
       )}
@@ -119,37 +129,40 @@ function Kpi({ label, value, tone, sub }: { label: string; value: string; tone: 
 }
 
 function ComparisonChart({ data: d }: { data: PerformanceResponse }) {
+  const benchmarkName = useBenchmarkName(d);
+  const hasBenchmark = d.series.some(p => p.benchmarkPct != null);
+  const dates = useMemo(() => d.series.map(p => p.date), [d.series]);
+  const series = useMemo<ChartSeries[]>(() => [
+    { key: 'twr', values: d.series.map(p => p.twrPct), color: 'var(--primary)', variant: 'line' },
+    ...(hasBenchmark
+      ? [{ key: 'bench', values: d.series.map(p => p.benchmarkPct), color: 'var(--muted-foreground)', variant: 'dashed' as const }]
+      : []),
+  ], [d.series, hasBenchmark]);
+
   if (d.series.length < 2) {
     return <p className="py-6 text-center text-sm text-muted-foreground">Pas encore assez d'historique sur cette période.</p>;
   }
-  const hasBenchmark = d.series.some(p => p.benchmarkPct != null);
   return (
     <div>
-      <ResponsiveContainer width="100%" height={180}>
-        <LineChart data={d.series} margin={{ left: 0, right: 4, top: 8, bottom: 0 }}>
-          <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3" />
-          <XAxis dataKey="date" tickFormatter={formatShortDate} tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-            axisLine={false} tickLine={false} minTickGap={32} />
-          <YAxis width={44} tickFormatter={v => `${Math.round(Number(v))} %`} axisLine={false} tickLine={false}
-            tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} domain={['auto', 'auto']} />
-          <Tooltip
-            contentStyle={{ background: 'var(--popover)', color: 'var(--popover-foreground)', border: '1px solid var(--border)', borderRadius: 12 }}
-            itemStyle={{ color: 'var(--popover-foreground)' }}
-            formatter={(v, name) => [signedPercent(Number(v)), name === 'twrPct' ? 'Mes placements' : d.benchmark?.name ?? 'Indice']}
-            labelFormatter={l => formatShortDate(String(l))}
-          />
-          {hasBenchmark && (
-            <Line type="monotone" dataKey="benchmarkPct" stroke="var(--muted-foreground)" strokeDasharray="4 4"
-              strokeWidth={1.5} dot={false} connectNulls />
-          )}
-          <Line type="monotone" dataKey="twrPct" stroke="var(--primary)" strokeWidth={2} dot={false} />
-        </LineChart>
-      </ResponsiveContainer>
+      <TimeSeriesChart dates={dates} series={series} height={180} baseline={0}
+        yFormat={v => `${Math.round(v)} %`}
+        ariaLabel={`Performance comparée${hasBenchmark ? ` à ${benchmarkName}` : ''}`}
+        tooltip={i => (
+          <div className="mt-0.5 space-y-0.5">
+            <p className="flex justify-between gap-2"><span className="text-muted-foreground">Moi</span>
+              <span className="font-medium tabular-nums">{signedPercent(d.series[i].twrPct)}</span></p>
+            {hasBenchmark && (
+              <p className="flex justify-between gap-2"><span className="text-muted-foreground">Indice</span>
+                <span className="font-medium tabular-nums">{signedPercent(d.series[i].benchmarkPct)}</span></p>
+            )}
+          </div>
+        )} />
       <div className="flex gap-4 mt-1 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5"><span className="h-0.5 w-4 bg-primary rounded" /> Mes placements</span>
         {hasBenchmark && (
-          <span className="flex items-center gap-1.5">
-            <span className="h-0 w-4 border-t border-dashed border-muted-foreground" /> {d.benchmark?.name}
+          <span className="flex items-center gap-1.5 min-w-0">
+            <span className="h-0 w-4 shrink-0 border-t border-dashed border-muted-foreground" />
+            <span className="truncate">{benchmarkName}</span>
           </span>
         )}
       </div>

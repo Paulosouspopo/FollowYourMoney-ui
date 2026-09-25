@@ -3,6 +3,10 @@ import type { AllocationCategory, AssetType, PortfolioType } from '@/shared/mode
 export const DASHBOARD_PERIODS = ['7d', '30d', '90d', '1y', 'all'] as const;
 export type DashboardPeriod = typeof DASHBOARD_PERIODS[number];
 export const PERIOD_LABEL: Record<DashboardPeriod, string> = { '7d': '1S', '30d': '1M', '90d': '3M', '1y': '1A', all: 'Max' };
+/** Pour une phrase : « +120 € sur 1 mois ». */
+export const PERIOD_SENTENCE: Record<DashboardPeriod, string> = {
+  '7d': 'sur 7 jours', '30d': 'sur 1 mois', '90d': 'sur 3 mois', '1y': 'sur 1 an', all: 'depuis le début',
+};
 
 export interface PositionValuation {
   assetId: string; symbol: string; name: string; assetType: AssetType;

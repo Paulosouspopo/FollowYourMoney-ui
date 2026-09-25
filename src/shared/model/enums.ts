@@ -19,7 +19,7 @@ export const TRANSACTION_TYPE_LABEL: Record<TransactionType, string> = {
 
 /** Couleur stable par type → utilisée par le donut, les badges, les icônes. Une seule source. */
 export const ASSET_TYPE_COLOR: Record<AssetType, string> = {
-  ACTION: '#6366F1', ETF: '#10B981', CRYPTO: '#F59E0B', LIVRET: '#06B6D4', IMMOBILIER: '#EC4899', AUTRE: '#8B5CF6',
+  ACTION: '#7C7FFF', ETF: '#2DD4A0', CRYPTO: '#F5B83D', LIVRET: '#38BDF8', IMMOBILIER: '#F472B6', AUTRE: '#A78BFA',
 };
 /** Catégories de la répartition : types d'actifs + liquidités des comptes suivis (LIVRET = solde des livrets). */
 export type AllocationCategory = AssetType | 'LIQUIDITES';
