@@ -14,6 +14,7 @@ import { DashboardSkeleton } from '../components/DashboardSkeleton';
 import { UpcomingPlansCard } from '@/features/plans/components/UpcomingPlansCard';
 import { PerformanceCard } from '@/features/performance/components/PerformanceCard';
 import { DataQualityBanner } from '@/features/quality/components/DataQualityBanner';
+import { IncomeCard } from '@/features/income/components/IncomeCard';
 
 /**
  * Accueil. Mobile : une colonne, l'essentiel en haut. Grand écran : le
@@ -39,6 +40,7 @@ export default function DashboardPage() {
           </div>
           <aside className="space-y-6 lg:col-span-4 min-w-0 lg:pt-4">
             <PortfolioList portfolios={d.portfolios} />
+            <IncomeCard />
             <UpcomingPlansCard />
             <AllocationDonut slices={d.allocation} />
           </aside>

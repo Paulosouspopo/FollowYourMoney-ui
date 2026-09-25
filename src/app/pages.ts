@@ -12,6 +12,7 @@ export const appPages = {
   markets: () => import('@/features/markets/pages/MarketsPage'),
   marketDetail: () => import('@/features/markets/pages/MarketDetailPage'),
   alerts: () => import('@/features/notifications/pages/AlertsPage'),
+  income: () => import('@/features/income/pages/IncomePage'),
 };
 
 /** Pages atteignables en un geste depuis l'accueil : préchargées quand le navigateur est inactif. */

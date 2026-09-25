@@ -13,6 +13,7 @@ const Import = lazy(appPages.import);
 const Markets = lazy(appPages.markets);
 const MarketDetail = lazy(appPages.marketDetail);
 const Alerts = lazy(appPages.alerts);
+const Income = lazy(appPages.income);
 const Login = lazy(() => import('@/features/auth/pages/LoginPage'));
 const Register = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const ForgotPassword = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
         { path: 'markets', element: <Markets /> },
         { path: 'markets/:symbol', element: <MarketDetail /> },
         { path: 'alerts', element: <Alerts /> },
+        { path: 'income', element: <Income /> },
         { path: 'settings', element: <Settings /> },
       ],
     }],
