@@ -187,6 +187,14 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   accès par les cartes de l'accueil. Clés de requête de ces features sous
   `dashboardKeys.all` (rafraîchies par toute mutation d'opération).
 
+## Fiscalité et corrections
+- `/tax` (`features/tax`) : année (défaut : écoulée), impôt estimé, cases à
+  reporter (copie du montant), cessions titres / crypto, PEA (5 ans, plafond),
+  export CSV (`taxCsv.ts`, « ; » et virgule décimale), rappels. `TaxCard` sur
+  l'accueil. Date d'ouverture d'un portefeuille dans son formulaire.
+- « Changer d'actif » sur la fiche d'une position (`ReplaceAssetSheet`) ;
+  l'alerte PEA ouvre la fenêtre directement (`?changer=1`).
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

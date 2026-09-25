@@ -14,6 +14,7 @@ export const appPages = {
   alerts: () => import('@/features/notifications/pages/AlertsPage'),
   income: () => import('@/features/income/pages/IncomePage'),
   goals: () => import('@/features/goals/pages/GoalsPage'),
+  tax: () => import('@/features/tax/pages/TaxPage'),
 };
 
 /** Pages atteignables en un geste depuis l'accueil : préchargées quand le navigateur est inactif. */

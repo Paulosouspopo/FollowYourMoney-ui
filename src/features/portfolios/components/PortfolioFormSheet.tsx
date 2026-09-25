@@ -3,6 +3,7 @@ import { Button } from '@/shared/ui/button';
 import { FormError } from '@/shared/ui/FormError';
 import { PORTFOLIO_TYPE_LABEL, PORTFOLIO_TYPES } from '@/shared/model/enums';
 import { Input } from '@/shared/ui/Input';
+import { todayLocal } from '@/shared/lib/dates';
 import { Switch } from '@/shared/ui/Switch';
 import { z } from 'zod';
 import type { PortfolioResponse } from '../model/portfolio.types';
@@ -19,6 +20,7 @@ const schema = z.object({
   cashTracking: z.boolean(),
   // Champ texte vide = pas de taux
   annualInterestRate: z.union([z.literal(''), z.coerce.number({ error: 'Taux invalide' }).min(0, 'Taux ≥ 0').max(100, 'Taux ≤ 100')]),
+  openedAt: z.string().refine(d => !d || d <= todayLocal(), "La date d'ouverture ne peut pas être dans le futur"),
 });
 type FormInput = z.input<typeof schema>;
 type FormOutput = z.output<typeof schema>;
@@ -39,13 +41,15 @@ function PortfolioForm({ onClose, initial }: Props) {
       ? {
           name: initial.name, type: initial.type, description: initial.description ?? '',
           cashTracking: initial.cashTracking, annualInterestRate: initial.annualInterestRate ?? '',
+          openedAt: initial.openedAt ?? '',
         }
-      : { name: '', type: 'PEA', description: '', cashTracking: false, annualInterestRate: '' },
+      : { name: '', type: 'PEA', description: '', cashTracking: false, annualInterestRate: '', openedAt: '' },
   });
   const create = useCreatePortfolio();
   const update = useUpdatePortfolio(initial?.id ?? '');
   const mutation = isEdit ? update : create;
-  const isLivret = useWatch({ control, name: 'type' }) === 'LIVRET';
+  const type = useWatch({ control, name: 'type' });
+  const isLivret = type === 'LIVRET';
 
   const onSubmit: SubmitHandler<FormOutput> = (v) => mutation.mutate({
     name: v.name,
@@ -54,6 +58,7 @@ function PortfolioForm({ onClose, initial }: Props) {
     // Un livret suit toujours ses liquidités (le back l'impose aussi)
     cashTracking: isLivret || v.cashTracking,
     annualInterestRate: isLivret && v.annualInterestRate !== '' ? v.annualInterestRate : null,
+    openedAt: v.openedAt || null,
   }, {
     onSuccess: () => { toast.success(isEdit ? 'Portefeuille modifié' : 'Portefeuille créé'); onClose(); },
     onError: (e) => e.fieldErrors?.forEach(f => setError(f.field as keyof FormInput, { message: f.message })),
@@ -88,6 +93,10 @@ function PortfolioForm({ onClose, initial }: Props) {
               description="Versements, retraits et solde espèces du compte, inclus dans sa valeur." />
           )} />
         )}
+
+        <Input label="Date d'ouverture (optionnel)" type="date" max={todayLocal()} {...register('openedAt')}
+          error={errors.openedAt?.message}
+          hint={type === 'PEA' ? "Point de départ des 5 ans du PEA (fiscalité). À défaut : ta première opération." : undefined} />
 
         <Input label="Description (optionnel)" {...register('description')} error={errors.description?.message} />
         {mutation.isError && !mutation.error.fieldErrors && <FormError message={mutation.error.message} />}
