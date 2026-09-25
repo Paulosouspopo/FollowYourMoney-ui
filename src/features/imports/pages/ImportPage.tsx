@@ -149,7 +149,7 @@ export default function ImportPage() {
         <>
           <Card className="p-4 flex-row items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-muted-foreground">{file.name}</p>
+              <p className="text-xs text-muted-foreground truncate" title={file.name}>{file.name}</p>
               <p className="text-sm font-medium">Relevé {preview.formatLabel}</p>
             </div>
             <FormSelect className="w-44" value={preview.format} disabled={previewMutation.isPending}

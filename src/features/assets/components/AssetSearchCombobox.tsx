@@ -62,13 +62,14 @@ export function AssetSearchCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between gap-2 min-w-0"
           disabled={disabled}
+          title={value ? `${value.symbol} · ${value.name}` : undefined}
         >
           {value ? (
-            <span>
-              <strong>{value.symbol}</strong>
-              <span className="ml-2 text-muted-foreground text-sm">{value.name}</span>
+            <span className="flex min-w-0 items-baseline gap-2">
+              <strong className="shrink-0">{value.symbol}</strong>
+              <span className="truncate text-muted-foreground text-sm">{value.name}</span>
             </span>
           ) : (
             placeholder

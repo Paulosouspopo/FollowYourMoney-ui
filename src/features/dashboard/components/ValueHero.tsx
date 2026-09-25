@@ -4,6 +4,7 @@ import { formatEur, formatLongDate, formatMoney, formatPercent } from '@/shared/
 import { useCountUp } from '@/shared/lib/useCountUp';
 import { cn } from '@/shared/lib/cn';
 import type { CurvePointDTO } from '../model/dashboard.types';
+import { periodChange } from '../model/periodChange';
 
 interface Props {
   label: string;
@@ -24,7 +25,7 @@ interface Props {
  * Le patrimoine en très grand, la courbe juste dessous. Glisser sur la courbe
  * fait défiler l'en-tête : valeur, date et variation depuis le début de la
  * période. La variation suit la plus-value : un versement ne compte pas comme
- * un gain.
+ * un gain ; son % est rapporté à l'argent engagé (`periodChange`).
  */
 export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', periodLabel, controls, aside }: Props) {
   const [scrub, setScrub] = useState<number | null>(null);
@@ -33,8 +34,9 @@ export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', perio
 
   const first = curve[0];
   const point = scrub != null ? curve[scrub] : curve[curve.length - 1];
-  const delta = first && point ? point.gainLossEur - first.gainLossEur : null;
-  const deltaPct = delta != null && first.totalValueEur > 0 ? (delta / first.totalValueEur) * 100 : null;
+  const change = periodChange(first, point);
+  const delta = change?.gain ?? null;
+  const deltaPct = change?.pct ?? null;
 
   const series = useMemo<ChartSeries[]>(() => [
     { key: 'value', values: curve.map(p => p.totalValueEur), color: 'var(--primary)', variant: 'area' },
@@ -59,7 +61,7 @@ export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', perio
           </span>
         )}
         <span className="text-muted-foreground">
-          {scrub != null && first ? `depuis le ${formatLongDate(first.date)}` : periodLabel}
+          {scrub != null && first ? `de gain depuis le ${formatLongDate(first.date)}` : `de gain ${periodLabel}`}
         </span>
         {aside && scrub == null && <span className="text-muted-foreground md:ml-auto">{aside}</span>}
       </div>

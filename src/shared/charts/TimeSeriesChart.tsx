@@ -1,5 +1,5 @@
 import { memo, useId, useMemo, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
-import { formatShortDate } from '@/shared/lib/format';
+import { formatMonthYear, formatShortDate } from '@/shared/lib/format';
 import { areaPath, extent, indexAt, linePath, scale } from './geometry';
 import { useElementWidth } from './useElementWidth';
 
@@ -75,6 +75,9 @@ export const TimeSeriesChart = memo(function TimeSeriesChart({
   };
 
   const labels = count >= 2 ? [0, Math.floor((count - 1) / 2), count - 1] : [];
+  // Au-delà de ~11 mois, « 27 août » est ambigu : on affiche le mois et l'année
+  const longRange = count >= 2 && (Date.parse(dates[count - 1]) - Date.parse(dates[0])) / 86_400_000 > 330;
+  const axisDate = longRange ? formatMonthYear : formatShortDate;
   const primary = series[0];
   const lastIndex = primary ? lastDefined(primary.values) : -1;
 
@@ -135,7 +138,7 @@ export const TimeSeriesChart = memo(function TimeSeriesChart({
           {labels.map((i, n) => (
             <text key={i} x={geo.x(i)} y={height - 4} textAnchor={n === 0 ? 'start' : n === 2 ? 'end' : 'middle'}
               className="fill-muted-foreground text-[10px]">
-              {formatShortDate(dates[i])}
+              {axisDate(dates[i])}
             </text>
           ))}
         </svg>

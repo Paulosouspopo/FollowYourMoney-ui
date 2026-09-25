@@ -23,6 +23,8 @@ export const formatMoney = (v: number | null | undefined, currency: string) =>
 export const formatPercent = (v: number | null | undefined) => v == null ? '—' : pct.format(v / 100);
 export const formatDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso));
 export const formatLongDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso));
+/** « août 2024 » : axes des longues périodes (le jour n'apporte rien, l'année est indispensable). */
+export const formatMonthYear = (iso: string) => new Intl.DateTimeFormat('fr-FR', { month: 'short', year: 'numeric' }).format(new Date(iso));
 export const formatShortDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' }).format(new Date(iso));
 
 /** Taux saisi en % (ex : 2.4 → « 2,4 % »), jusqu'à 3 décimales. */
