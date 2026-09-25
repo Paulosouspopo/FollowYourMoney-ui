@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { Plus } from 'lucide-react';
 import { QueryBoundary } from '@/shared/ui/QueryBoundary';
@@ -11,7 +12,10 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 export default function PortfoliosPage() {
   // Même clé de cache que la page Accueil (période par défaut) : pas de requête en plus
   const q = useDashboard('30d');
-  const [sheet, setSheet] = useState<'create' | null>(null);
+  // « ?nouveau=1 » (recherche globale) : ouvre directement la création
+  const [params, setParams] = useSearchParams();
+  const [sheet, setSheet] = useState<'create' | null>(params.get('nouveau') === '1' ? 'create' : null);
+  const closeSheet = () => { setSheet(null); if (params.has('nouveau')) setParams({}, { replace: true }); };
   return (
     <div className="space-y-4 pt-4">
       <header className="flex items-center justify-between">
@@ -27,7 +31,7 @@ export default function PortfoliosPage() {
             </div>
           : <EmptyState title="Aucun portefeuille" description="Crée un PEA, un CTO, un wallet crypto…" />}
       </QueryBoundary>
-      <PortfolioFormSheet open={sheet === 'create'} onClose={() => setSheet(null)} />
+      <PortfolioFormSheet open={sheet === 'create'} onClose={closeSheet} />
     </div>
   );
 }

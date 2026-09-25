@@ -5,6 +5,7 @@ import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { toast } from "@/shared/ui/toast.store";
 import { usePortfolio, useDeletePortfolio } from "../api/portfolio.api";
 import { PortfolioFormSheet } from "./PortfolioFormSheet";
+import { undoAction } from "@/features/trash/api/trash.api";
 
 export function PortfolioMenu({ portfolioId }: { portfolioId: string }) {
   const [edit, setEdit] = useState(false);
@@ -14,7 +15,7 @@ export function PortfolioMenu({ portfolioId }: { portfolioId: string }) {
   const nav = useNavigate();
 
   const onDelete = () => del.mutate(portfolioId, {
-    onSuccess: () => { toast.success('Portefeuille supprimé'); nav('/portfolios', { replace: true }); },
+    onSuccess: r => { toast.success('Portefeuille supprimé', undoAction(r)); nav('/portfolios', { replace: true }); },
     onError: e => { setConfirmDelete(false); toast.error(e.message); },
   });
 

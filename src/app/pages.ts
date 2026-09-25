@@ -18,6 +18,8 @@ export const appPages = {
   analysis: () => import('@/features/analysis/pages/AnalysisPage'),
   more: () => import('./layout/MorePage'),
   guide: () => import('@/features/guide/pages/GuidePage'),
+  trash: () => import('@/features/trash/pages/TrashPage'),
+  wrapped: () => import('@/features/wrapped/pages/WrappedPage'),
 };
 
 /** Pages atteignables en un geste depuis l'accueil : préchargées quand le navigateur est inactif. */

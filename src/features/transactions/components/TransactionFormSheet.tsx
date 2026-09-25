@@ -18,6 +18,7 @@ import { formatQty } from '@/shared/lib/format';
 import { nowLocalDateTime } from '@/shared/lib/dates';
 import type { ApiError } from '@/shared/api/types';
 import { AssetSearchCombobox } from '@/features/assets/components/AssetSearchCombobox';
+import { undoAction } from '@/features/trash/api/trash.api';
 import { ManualAssetPicker } from '@/features/assets/components/ManualAssetPicker';
 import { isManualSymbol } from '@/shared/model/portfolioRules';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/features/transactions/api/transaction.api';
@@ -138,7 +139,7 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
   const onDelete = () => {
     if (!initial) return;
     remove.mutate(initial.id, {
-      onSuccess: () => { toast.success('Transaction supprimée'); onClose(); },
+      onSuccess: r => { toast.success('Transaction supprimée', undoAction(r)); onClose(); },
       onError: e => { setConfirmDelete(false); toast.error(e.message); },
     });
   };

@@ -18,6 +18,19 @@ export const useLogin = (redirectTo = '/') => {
   });
 };
 
+/**
+ * Mode démo : le back crée un compte invité rempli d'un patrimoine fictif
+ * (quelques secondes : cours téléchargés) et ouvre la session.
+ */
+export const useDemo = () => {
+  const setSession = useAuthStore(s => s.setSession);
+  const nav = useNavigate();
+  return useMutation({
+    mutationFn: () => api.post<AuthResponse>('/auth/demo', undefined, { ...noRefresh, timeout: 120_000 }).then(r => r.data),
+    onSuccess: ({ accessToken }) => { setSession(accessToken); nav('/', { replace: true }); },
+  });
+};
+
 /** Crée le compte ; la connexion n'est possible qu'après confirmation de l'email. */
 export const useRegister = () => useMutation({
   mutationFn: (b: UserCreateRequest) => api.post<UserResponse>('/auth/register', b, noRefresh).then(r => r.data),

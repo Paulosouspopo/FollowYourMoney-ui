@@ -13,6 +13,7 @@ const resendMutate = vi.fn<(email: string, opts?: MutateOpts) => void>();
 vi.mock('@/features/auth/api/auth.api', () => ({
   useLogin: () => ({ mutate: loginMutate, isPending: false, isError: state.error !== null, error: state.error }),
   useResendVerification: () => ({ mutate: resendMutate, isPending: false }),
+  useDemo: () => ({ mutate: vi.fn(), isPending: false, isError: false, error: null }),
 }));
 
 const renderPage = () => {

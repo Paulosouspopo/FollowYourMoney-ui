@@ -3,6 +3,7 @@ import { cn } from '@/shared/lib/cn';
 import { useUnreadCount } from '@/features/notifications/api/notification.api';
 import { GUIDE_NAV_ITEM, NAV_ITEMS, SECONDARY_NAV_ITEMS, unreadLabel } from './nav';
 import { Logo } from './Logo';
+import { SearchButton } from '../search/SearchButton';
 import { PrivacyToggle } from '@/shared/privacy/PrivacyToggle';
 
 /** Barre latérale sur grand écran (≥ lg). */
@@ -14,7 +15,8 @@ export function Sidebar() {
         <Logo className="h-8 w-8" />
         <span className="font-semibold tracking-tight">FollowYourMoney</span>
       </div>
-      <nav aria-label="Navigation principale" className="mt-8 flex flex-col gap-1">
+      <SearchButton wide className="mt-6" />
+      <nav aria-label="Navigation principale" className="mt-4 flex flex-col gap-1">
         {NAV_ITEMS.map(t => (
           <NavLink key={t.to} to={t.to} end={t.to === '/'}
             className={({ isActive }) => cn('group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',

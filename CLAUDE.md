@@ -252,6 +252,23 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   drapeaux emoji dans la liste des pays (Windows affiche les lettres).
 - `ExposureTeaser` sur l'accueil. Clés sous `dashboardKeys.all`.
 
+## Confort (v5, lot C)
+- Recherche globale `app/search` : `CommandPalette` (cmdk, Ctrl+K / ⌘K / « / »)
+  pages, portefeuilles, lignes, actions (nouveau portefeuille via
+  `/portfolios?nouveau=1`, confidentialité, thème, guide), marchés Yahoo.
+  `SearchButton` (barre latérale, accueil mobile, Plus). NB : `CommandDialog`
+  n'inclut pas la racine `Command`, l'ajouter.
+- Corbeille `features/trash` : toast avec action « Annuler » (`toast.success(msg,
+  action)`, `undoAction(response)` lit l'en-tête `X-Trash-Id`), page `/trash`
+  (Plus → Compte).
+- Bilan `/wrapped` (`features/wrapped`) : diapositives au toucher/clavier,
+  carte PNG à partager en pourcentages seulement (`shareCard.ts`, testé),
+  `WrappedTeaser` sur l'accueil du 15/12 au 15/02.
+- Mode démo : « Essayer sans compte » sur la connexion (`useDemo`),
+  `DemoBanner` si `me.demo`.
+- Tests : délai porté à 15 s (`testTimeout`) — les tests de formulaires
+  dépassaient 5 s sur une machine chargée.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

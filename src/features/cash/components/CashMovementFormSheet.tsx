@@ -16,6 +16,7 @@ import { CASH_MOVEMENT_LABEL, CASH_MOVEMENT_SIGN, CASH_MOVEMENT_TYPES, type Cash
 import { CASH_CURRENCIES, movementTypes } from '@/shared/model/portfolioRules';
 import { todayLocal } from '@/shared/lib/dates';
 import type { ApiError } from '@/shared/api/types';
+import { undoAction } from '@/features/trash/api/trash.api';
 import { useCreateCashMovement, useDeleteCashMovement, useUpdateCashMovement } from '../api/cash.api';
 import type { CashMovementPrefill, CashMovementRequest, CashMovementResponse } from '../model/cash.types';
 
@@ -111,7 +112,7 @@ function CashMovementForm({ portfolioId, onClose, initial, prefill, balance, noO
   };
 
   const onDelete = () => initial && remove.mutate(initial.id, {
-    onSuccess: () => { toast.success('Mouvement supprimé'); onClose(); },
+    onSuccess: r => { toast.success('Mouvement supprimé', undoAction(r)); onClose(); },
     onError: e => { setConfirmDelete(false); toast.error(e.message); },
   });
 

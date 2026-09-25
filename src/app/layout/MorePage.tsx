@@ -4,12 +4,16 @@ import { Card } from '@/shared/ui/card';
 import { SectionHeader } from '@/shared/ui/SectionHeader';
 import { PrivacyToggle } from '@/shared/privacy/PrivacyToggle';
 import { MORE_SECTIONS } from './nav';
+import { SearchButton } from '../search/SearchButton';
 
 /** Onglet « Plus » (mobile) : pages d'analyse et réglages. La liste vient de `MORE_SECTIONS`. */
 export default function MorePage() {
   return (
     <div className="space-y-6 pt-4 lg:max-w-2xl">
-      <h1 className="text-2xl font-semibold tracking-tight">Plus</h1>
+      <header className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">Plus</h1>
+        <SearchButton />
+      </header>
       {MORE_SECTIONS.map(section => (
         <section key={section.title}>
           <SectionHeader title={section.title} />

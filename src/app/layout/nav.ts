@@ -1,4 +1,4 @@
-import { Bell, BookOpen, CandlestickChart, ScanSearch, Coins, Landmark, LayoutDashboard, LayoutGrid, Settings, Target, Wallet } from 'lucide-react';
+import { Bell, BookOpen, CandlestickChart, ScanSearch, Sparkles, Trash2, Coins, Landmark, LayoutDashboard, LayoutGrid, Settings, Target, Wallet } from 'lucide-react';
 
 /** Navigation principale de la barre latérale (bureau). */
 export const NAV_ITEMS = [
@@ -15,6 +15,7 @@ export const SECONDARY_NAV_ITEMS = [
   { to: '/income', icon: Coins, label: 'Revenus', description: 'Dividendes et intérêts : reçus, attendus, calendrier' },
   { to: '/goals', icon: Target, label: 'Objectifs', description: 'Projection de ton patrimoine et objectifs d\'épargne' },
   { to: '/tax', icon: Landmark, label: 'Fiscalité', description: 'Cases à déclarer, plus-values, crypto, PEA' },
+  { to: '/wrapped', icon: Sparkles, label: "Bilan de l'année", description: "Ton année d'investisseur en quelques écrans" },
 ] as const;
 
 /** Guide d'utilisation : page « Plus », barre latérale et Réglages. */
@@ -31,6 +32,7 @@ export const MORE_SECTIONS = [
   { title: 'Aide', items: [GUIDE_NAV_ITEM] },
   { title: 'Compte', items: [
     { to: '/settings', icon: Settings, label: 'Réglages', description: 'Apparence, devise, notifications, sécurité' },
+    { to: '/trash', icon: Trash2, label: 'Corbeille', description: 'Opérations et portefeuilles supprimés (30 jours)' },
   ] },
 ] as const;
 

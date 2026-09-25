@@ -12,7 +12,7 @@ const report: TaxReport = {
   securities: {
     sales: [{ date: '2025-06-01', symbol: 'AI.PA', name: 'Air Liquide', quantity: 4, proceedsEur: 800, costEur: 600, gainEur: 200 }],
     gainsEur: 200, lossesEur: 0, netEur: 200, carriedLossesUsedEur: 0, taxableGainEur: 200, lossesCarryForwardEur: 0,
-    dividendsEur: 30, estimatedTaxEur: 69,
+    dividendsEur: 30, foreignTaxCreditEur: 0, estimatedTaxEur: 69,
     boxes: [{ code: '3VG', label: 'Plus-value nette imposable', amountEur: 200, form: '2042 / 2074' },
       { code: '2DC', label: 'Dividendes (montant brut)', amountEur: 30, form: '2042' }],
   },

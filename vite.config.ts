@@ -23,5 +23,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // Tests de formulaires (saisie clavier simulée) : lents sur une machine chargée
+    testTimeout: 15_000,
   },
 })

@@ -7,7 +7,10 @@ export interface TaxReport {
     sales: TaxSale[];
     gainsEur: number; lossesEur: number; netEur: number;
     carriedLossesUsedEur: number; taxableGainEur: number; lossesCarryForwardEur: number;
-    dividendsEur: number; estimatedTaxEur: number;
+    dividendsEur: number;
+    /** Crédit d'impôt estimé sur les dividendes d'actions étrangères (case 2AB), déduit de l'impôt estimé. */
+    foreignTaxCreditEur: number;
+    estimatedTaxEur: number;
     boxes: TaxBox[];
   };
   crypto: {

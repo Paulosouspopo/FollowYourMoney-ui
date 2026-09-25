@@ -18,9 +18,11 @@ import { IncomeCard } from '@/features/income/components/IncomeCard';
 import { GoalsCard } from '@/features/goals/components/GoalsCard';
 import { TaxCard } from '@/features/tax/components/TaxCard';
 import { ExposureTeaser } from '@/features/analysis/components/ExposureTeaser';
+import { WrappedTeaser } from '@/features/wrapped/components/WrappedTeaser';
 import { TOURS } from '@/features/guide/tours';
 import { usePageTour } from '@/shared/tour/usePageTour';
 import { TourButton } from '@/shared/tour/TourButton';
+import { SearchButton } from '@/app/search/SearchButton';
 
 /**
  * Accueil. Mobile : une colonne, l'essentiel en haut. Grand écran : le
@@ -44,12 +46,13 @@ export default function DashboardPage() {
               periodLabel={PERIOD_SENTENCE[period]}
               aside={<>Investi <MoneyValue value={d.totalInvestedEur} className="text-foreground font-medium" /></>}
               controls={<PeriodSelector value={period} onChange={setPeriod} />}
-              help={<TourButton tour={TOURS.welcome} />} />
+              help={<><SearchButton className="lg:hidden" /><TourButton tour={TOURS.welcome} /></>} />
             <StatStrip data={d} />
             <PerformanceCard portfolioId={null} />
           </div>
           <aside className="space-y-6 lg:col-span-4 min-w-0 lg:pt-4">
             <PortfolioList portfolios={d.portfolios} />
+            <WrappedTeaser />
             <ExposureTeaser />
             <IncomeCard />
             <GoalsCard />
