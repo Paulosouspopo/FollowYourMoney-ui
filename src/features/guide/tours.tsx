@@ -1,7 +1,7 @@
 import {
   ArrowLeftRight, BellRing, CalendarClock, ChartNoAxesCombined, CircleHelp, Coins, Download, Eye, FileSearch,
   FileUp, Globe, Hand, Landmark, LayoutDashboard, LayoutGrid, ListChecks, Percent, PiggyBank, Plus, Receipt,
-  Rocket, ScrollText, ShieldCheck, SlidersHorizontal, Sparkles, Target, Timer, TrendingUp, TriangleAlert, Wallet,
+  Rocket, ScanSearch, ScrollText, ShieldCheck, SlidersHorizontal, Sparkles, Target, Timer, TrendingUp, TriangleAlert, Wallet,
 } from 'lucide-react';
 import type { Tour } from '@/shared/tour/tour.types';
 import { Def, Example } from './components/TourText';
@@ -242,6 +242,42 @@ export const TOURS = {
         </> },
       { target: 'goals-list', icon: Target, title: 'Tes objectifs',
         body: <p>Fixe une cible (« 100 000 € en 2035 ») : l'app te dit si tu es dans les temps et combien verser par mois pour l'atteindre.</p> },
+      helpStep,
+    ],
+  },
+
+  analysis: {
+    key: 'analysis', title: 'Radiographie', icon: ScanSearch,
+    summary: 'Où est vraiment ton argent, ce qui a fait ta performance, ton risque et tes frais cachés.',
+    steps: [
+      { target: 'analysis-headline', icon: ScanSearch, title: 'Ton patrimoine aux rayons X',
+        body: <p>Un ETF « Monde » acheté en euros, c'est en réalité surtout des entreprises américaines. L'app regarde à l'intérieur de tes fonds pour te dire où va vraiment ton argent.</p> },
+      { target: 'analysis-breakdown', icon: Globe, title: 'Pays, secteurs, devises', interactive: true,
+        body: <>
+          <p>Passe d'un onglet à l'autre. Les pays des ETF sont estimés d'après leur indice ; les secteurs viennent de Yahoo.</p>
+          <Example>Un ETF S&P 500 en euros : 100 % États-Unis, exposé au dollar même s'il cote en euros.</Example>
+        </> },
+      { target: 'analysis-concentration', icon: TriangleAlert, title: 'Trop d\'œufs dans le même panier ?',
+        body: <p>Ta plus grosse ligne et les entreprises auxquelles tu es le plus exposé, fonds compris. Une même action peut se cacher dans plusieurs de tes ETF.</p> },
+      { target: 'analysis-period', icon: Timer, title: 'Choisis la période', interactive: true,
+        body: <p>La carte des positions, les contributions et le risque suivent cette période.</p> },
+      { target: 'analysis-map', icon: LayoutGrid, title: 'La carte des positions',
+        body: <p>Chaque tuile est une ligne : plus elle est grande, plus elle pèse ; vert, elle a monté, rouge, elle a baissé. Touche-la pour l'ouvrir.</p> },
+      { target: 'analysis-contributions', icon: TrendingUp, title: 'Qui a fait ta performance',
+        body: <p>Ce que chaque ligne t'a rapporté ou coûté sur la période, dividendes compris. Souvent, deux ou trois lignes font presque tout.</p> },
+      { target: 'analysis-risk', icon: ChartNoAxesCombined, title: 'Ton risque, en clair',
+        body: <>
+          <Def term="Volatilité">l'amplitude des variations sur un an : 15 % environ pour les actions mondiales.</Def>
+          <Def term="Pire baisse">la plus forte chute d'un sommet à un creux. Demande-toi si tu la supporterais deux fois plus fort.</Def>
+        </> },
+      { target: 'analysis-fees', icon: Receipt, title: 'Les frais cachés',
+        body: <>
+          <p>Les frais courants des fonds sont prélevés chaque jour, sans ligne sur ton relevé.</p>
+          <Example>0,5 % de frais sur 20 000 € pendant 20 ans ≈ 5 000 € de patrimoine en moins.</Example>
+          <p>Yahoo ne les connaît pas toujours : renseigne-les avec le crayon (ils sont dans le DIC du fonds).</p>
+        </> },
+      { target: 'analysis-calendar', icon: CalendarClock, title: 'Le calendrier des performances',
+        body: <p>Chaque mois en couleur : repère d'un coup d'œil tes bons et mauvais mois, et ta performance année par année.</p> },
       helpStep,
     ],
   },

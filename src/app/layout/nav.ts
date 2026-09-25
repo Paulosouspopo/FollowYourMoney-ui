@@ -1,4 +1,4 @@
-import { Bell, BookOpen, CandlestickChart, Coins, Landmark, LayoutDashboard, LayoutGrid, Settings, Target, Wallet } from 'lucide-react';
+import { Bell, BookOpen, CandlestickChart, ScanSearch, Coins, Landmark, LayoutDashboard, LayoutGrid, Settings, Target, Wallet } from 'lucide-react';
 
 /** Navigation principale de la barre latérale (bureau). */
 export const NAV_ITEMS = [
@@ -11,6 +11,7 @@ export const NAV_ITEMS = [
 
 /** Pages d'analyse : section « Analyse » de la barre latérale, et page « Plus » sur mobile. */
 export const SECONDARY_NAV_ITEMS = [
+  { to: '/analysis', icon: ScanSearch, label: 'Radiographie', description: 'Pays, secteurs, devises, risque, frais cachés, contributions' },
   { to: '/income', icon: Coins, label: 'Revenus', description: 'Dividendes et intérêts : reçus, attendus, calendrier' },
   { to: '/goals', icon: Target, label: 'Objectifs', description: 'Projection de ton patrimoine et objectifs d\'épargne' },
   { to: '/tax', icon: Landmark, label: 'Fiscalité', description: 'Cases à déclarer, plus-values, crypto, PEA' },

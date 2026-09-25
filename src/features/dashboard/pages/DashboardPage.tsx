@@ -17,6 +17,7 @@ import { DataQualityBanner } from '@/features/quality/components/DataQualityBann
 import { IncomeCard } from '@/features/income/components/IncomeCard';
 import { GoalsCard } from '@/features/goals/components/GoalsCard';
 import { TaxCard } from '@/features/tax/components/TaxCard';
+import { ExposureTeaser } from '@/features/analysis/components/ExposureTeaser';
 import { TOURS } from '@/features/guide/tours';
 import { usePageTour } from '@/shared/tour/usePageTour';
 import { TourButton } from '@/shared/tour/TourButton';
@@ -49,6 +50,7 @@ export default function DashboardPage() {
           </div>
           <aside className="space-y-6 lg:col-span-4 min-w-0 lg:pt-4">
             <PortfolioList portfolios={d.portfolios} />
+            <ExposureTeaser />
             <IncomeCard />
             <GoalsCard />
             <TaxCard />

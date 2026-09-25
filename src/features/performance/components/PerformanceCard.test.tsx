@@ -26,6 +26,7 @@ const data: PerformanceResponse = {
     { portfolioId: 'a', name: 'PEA', type: 'PEA', valueEur: 12000, gainEur: 900, twrPct: 4, mwrPct: 4, xirrPct: 4 },
     { portfolioId: 'b', name: 'Crypto', type: 'CRYPTO', valueEur: 4000, gainEur: 100, twrPct: 20, mwrPct: 3, xirrPct: null },
   ],
+  risk: null,
 };
 
 describe('PerformanceCard', () => {

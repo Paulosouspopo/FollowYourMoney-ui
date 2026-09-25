@@ -237,6 +237,21 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Fiscalité : `TaxBracketCard` (tranche marginale), économie PER dans l'en-tête,
   case 6NS, cartes assurance-vie (8 ans, rachats) et épargne salariale.
 
+## Radiographie (v5, lot B)
+- Page `/analysis` (`features/analysis`, entrée « Radiographie » de la
+  section Analyse) : phrase-résumé (actions, pays, secteur dominants),
+  `ExposureBreakdown` (pays / secteurs / devises / classes), `RealExposures`
+  (concentration), `PositionsMap` (treemap : surface = poids, couleur =
+  performance de la période), `ContributionsCard`, `RiskCard`,
+  `PerformanceCalendar` (mois × années, depuis la série TWR « all »),
+  `FeesCard` (TER éditable). Filtre : patrimoine ou un portefeuille.
+- Graphiques : `shared/charts/squarify.ts` (disposition du treemap, pure et
+  testée ; nommé ainsi pour éviter le conflit de casse avec `Treemap.tsx` sous
+  Windows), `Treemap.tsx` (largeur mesurée). `model/calendar.ts` testé.
+- `formatShare` : parts arrondies (« 72 % », « < 0,1 % ») pour la lecture ;
+  drapeaux emoji dans la liste des pays (Windows affiche les lettres).
+- `ExposureTeaser` sur l'accueil. Clés sous `dashboardKeys.all`.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`
