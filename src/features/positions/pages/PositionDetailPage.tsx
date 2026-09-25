@@ -1,3 +1,5 @@
+import { displaySymbol, isManualSymbol } from '@/shared/model/portfolioRules';
+import { ValuationsSection } from '@/features/assets/components/ValuationsSection';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeftRight } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -58,7 +60,7 @@ export default function PositionDetailPage() {
           <>
             <Card data-tour="position-summary" className="p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{symbol}</span>
+                <span className="text-sm text-muted-foreground">{displaySymbol(symbol)}</span>
                 <AssetTypeBadge type={position.assetType} />
               </div>
               <MoneyValue value={position.currentValueEur} className="block text-3xl font-semibold" />
@@ -77,6 +79,10 @@ export default function PositionDetailPage() {
               </dl>
             </Card>
             <KpiGrid items={performanceKpis(position)} />
+            {isManualSymbol(symbol) && (
+              <ValuationsSection portfolioId={portfolioId} assetId={position.assetId}
+                currency={position.priceCurrency ?? 'EUR'} />
+            )}
           </>
         ) : <p className="text-sm text-muted-foreground">Position introuvable dans ce portefeuille.</p>}
       </QueryBoundary>

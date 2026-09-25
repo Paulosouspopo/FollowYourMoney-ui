@@ -18,6 +18,8 @@ import { formatQty } from '@/shared/lib/format';
 import { nowLocalDateTime } from '@/shared/lib/dates';
 import type { ApiError } from '@/shared/api/types';
 import { AssetSearchCombobox } from '@/features/assets/components/AssetSearchCombobox';
+import { ManualAssetPicker } from '@/features/assets/components/ManualAssetPicker';
+import { isManualSymbol } from '@/shared/model/portfolioRules';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/features/transactions/api/transaction.api';
 import type { TransactionResponse } from '../model/transaction.types';
 import { TransactionCheckHint } from '@/features/quality/components/TransactionCheckHint';
@@ -149,12 +151,16 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
       {!asset ? (
         <div className="space-y-4">
           <AssetSearchCombobox onChange={r => setAsset({ symbol: r.symbol, name: r.name })} placeholder="Bitcoin, Apple, TotalEnergies..." />
-          <p className="text-xs text-muted-foreground">Recherche parmi les actions, ETF et cryptos disponibles sur Yahoo Finance.</p>
+          <p className="text-xs text-muted-foreground">Recherche parmi les actions, ETF, fonds et cryptos disponibles sur Yahoo Finance.</p>
+          <ManualAssetPicker portfolioId={portfolioId} onSelect={a => {
+            setAsset({ symbol: a.symbol, name: a.name });
+            setValue('currency', a.currency);
+          }} />
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">{asset.symbol}</span>
+            <span className="text-muted-foreground">{isManualSymbol(asset.symbol) ? 'Non coté · valeur saisie' : asset.symbol}</span>
             {!isEdit && !lockedAsset && (
               <button type="button" onClick={() => setAsset(null)} className="text-primary">Changer d'actif</button>
             )}
@@ -181,7 +187,7 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
           {oversell && (
             <p className="flex items-start gap-1.5 text-xs text-warning">
               <AlertTriangle size={14} className="shrink-0 mt-px" />
-              Tu ne détiens que {formatQty(held)} {asset.symbol} : la vente sera refusée.
+              Tu ne détiens que {formatQty(held)} {isManualSymbol(asset.symbol) ? 'parts' : asset.symbol} : la vente sera refusée.
             </p>
           )}
 

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 import TaxPage from './TaxPage';
 import { salesCsv } from '../model/taxCsv';
 import { fiveYearsProgress } from '../model/pea';
@@ -23,10 +24,22 @@ const report: TaxReport = {
   peas: [{ portfolioId: 'p1', name: 'PEA', openedAt: '2019-01-15', openedAtEstimated: false, fiveYearsDate: '2024-01-15',
     fiveYearsReached: true, depositsEur: 30000, depositsEstimated: false, ceilingEur: 150000, valueEur: 42000,
     socialChargesIfWithdrawnEur: 2064 }],
+  marginalTaxRate: 30,
+  retirementSavings: { depositsEur: 2000, estimatedSavingEur: 600,
+    boxes: [{ code: '6NS', label: 'Versements sur un PER (déductibles)', amountEur: 2000, form: '2042' }] },
+  lifeInsurances: [{ portfolioId: 'av1', name: 'Linxea Spirit', openedAt: '2016-03-01', openedAtEstimated: false,
+    eightYearsDate: '2024-03-01', eightYearsReached: true, depositsEur: 20000, valueEur: 26000, gainEur: 6000,
+    withdrawalsEur: 2600, withdrawalsGainEur: 600 }],
+  employeeSavings: [{ portfolioId: 'es1', name: 'PEE Amundi', depositsEur: 3000, employerContributionsEur: 1000,
+    valueEur: 3500, gainEur: 500, socialChargesIfWithdrawnEur: 86 }],
   reminders: ['Estimation établie d\'après tes opérations.'],
 };
 
-vi.mock('../api/tax.api', () => ({ useTaxReport: () => ({ isPending: false, isError: false, data: report }) }));
+const setRate = vi.fn();
+vi.mock('../api/tax.api', () => ({
+  useTaxReport: () => ({ isPending: false, isError: false, data: report }),
+  useSetMarginalTaxRate: () => ({ mutate: setRate, isPending: false }),
+}));
 
 describe('TaxPage', () => {
   it("impôt estimé, cases à reporter, cessions, PEA et année de déclaration", () => {
@@ -38,6 +51,20 @@ describe('TaxPage', () => {
     expect(screen.getByText('Air Liquide')).toBeInTheDocument();
     expect(screen.getByText(/5 ans atteints/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Exporter les cessions 2025/ })).toBeInTheDocument();
+  });
+
+  it('PER (case 6NS, économie selon la tranche), assurance-vie (8 ans, rachats) et épargne salariale', async () => {
+    const user = userEvent.setup();
+    render(<MemoryRouter><TaxPage /></MemoryRouter>);
+    expect(screen.getByText('6NS')).toBeInTheDocument();
+    expect(screen.getByText(/grâce à tes versements PER \(30 %/)).toBeInTheDocument();
+    expect(screen.getByText(/8 ans atteints/)).toBeInTheDocument();
+    expect(screen.getByText(/Rachats 2025/)).toBeInTheDocument();
+    expect(screen.getByText('PEE Amundi')).toBeInTheDocument();
+
+    expect(screen.getByRole('radio', { name: '30 %' })).toHaveAttribute('aria-checked', 'true');
+    await user.click(screen.getByRole('radio', { name: '41 %' }));
+    expect(setRate.mock.calls[0][0]).toBe(41);
   });
 });
 

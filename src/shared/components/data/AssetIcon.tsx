@@ -1,11 +1,12 @@
+import { iconLabel } from '@/shared/model/portfolioRules';
 import { ASSET_TYPE_COLOR, ASSET_TYPE_LABEL, type AssetType } from '@/shared/model/enums';
 import { TypeBadge } from './TypeBadge';
 
-export function AssetIcon({ symbol, type }: { symbol: string; type: AssetType }) {
+export function AssetIcon({ symbol, type, name }: { symbol: string; type: AssetType; name?: string }) {
   return (
     <div className="h-10 w-10 shrink-0 rounded-xl grid place-items-center text-xs font-bold text-white"
          style={{ background: ASSET_TYPE_COLOR[type] }}>
-      {symbol.replace(/-.*$/, '').slice(0, 4)}
+      {iconLabel(symbol, name)}
     </div>
   );
 }

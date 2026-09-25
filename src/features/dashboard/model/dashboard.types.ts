@@ -27,10 +27,17 @@ export interface PortfolioValuation {
   unrealizedGainEur: number; unrealizedGainPercentage: number;
   realizedGainEur: number; dividendsEur: number; interestEur: number; totalFeesEur: number;
   cashTracking: boolean; cashEur: number; netDepositsEur: number; annualInterestRate: number | null;
+  /** Dont abondement de l'employeur (épargne salariale, PER). */
+  employerContributionsEur: number;
+  /** Compte multidevise ; `cashBalances` : soldes par devise (vide si tout est en euros). */
+  multiCurrencyCash: boolean; cashBalances: CashBalance[];
   positions: PositionValuation[];
   openPositionCount: number;
   hasIncompletePrices: boolean;
 }
+
+/** Solde dans une devise et sa valeur en euros au taux du jour. */
+export interface CashBalance { currency: string; amount: number; amountEur: number; }
 
 export interface AllocationSliceDTO { category: AllocationCategory; value: number; percentage: number; }
 

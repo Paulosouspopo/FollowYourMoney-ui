@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.api';
-import type { CashMovementRequest, CashMovementResponse } from '../model/cash.types';
+import type { CashMovementRequest, CashMovementResponse, InterestEstimate } from '../model/cash.types';
 
 export const cashKeys = {
   all: ['cash-movements'] as const,
   byPortfolio: (pid: string) => [...cashKeys.all, pid] as const,
+  /** Sous dashboardKeys.all : un achat d'unités de compte change le fonds euros. */
+  interest: (pid: string, year: number) => [...dashboardKeys.all, 'interest', pid, year] as const,
 };
 
 const base = (pid: string) => `/portfolios/${pid}/cash-movements`;
@@ -54,3 +56,11 @@ export const useDeleteCashMovement = (portfolioId: string) => {
     onSuccess: invalidate,
   });
 };
+
+/** Intérêts estimés d'une année (livret, fonds euros). */
+export const useInterestEstimate = (portfolioId: string, year: number, enabled = true) =>
+  useQuery({
+    queryKey: cashKeys.interest(portfolioId, year),
+    queryFn: () => api.get<InterestEstimate>(`${base(portfolioId)}/interest-estimate`, { params: { year } }).then(r => r.data),
+    enabled: enabled && !!portfolioId,
+  });

@@ -219,6 +219,24 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Tests : `src/test/setup.ts` simule `tour.api` (tout vu, auto coupé) pour
   que les tests de pages n'aient pas besoin de QueryClient.
 
+## Enveloppes, actifs non cotés, devises (v5, lot A)
+- `shared/model/portfolioRules.ts` : miroir de `PortfolioRules` (enveloppes,
+  fonds euros, libellé du solde `cashLabel`, types de mouvement proposés,
+  `isManualSymbol` / `displaySymbol` / `iconLabel`). Le symbole interne « ~… »
+  d'un actif non coté ne s'affiche jamais (« non coté », initiales du nom).
+- Formulaire de portefeuille : phrase d'aide par type, taux du fonds euros
+  (AV, PER), suivi des liquidités forcé pour livret et enveloppes, « Compte
+  multidevise » si le suivi est actif, date d'ouverture = 8 ans d'une AV.
+- `CashMovementFormSheet` : types selon le compte (abondement, change),
+  devise et montant reçu (multidevise), `prefill` (intérêts à créditer).
+  `CashSection` : libellé du solde, soldes par devise, `InterestHint`
+  (intérêts courus de l'année + « Créditer les intérêts N-1 »).
+- Actifs non cotés : `ManualAssetPicker` sous la recherche du formulaire
+  d'opération (existants + création par nom), `ValuationsSection` sur la fiche
+  de la ligne (valeurs liquidatives). Clés sous `dashboardKeys.all`.
+- Fiscalité : `TaxBracketCard` (tranche marginale), économie PER dans l'en-tête,
+  case 6NS, cartes assurance-vie (8 ans, rachats) et épargne salariale.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

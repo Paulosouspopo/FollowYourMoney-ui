@@ -15,10 +15,10 @@ import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { toast } from '@/shared/ui/toast.store';
 import { cn } from '@/shared/lib/cn';
 import { formatDate, formatEur, formatMonthYear, formatQty } from '@/shared/lib/format';
-import { useTaxReport } from '../api/tax.api';
+import { useSetMarginalTaxRate, useTaxReport } from '../api/tax.api';
 import { downloadCsv, salesCsv } from '../model/taxCsv';
-import type { PeaStatus, TaxBox, TaxReport } from '../model/tax.types';
-import { fiveYearsProgress } from '../model/pea';
+import { TAX_BRACKETS, type EmployeeSavingsStatus, type LifeInsuranceStatus, type PeaStatus, type TaxBox, type TaxReport } from '../model/tax.types';
+import { fiveYearsProgress, yearsProgress } from '../model/pea';
 
 /**
  * Fiscalité : ce qu'il faut déclarer pour une année (revenus de l'année,
@@ -48,7 +48,8 @@ export default function TaxPage() {
 
 function Report({ report: r }: { report: TaxReport }) {
   const total = r.securities.estimatedTaxEur + r.crypto.estimatedTaxEur;
-  const boxes = [...r.securities.boxes, ...r.crypto.boxes];
+  const boxes = [...r.securities.boxes, ...r.crypto.boxes, ...r.retirementSavings.boxes];
+  const perSaving = r.retirementSavings.estimatedSavingEur;
   const hasSales = r.securities.sales.length + r.crypto.sales.length > 0;
 
   return (
@@ -60,8 +61,14 @@ function Report({ report: r }: { report: TaxReport }) {
           </p>
           <p className="text-display mt-2">{formatEur(total)}</p>
           <p className="mt-3 text-sm text-muted-foreground">
-            Flat tax 30 % (12,8 % d'impôt + 17,2 % de prélèvements sociaux), hors PEA et livrets réglementés.
+            Flat tax 30 % (12,8 % d'impôt + 17,2 % de prélèvements sociaux), hors PEA, livrets, assurance-vie et épargne retraite.
           </p>
+          {perSaving > 0 && (
+            <p className="mt-2 text-sm">
+              <span className="text-gain font-medium">≈ −<MoneyValue value={perSaving} /></span>
+              <span className="text-muted-foreground"> d'impôt grâce à tes versements PER ({r.marginalTaxRate} % de <MoneyValue value={r.retirementSavings.depositsEur} />)</span>
+            </p>
+          )}
         </section>
 
         <section data-tour="tax-boxes">
@@ -165,6 +172,19 @@ function Report({ report: r }: { report: TaxReport }) {
       </div>
 
       <aside className="space-y-6 lg:col-span-5 min-w-0 lg:pt-2">
+        <TaxBracketCard rate={r.marginalTaxRate} />
+        {r.lifeInsurances.length > 0 && (
+          <section data-tour="tax-life-insurance">
+            <SectionHeader title="Assurance-vie" />
+            <div className="space-y-3">{r.lifeInsurances.map(l => <LifeInsuranceCard key={l.portfolioId} life={l} year={r.year} />)}</div>
+          </section>
+        )}
+        {r.employeeSavings.length > 0 && (
+          <section>
+            <SectionHeader title="Épargne salariale" />
+            <div className="space-y-3">{r.employeeSavings.map(e => <EmployeeSavingsCard key={e.portfolioId} savings={e} />)}</div>
+          </section>
+        )}
         {r.peas.length > 0 && (
           <section data-tour="tax-pea">
             <SectionHeader title="PEA" />
@@ -251,6 +271,99 @@ function PeaCard({ pea: p }: { pea: PeaStatus }) {
           Renseigne la date d'ouverture (Modifier le portefeuille) pour un calcul exact
         </Link>
       )}
+    </Card>
+  );
+}
+
+/** Tranche marginale : sert à estimer l'avantage fiscal des versements PER. */
+function TaxBracketCard({ rate }: { rate: number }) {
+  const set = useSetMarginalTaxRate();
+  return (
+    <Card data-tour="tax-bracket" className="p-4 gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold">Ta tranche d'imposition</p>
+          <p className="text-[11px] text-muted-foreground">Indiquée sur ton avis d'impôt (taux marginal)</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-5 gap-1.5" role="radiogroup" aria-label="Tranche marginale d'imposition">
+        {TAX_BRACKETS.map(b => (
+          <button key={b} type="button" role="radio" aria-checked={b === rate} disabled={set.isPending}
+            onClick={() => b !== rate && set.mutate(b, { onError: e => toast.error(e.message) })}
+            className={cn('rounded-lg py-2 text-sm font-medium tabular-nums ring-1 transition-colors',
+              b === rate ? 'bg-primary text-primary-foreground ring-primary' : 'ring-border hover:ring-primary/60')}>
+            {b} %
+          </button>
+        ))}
+      </div>
+      <p className="text-[11px] text-muted-foreground">Sert à estimer l'impôt économisé grâce à tes versements sur un PER.</p>
+    </Card>
+  );
+}
+
+function LifeInsuranceCard({ life: l, year }: { life: LifeInsuranceStatus; year: number }) {
+  const progress = yearsProgress(l.openedAt, 8);
+  return (
+    <Card className="p-4 gap-3">
+      <div className="flex items-center gap-3">
+        <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/12 text-primary"><Landmark size={16} /></span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-semibold">{l.name}</p>
+          <p className="text-[11px] text-muted-foreground">
+            {l.openedAt ? `Ouvert en ${formatMonthYear(l.openedAt)}${l.openedAtEstimated ? ' (estimé)' : ''}` : 'Date d\'ouverture inconnue'}
+          </p>
+        </div>
+      </div>
+      <div>
+        <p className={cn('text-sm font-medium', l.eightYearsReached ? 'text-gain' : 'text-foreground')}>
+          {l.eightYearsReached ? '8 ans atteints : abattement annuel sur les gains retirés'
+            : l.eightYearsDate ? `8 ans le ${formatDate(l.eightYearsDate)}` : '—'}
+        </p>
+        {!l.eightYearsReached && l.eightYearsDate && (
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          {l.eightYearsReached
+            ? 'Chaque année, 4 600 € de gains retirés (9 200 € pour un couple) sont exonérés d\'impôt ; les prélèvements sociaux restent dus.'
+            : 'Avant 8 ans, les gains retirés sont soumis à la flat tax de 30 %.'}
+        </p>
+      </div>
+      <div className="grid grid-cols-3 gap-2 text-xs">
+        <div><p className="text-muted-foreground">Versé</p><MoneyValue value={l.depositsEur} className="font-medium" /></div>
+        <div><p className="text-muted-foreground">Valeur</p><MoneyValue value={l.valueEur} className="font-medium" /></div>
+        <div><p className="text-muted-foreground">Gain</p><MoneyValue value={l.gainEur} signed colored className="font-medium" /></div>
+      </div>
+      {l.withdrawalsEur > 0 && (
+        <p className="text-xs text-muted-foreground">
+          Rachats {year} : <MoneyValue value={l.withdrawalsEur} className="font-medium text-foreground" />, dont
+          ≈ <MoneyValue value={l.withdrawalsGainEur} className="font-medium text-foreground" /> de gains (estimation).
+          Les montants à déclarer figurent sur l'IFU envoyé par ton assureur.
+        </p>
+      )}
+      {l.openedAtEstimated && (
+        <Link to={`/portfolios/${l.portfolioId}`} className="text-xs font-medium text-primary">
+          Renseigne la date d'ouverture du contrat (Modifier le portefeuille) pour un calcul exact
+        </Link>
+      )}
+    </Card>
+  );
+}
+
+function EmployeeSavingsCard({ savings: e }: { savings: EmployeeSavingsStatus }) {
+  return (
+    <Card className="p-4 gap-3">
+      <p className="font-semibold">{e.name}</p>
+      <div className="grid grid-cols-3 gap-2 text-xs">
+        <div><p className="text-muted-foreground">Versé</p><MoneyValue value={e.depositsEur} className="font-medium" /></div>
+        <div><p className="text-muted-foreground">Dont abondement</p><MoneyValue value={e.employerContributionsEur} className="font-medium" /></div>
+        <div><p className="text-muted-foreground">Gain</p><MoneyValue value={e.gainEur} signed colored className="font-medium" /></div>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Gains exonérés d'impôt sur le revenu ; au déblocage, ≈ <MoneyValue value={e.socialChargesIfWithdrawnEur} className="font-medium text-foreground" /> de
+        prélèvements sociaux (17,2 %). Rien à déclarer tant que tu ne débloques pas.
+      </p>
     </Card>
   );
 }

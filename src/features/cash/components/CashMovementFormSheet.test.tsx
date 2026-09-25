@@ -74,4 +74,30 @@ describe('CashMovementFormSheet', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Solde insuffisant');
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it("épargne salariale : un abondement pré-rempli part tel quel, sans devise", async () => {
+    const { user } = renderForm({
+      portfolioType: 'EPARGNE_SALARIALE',
+      prefill: { type: 'ABONDEMENT', amount: 300, movementDate: '2026-03-01', notes: 'Abondement' },
+    });
+    expect(screen.getByLabelText('Montant (€)')).toHaveValue(300);
+    await user.click(screen.getByRole('button', { name: 'Ajouter' }));
+    expect(createMutate.mock.calls[0][0]).toEqual({
+      type: 'ABONDEMENT', amount: 300, movementDate: '2026-03-01', notes: 'Abondement',
+    });
+  });
+
+  it('compte multidevise : un change envoie les deux montants et leurs devises', async () => {
+    const { user } = renderForm({ multiCurrency: true, prefill: { type: 'CONVERSION', amount: 900, movementDate: '2026-03-10' } });
+    await user.click(screen.getByRole('button', { name: 'Ajouter' }));
+    expect(await screen.findByText('Montant reçu requis')).toBeInTheDocument();
+    expect(createMutate).not.toHaveBeenCalled();
+
+    await user.type(screen.getByLabelText('Montant reçu'), '1000');
+    await user.click(screen.getByRole('button', { name: 'Ajouter' }));
+    expect(createMutate.mock.calls[0][0]).toEqual({
+      type: 'CONVERSION', amount: 900, movementDate: '2026-03-10', notes: undefined,
+      currency: 'EUR', counterAmount: 1000, counterCurrency: 'USD',
+    });
+  });
 });

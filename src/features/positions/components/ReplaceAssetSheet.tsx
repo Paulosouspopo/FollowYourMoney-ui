@@ -1,3 +1,4 @@
+import { displaySymbol } from '@/shared/model/portfolioRules';
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { BottomSheet } from '@/shared/ui/BottomSheet';
@@ -28,14 +29,14 @@ export function ReplaceAssetSheet({ open, onClose, portfolioId, assetId, symbol,
     <BottomSheet open={open} onClose={close} onBack={close} title="Changer d'actif">
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Toutes les opérations de <strong className="text-foreground">{name}</strong> ({symbol}) seront rattachées au
+          Toutes les opérations de <strong className="text-foreground">{name}</strong> ({displaySymbol(symbol)}) seront rattachées au
           nouvel actif : quantités, prix, dates et devise ne changent pas, seuls les cours de référence changent.
           Si l'actif choisi est déjà dans ce portefeuille, les deux lignes sont fusionnées.
         </p>
         <AssetSearchCombobox value={choice} onChange={setChoice} placeholder="Rechercher le bon actif (ex. Ferrari Milan)…" />
         {choice && (
           <p className="flex items-center gap-2 rounded-xl bg-muted p-3 text-sm">
-            <span className="font-medium">{symbol}</span><ArrowRight size={14} className="text-muted-foreground" />
+            <span className="font-medium">{displaySymbol(symbol)}</span><ArrowRight size={14} className="text-muted-foreground" />
             <span className="font-medium">{choice.symbol}</span>
             <span className="truncate text-muted-foreground">{choice.name}{choice.exchange && ` · ${choice.exchange}`}</span>
           </p>

@@ -14,7 +14,7 @@ vi.mock('../api/portfolio.api', () => ({
 
 const LIVRET: PortfolioResponse = {
   id: 'l1', name: 'Livret A', description: null, type: 'LIVRET', cashTracking: true, annualInterestRate: 2.4,
-  openedAt: null, userId: 'u', createdAt: '', updatedAt: '',
+  openedAt: null, multiCurrencyCash: false, userId: 'u', createdAt: '', updatedAt: '',
 };
 
 describe('PortfolioFormSheet', () => {
@@ -31,7 +31,8 @@ describe('PortfolioFormSheet', () => {
     await user.click(screen.getByRole('button', { name: 'Créer' }));
 
     expect(createMutate.mock.calls[0][0]).toEqual({
-      name: 'CTO Bourso', type: 'PEA', description: undefined, cashTracking: true, annualInterestRate: null, openedAt: null,
+      name: 'CTO Bourso', type: 'PEA', description: undefined, cashTracking: true, multiCurrencyCash: false, annualInterestRate: null,
+      openedAt: null,
     });
   });
 

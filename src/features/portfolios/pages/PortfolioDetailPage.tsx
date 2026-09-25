@@ -75,7 +75,10 @@ export default function PortfolioDetailPage() {
                 {!livret && <PositionsList portfolioId={portfolioId} positions={pf.positions} />}
               </div>
               <aside className="space-y-6 lg:col-span-4 min-w-0">
-                {(livret || pf.cashTracking) && <CashSection portfolioId={portfolioId} balance={pf.cashEur} isLivret={livret} />}
+                {(livret || pf.cashTracking) && (
+                  <CashSection portfolioId={portfolioId} balance={pf.cashEur} portfolioType={pf.type}
+                    balances={pf.cashBalances} multiCurrency={pf.multiCurrencyCash} annualInterestRate={pf.annualInterestRate} />
+                )}
                 <PlansSection portfolioId={portfolioId} portfolioType={pf.type} cashTracking={livret || pf.cashTracking} />
                 {!livret && <AllocationDonut slices={d.allocation} />}
                 {!livret && <RecentTransactions portfolioId={portfolioId} heldQuantities={heldQuantities} />}
@@ -90,7 +93,7 @@ export default function PortfolioDetailPage() {
       <TransactionFormSheet portfolioId={portfolioId} open={sheet === 'transaction'} onClose={() => setSheet(null)}
         heldQuantities={heldQuantities} />
       <CashMovementFormSheet portfolioId={portfolioId} open={sheet === 'cash'} onClose={() => setSheet(null)}
-        balance={p?.cashEur} noOverdraft={isLivret} />
+        balance={p?.cashEur} noOverdraft={isLivret} portfolioType={p?.type} multiCurrency={p?.multiCurrencyCash} />
     </div>
   );
 }

@@ -26,6 +26,8 @@ export const TOURS = {
           <p>Crée un portefeuille pour chaque compte que tu as chez ta banque ou ton courtier :</p>
           <Def term="PEA">actions européennes, gains exonérés d'impôt après 5 ans.</Def>
           <Def term="Compte-titres">tout le reste : actions US, ETF, obligations…</Def>
+          <Def term="Assurance-vie, PER">fonds euros + unités de compte ; fiscalité propre.</Def>
+          <Def term="Épargne salariale">PEE, PERCO : versements et abondement de l'employeur.</Def>
           <Def term="Crypto">Binance, Coinbase, ton wallet…</Def>
           <Def term="Livret">Livret A, LDDS… un taux, pas de cours.</Def>
         </> },
@@ -101,7 +103,7 @@ export const TOURS = {
         body: <p>Plus-values, dividendes, frais : tout ce que ce compte t'a rapporté ou coûté depuis le début.</p> },
       { target: 'add', icon: Plus, title: 'Ajoute une opération',
         body: <>
-          <p>Le bouton + ajoute un achat, une vente ou un dividende. Cherche l'actif par son nom, puis indique date, quantité, prix et frais.</p>
+          <p>Le bouton + ajoute un achat, une vente ou un dividende. Cherche l'actif par son nom, puis indique date, quantité, prix et frais. Un fonds introuvable (assurance-vie, FCPE) ? Saisis sa valeur toi-même.</p>
           <Example>Achat de 3 Air Liquide à 170 € le 12 mars, 2 € de frais.</Example>
           <p>Une opération ancienne ? Les cours de l'époque sont récupérés et la courbe se recalcule en quelques secondes.</p>
         </> },
@@ -114,7 +116,10 @@ export const TOURS = {
           <Example>10 actions à 50 € puis 10 à 70 € : PRU = 60 €. Une vente ne change pas le PRU des actions restantes.</Example>
         </> },
       { target: 'cash', icon: PiggyBank, title: 'Les liquidités',
-        body: <p>L'argent qui attend sur le compte : versements − achats + ventes + dividendes. Il compte dans la valeur du portefeuille.</p> },
+        body: <>
+          <p>L'argent qui attend sur le compte : versements − achats + ventes + dividendes. Il compte dans la valeur du portefeuille.</p>
+          <p>Sur une assurance-vie ou un PER, c'est ton <span className="font-medium text-foreground">fonds euros</span> : l'app estime ses intérêts de l'année et te propose de les créditer.</p>
+        </> },
       { target: 'plans', icon: CalendarClock, title: 'Investissements programmés',
         body: <p>Tu investis tous les mois ? Programme l'achat ou le versement une fois : il s'ajoute tout seul à chaque échéance.</p> },
       { target: 'recent', icon: Receipt, title: 'Tes dernières opérations',
@@ -247,10 +252,12 @@ export const TOURS = {
     steps: [
       { target: 'tax-year', icon: CalendarClock, title: 'Choisis l\'année',
         body: <p>Les revenus d'une année se déclarent au printemps suivant : en mai 2027, tu déclares 2026.</p> },
+      { target: 'tax-bracket', icon: SlidersHorizontal, title: 'Ta tranche d\'imposition',
+        body: <p>Indique ton taux marginal (sur ton avis d'impôt) : l'app calcule l'impôt économisé grâce à tes versements sur un PER.</p> },
       { target: 'tax-hero', icon: Percent, title: 'L\'impôt estimé',
         body: <>
           <p>La flat tax de 30 % : 12,8 % d'impôt + 17,2 % de prélèvements sociaux, sur tes plus-values et dividendes.</p>
-          <p>PEA et livrets réglementés à part : ils ont leur propre fiscalité.</p>
+          <p>PEA, livrets, assurance-vie, PER et épargne salariale à part : ils ont leur propre fiscalité, détaillée plus bas.</p>
         </> },
       { target: 'tax-boxes', icon: ScrollText, title: 'Les cases à reporter',
         body: <p>Le code de chaque case et son montant, à copier d'un geste sur impots.gouv.fr. C'est une estimation : vérifie toujours avant de signer.</p> },
