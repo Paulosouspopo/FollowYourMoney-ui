@@ -1,4 +1,5 @@
 import { ArrowDownLeft, ArrowUpRight, Coins } from 'lucide-react';
+import { EditHint } from '@/shared/ui/EditHint';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { TRANSACTION_TYPE_LABEL } from '@/shared/model/enums';
 import { formatDate, formatMoney, formatQty } from '@/shared/lib/format';
@@ -14,7 +15,9 @@ export function TransactionRow({ tx, onClick, showAsset = false }: { tx: Transac
   const cashFlow = tx.type === 'BUY' ? -(tx.totalAmountEur + tx.feesEur) : tx.totalAmountEur - tx.feesEur;
 
   return (
-    <button type="button" onClick={onClick} className="w-full flex items-center gap-3 py-3 text-left -mx-2 px-2 rounded-xl active:bg-muted/60">
+    <button type="button" onClick={onClick} disabled={!onClick}
+      aria-label={onClick ? `Modifier : ${TRANSACTION_TYPE_LABEL[tx.type]} ${tx.symbol} du ${formatDate(tx.transactionDate)}` : undefined}
+      className="group w-full flex items-center gap-3 py-3 text-left -mx-2 px-2 rounded-xl hover:bg-muted/50 active:bg-muted/60 transition-colors disabled:cursor-default">
       <span className={cn('h-9 w-9 rounded-full grid place-items-center shrink-0', TONE[tx.type])}><Icon size={16} /></span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate">
@@ -29,6 +32,7 @@ export function TransactionRow({ tx, onClick, showAsset = false }: { tx: Transac
         <MoneyValue value={cashFlow} signed colored className="block text-sm font-medium" />
         {tx.currency !== 'EUR' && <span className="text-[11px] text-muted-foreground"><MoneyValue value={tx.totalAmount} currency={tx.currency} /></span>}
       </div>
+      {onClick && <EditHint />}
     </button>
   );
 }

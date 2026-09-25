@@ -83,7 +83,8 @@ function CashMovementForm({ portfolioId, onClose, initial, balance, noOverdraft 
   });
 
   return (
-    <BottomSheet open onClose={onClose} title={isEdit ? 'Modifier le mouvement' : 'Mouvement d\'argent'}>
+    <BottomSheet open onClose={onClose} title={isEdit ? 'Modifier le mouvement' : 'Mouvement d\'argent'}
+      onBack={isEdit ? onClose : undefined}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <SegmentedControl<CashMovementType> fullWidth value={type} onChange={v => setValue('type', v)}
           options={CASH_MOVEMENT_TYPES.map(t => ({ value: t, label: CASH_MOVEMENT_LABEL[t] }))} />
@@ -111,6 +112,7 @@ function CashMovementForm({ portfolioId, onClose, initial, balance, noOverdraft 
           {isEdit && (
             <Button type="button" variant="destructive" onClick={() => setConfirmDelete(true)} aria-label="Supprimer"><Trash2 size={18} /></Button>
           )}
+          {isEdit && <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>}
           <Button type="submit" className="flex-1" loading={mutation.isPending}>{isEdit ? 'Enregistrer' : 'Ajouter'}</Button>
         </div>
       </form>

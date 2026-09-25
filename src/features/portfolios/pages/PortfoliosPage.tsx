@@ -20,7 +20,11 @@ export default function PortfoliosPage() {
       </header>
       <QueryBoundary query={q} skeleton={<ListSkeleton rows={3} />}>
         {d => d.portfolios.length
-          ? <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{d.portfolios.map(p => <PortfolioCard key={p.portfolioId} valuation={p} />)}</div>
+          ? <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {d.portfolios.map(p => (
+                <PortfolioCard key={p.portfolioId} valuation={p} trend={d.trends?.find(t => t.portfolioId === p.portfolioId)} />
+              ))}
+            </div>
           : <EmptyState title="Aucun portefeuille" description="Crée un PEA, un CTO, un wallet crypto…" />}
       </QueryBoundary>
       <PortfolioFormSheet open={sheet === 'create'} onClose={() => setSheet(null)} />

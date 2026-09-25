@@ -49,4 +49,9 @@ export interface DashboardResponse {
   /** Montants de `curve` dans cette devise (taux historique de chaque jour), EUR par défaut. */
   curve: CurvePointDTO[];
   curveCurrency?: string;
+  /** Vue globale : tendance 30 jours de chaque portefeuille (tuiles). */
+  trends?: PortfolioTrend[];
 }
+
+/** Valeurs quotidiennes sur 30 jours et variation de plus-value (EUR, un versement n'est pas un gain). */
+export interface PortfolioTrend { portfolioId: string; values: number[]; changeEur: number; changePct: number | null; }

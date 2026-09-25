@@ -17,7 +17,7 @@ export function AppShell() {
     <div className="min-h-dvh bg-background text-foreground">
       <Sidebar />
       <div className="lg:pl-64">
-        <main className="mx-auto w-full max-w-lg md:max-w-3xl lg:max-w-6xl px-4 md:px-6 lg:px-10 lg:pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-16">
+        <main className="mx-auto w-full max-w-lg md:max-w-3xl lg:max-w-6xl px-4 md:px-6 lg:px-10 lg:pt-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-16">
           <Suspense fallback={<PageSkeleton />}>
             {/* Clé = page : courte apparition à chaque navigation */}
             <div key={pathname} className="animate-rise">

@@ -143,7 +143,8 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
   const title = isEdit ? 'Modifier la transaction' : asset ? asset.name : 'Choisir un actif';
 
   return (
-    <BottomSheet open onClose={onClose} title={title}>
+    <BottomSheet open onClose={onClose} title={title}
+      onBack={isEdit ? onClose : asset && !lockedAsset ? () => setAsset(null) : undefined}>
       {!asset ? (
         <div className="space-y-4">
           <AssetSearchCombobox onChange={r => setAsset({ symbol: r.symbol, name: r.name })} placeholder="Bitcoin, Apple, TotalEnergies..." />
@@ -200,6 +201,7 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
             {isEdit && (
               <Button type="button" variant="destructive" onClick={() => setConfirmDelete(true)} aria-label="Supprimer"><Trash2 size={18} /></Button>
             )}
+            {isEdit && <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>}
             <Button type="submit" className="flex-1" loading={mutation.isPending}>{isEdit ? 'Enregistrer' : 'Ajouter'}</Button>
           </div>
         </form>

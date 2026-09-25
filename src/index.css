@@ -152,6 +152,11 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Aucun défilement horizontal de la page, quoi qu'il arrive (clip : ne casse pas sticky) */
+  html, body {
+    overflow-x: clip;
+  }
+
   html {
     @apply font-sans antialiased;
     color-scheme: light dark;
@@ -181,15 +186,20 @@
     content: '';
     position: absolute;
     z-index: -1;
-    inset: -6rem -4rem auto -4rem;
+    /* Jamais au-delà du bord droit : un débordement élargit la page sur mobile
+       (la barre du bas se retrouve décalée et instable au défilement) */
+    inset: -6rem 0 auto -4rem;
     height: 28rem;
     pointer-events: none;
     background: radial-gradient(50% 50% at 35% 40%, var(--glow), transparent 75%);
   }
 
-  /* Apparition des pages et des blocs : courte, jamais bloquante */
+  /* Apparition des pages et des blocs : courte, jamais bloquante.
+     « backwards » et non « both » : une animation qui garde son état final
+     fait de l'élément le repère des enfants en position fixe (fenêtres,
+     bouton +) : ils se retrouveraient en bas de la page au lieu de l'écran. */
   .animate-rise {
-    animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
 
   .text-display {
