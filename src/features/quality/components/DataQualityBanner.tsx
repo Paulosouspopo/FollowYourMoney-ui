@@ -29,7 +29,7 @@ export function DataQualityBanner() {
   if (!issues.length) return null;
 
   return (
-    <section className="rounded-2xl border border-warning/40 bg-warning/10 text-sm">
+    <section data-tour="quality-banner" className="rounded-2xl border border-warning/40 bg-warning/10 text-sm">
       <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
         className="flex w-full items-center gap-2 px-4 py-3 text-left text-warning">
         <AlertTriangle size={16} className="shrink-0" />

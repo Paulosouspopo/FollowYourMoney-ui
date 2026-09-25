@@ -16,6 +16,7 @@ export const appPages = {
   goals: () => import('@/features/goals/pages/GoalsPage'),
   tax: () => import('@/features/tax/pages/TaxPage'),
   more: () => import('./layout/MorePage'),
+  guide: () => import('@/features/guide/pages/GuidePage'),
 };
 
 /** Pages atteignables en un geste depuis l'accueil : préchargées quand le navigateur est inactif. */

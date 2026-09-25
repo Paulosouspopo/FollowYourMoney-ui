@@ -236,6 +236,18 @@
   to { opacity: 1; transform: none; }
 }
 
+/* Visite guidée : halo qui pulse autour d'un élément à essayer (« À toi ! ») */
+.tour-pulse {
+  animation: tour-pulse 1.6s ease-out infinite;
+}
+@keyframes tour-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 55%, transparent); }
+  100% { box-shadow: 0 0 0 14px transparent; }
+}
+@keyframes tour-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

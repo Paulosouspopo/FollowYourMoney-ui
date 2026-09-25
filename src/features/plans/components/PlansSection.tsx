@@ -19,7 +19,7 @@ export function PlansSection({ portfolioId, portfolioType, cashTracking }: Props
   const monthly = (q.data ?? []).filter(p => p.active && p.nextExecutionDate).reduce((s, p) => s + p.monthlyAmount, 0);
 
   return (
-    <section className="space-y-1">
+    <section data-tour="plans" className="space-y-1">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-sm font-semibold tracking-tight">Investissements programmés</h2>

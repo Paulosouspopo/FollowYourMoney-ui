@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Plus, Target } from 'lucide-react';
 import { TopBar } from '@/app/layout/TopBar';
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
 import { SectionHeader } from '@/shared/ui/SectionHeader';
@@ -28,10 +31,11 @@ export default function GoalsPage() {
   const plannedMonthly = Math.round((plans.data ?? []).filter(p => p.active && p.nextExecutionDate)
     .reduce((s, p) => s + p.monthlyAmount, 0));
   const [rate, setRate] = useState(5);
+  usePageTour(TOURS.goals, !!dashboard.data && !!plans.data);
 
   return (
     <div className="lg:max-w-5xl">
-      <TopBar back title="Projection et objectifs" />
+      <TopBar back title="Projection et objectifs" right={<TourButton tour={TOURS.goals} />} />
       <div className="space-y-8">
         {dashboard.data && plans.data && (
           <Simulator key={plannedMonthly} start={dashboard.data.totalValueEur} defaultMonthly={plannedMonthly}
@@ -69,7 +73,7 @@ function Simulator({ start, defaultMonthly, rate, onRate }: {
 
   return (
     <section className="space-y-4">
-      <div className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
+      <div data-tour="goals-hero" className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Dans {years} ans</p>
         <p className="text-display mt-2">≈ {formatEurRounded(final.median.value)}</p>
         <p className="mt-3 text-sm text-muted-foreground">
@@ -100,7 +104,7 @@ function Simulator({ start, defaultMonthly, rate, onRate }: {
           <span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t border-dashed border-muted-foreground" /> Versé</span>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div data-tour="goals-sliders" className="grid gap-5 md:grid-cols-3">
           <Range label="Horizon" value={years} min={1} max={40} step={1} onChange={setYears} display={`${years} ans`} />
           <Range label="Versement mensuel" value={monthly} min={0} max={5000} step={25} onChange={setMonthly}
             display={formatEurRounded(monthly)} hint={defaultMonthly > 0 ? `Tes plans : ${formatEurRounded(defaultMonthly)} / mois` : undefined} />
@@ -119,7 +123,7 @@ function Goals({ rate }: { rate: number }) {
   const q = useGoals();
   const [editing, setEditing] = useState<Goal | 'new' | null>(null);
   return (
-    <section>
+    <section data-tour="goals-list">
       <SectionHeader title="Mes objectifs"
         action={<Button size="sm" onClick={() => setEditing('new')}><Plus size={14} /> Nouvel objectif</Button>} />
       <QueryBoundary query={q} skeleton={<ListSkeleton rows={2} />}>

@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
 import { PageSkeleton } from "./PageSkeleton";
+import { TourOverlay } from "@/shared/tour/TourOverlay";
 
 /**
  * Mobile : une colonne + dock en bas. Grand écran : barre latérale, contenu
@@ -27,6 +28,7 @@ export function AppShell() {
         </main>
       </div>
       <BottomNav />
+      <TourOverlay />
     </div>
   );
 }

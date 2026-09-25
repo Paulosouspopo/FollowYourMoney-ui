@@ -18,6 +18,9 @@ import { Card } from '@/shared/ui/card';
 import { formatQty, formatMoney, formatDate } from '@/shared/lib/format';
 import type { TransactionResponse } from '@/features/transactions/model/transaction.types';
 import { AssetTypeBadge } from '@/shared/components/data/AssetIcon';
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 
 export default function PositionDetailPage() {
   const { portfolioId = '', symbol: raw = '' } = useParams();
@@ -31,14 +34,18 @@ export default function PositionDetailPage() {
   const navigate = useNavigate();
 
   const position = dash.data?.portfolios[0]?.positions.find(p => p.symbol === symbol);
+  usePageTour(TOURS.position, !!position && !replacing && editing === null);
 
   return (
     <div className="space-y-4 lg:max-w-3xl">
-      <TopBar back title={position?.name ?? symbol} right={position && (
-        <Button size="sm" variant="outline" onClick={() => setReplacing(true)}>
-          <ArrowLeftRight size={14} /> Changer d'actif
-        </Button>
-      )} />
+      <TopBar back title={position?.name ?? symbol} right={<>
+        <TourButton tour={TOURS.position} />
+        {position && (
+          <Button size="sm" variant="outline" onClick={() => setReplacing(true)} data-tour="replace-asset">
+            <ArrowLeftRight size={14} /> Changer d'actif
+          </Button>
+        )}
+      </>} />
       {position && (
         <ReplaceAssetSheet open={replacing} portfolioId={portfolioId} assetId={position.assetId} symbol={symbol}
           name={position.name}
@@ -49,7 +56,7 @@ export default function PositionDetailPage() {
       <QueryBoundary query={dash}>
         {() => position ? (
           <>
-            <Card className="p-4 space-y-2">
+            <Card data-tour="position-summary" className="p-4 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{symbol}</span>
                 <AssetTypeBadge type={position.assetType} />
@@ -74,7 +81,7 @@ export default function PositionDetailPage() {
         ) : <p className="text-sm text-muted-foreground">Position introuvable dans ce portefeuille.</p>}
       </QueryBoundary>
 
-      <section>
+      <section data-tour="position-history">
         <h2 className="text-sm font-semibold tracking-tight mb-1">Historique</h2>
         <QueryBoundary query={txs}>
           {list => list.length

@@ -17,6 +17,9 @@ import { DataQualityBanner } from '@/features/quality/components/DataQualityBann
 import { IncomeCard } from '@/features/income/components/IncomeCard';
 import { GoalsCard } from '@/features/goals/components/GoalsCard';
 import { TaxCard } from '@/features/tax/components/TaxCard';
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 
 /**
  * Accueil. Mobile : une colonne, l'essentiel en haut. Grand écran : le
@@ -25,6 +28,9 @@ import { TaxCard } from '@/features/tax/components/TaxCard';
 export default function DashboardPage() {
   const [period, setPeriod] = useState<DashboardPeriod>('30d');
   const query = useDashboard(period);
+  const hasPortfolios = (query.data?.portfolios.length ?? 0) > 0;
+  // Premier lancement : « Premiers pas » sur l'écran d'accueil ; ensuite, la visite du tableau de bord
+  usePageTour(hasPortfolios ? TOURS.welcome : TOURS.start, query.isSuccess);
 
   return (
     <QueryBoundary query={query} skeleton={<DashboardSkeleton />}>
@@ -36,7 +42,8 @@ export default function DashboardPage() {
             <ValueHero label="Patrimoine" valueEur={d.totalValueEur} curve={d.curve} curveCurrency={d.curveCurrency}
               periodLabel={PERIOD_SENTENCE[period]}
               aside={<>Investi <MoneyValue value={d.totalInvestedEur} className="text-foreground font-medium" /></>}
-              controls={<PeriodSelector value={period} onChange={setPeriod} />} />
+              controls={<PeriodSelector value={period} onChange={setPeriod} />}
+              help={<TourButton tour={TOURS.welcome} />} />
             <StatStrip data={d} />
             <PerformanceCard portfolioId={null} />
           </div>

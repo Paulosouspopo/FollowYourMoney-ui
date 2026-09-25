@@ -25,7 +25,7 @@ export function CashSection({ portfolioId, balance, isLivret = false }: Props) {
   const [editing, setEditing] = useState<CashMovementResponse | null>(null);
 
   return (
-    <section className="space-y-2">
+    <section data-tour="cash" className="space-y-2">
       {isLivret ? (
         <h2 className="text-sm font-semibold tracking-tight">Mouvements</h2>
       ) : (

@@ -31,7 +31,7 @@ export function PerformanceCard({ portfolioId }: { portfolioId: string | null })
   const [help, setHelp] = useState(false);
 
   return (
-    <section className="space-y-2">
+    <section data-tour="performance" className="space-y-2">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold tracking-tight flex items-center gap-1.5">
           Performance
