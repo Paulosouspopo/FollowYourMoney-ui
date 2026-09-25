@@ -1,6 +1,6 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { FileUp, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { toast } from "@/shared/ui/toast.store";
 import { usePortfolio, useDeletePortfolio } from "../api/portfolio.api";
@@ -20,6 +20,7 @@ export function PortfolioMenu({ portfolioId }: { portfolioId: string }) {
 
   return (
     <>
+      <Link to={`/portfolios/${portfolioId}/import`} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Importer un relevé" title="Importer un relevé"><FileUp size={18} /></Link>
       <button onClick={() => setEdit(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Modifier"><Pencil size={18} /></button>
       <button onClick={() => setConfirmDelete(true)} className="p-2 text-loss" aria-label="Supprimer"><Trash2 size={18} /></button>
       {data && <PortfolioFormSheet open={edit} onClose={() => setEdit(false)} initial={data} />}

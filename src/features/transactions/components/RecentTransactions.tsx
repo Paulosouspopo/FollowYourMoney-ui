@@ -16,7 +16,7 @@ export function RecentTransactions({ portfolioId, heldQuantities }: { portfolioI
 
   return (
     <section>
-      <h2 className="text-sm font-medium mb-1">Transactions</h2>
+      <h2 className="text-sm font-semibold tracking-tight mb-1">Transactions</h2>
       <QueryBoundary query={q} skeleton={<ListSkeleton rows={3} />}>
         {list => list.length ? (
           <>

@@ -12,6 +12,9 @@ import { THEMES, THEME_LABEL, useThemeStore, type Theme } from "@/shared/theme/t
 import { useMe, useUpdateMe, useDeleteMe } from '@/features/settings/api/user.api';
 import type { UserUpdateRequest } from '@/features/settings/model/user.types';
 import { useLogout } from "@/features/auth/api/auth.api";
+import { SecuritySection } from "@/features/settings/components/SecuritySection";
+import { PushSettingsCard } from "@/features/notifications/components/PushSettingsCard";
+import { DISPLAY_CURRENCIES, DISPLAY_CURRENCY_LABEL, useDisplayCurrencyStore } from "@/shared/currency/displayCurrency.store";
 
 const THEME_ICON: Record<Theme, typeof Sun> = { system: Monitor, light: Sun, dark: Moon };
 
@@ -29,6 +32,26 @@ function ThemePicker() {
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function CurrencyPicker() {
+  const { currency, setCurrency } = useDisplayCurrencyStore();
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Devise d'affichage">
+        {DISPLAY_CURRENCIES.map(c => (
+          <button key={c} type="button" role="radio" aria-checked={currency === c} onClick={() => setCurrency(c)}
+            className={cn('rounded-xl border py-2.5 text-xs font-medium transition-colors',
+              currency === c ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:text-foreground')}>
+            {DISPLAY_CURRENCY_LABEL[c]}
+          </button>
+        ))}
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        Montants convertis au taux du jour, courbes au taux de chaque jour. Calculs, saisies et performances restent en euros.
+      </p>
     </div>
   );
 }
@@ -52,16 +75,21 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="space-y-6 pt-2">
-      <h1 className="text-lg font-semibold">Réglages</h1>
+    <div className="space-y-6 pt-4 lg:max-w-2xl">
+      <h1 className="text-2xl font-semibold tracking-tight">Réglages</h1>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">Apparence</h2>
-        <Card className="p-4"><ThemePicker /></Card>
+        <h2 className="text-sm font-semibold tracking-tight">Apparence</h2>
+        <Card className="p-4 space-y-4"><ThemePicker /><CurrencyPicker /></Card>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">Profil</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Notifications</h2>
+        <PushSettingsCard />
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold tracking-tight">Profil</h2>
         <QueryBoundary query={me}>
           {u => (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
@@ -75,15 +103,17 @@ export default function SettingsPage() {
         </QueryBoundary>
       </section>
 
+      <SecuritySection />
+
       <section className="space-y-2">
-        <h2 className="text-sm font-medium">Compte</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Compte</h2>
         <Card className="p-4 space-y-3">
           <Button variant="outline" className="w-full" onClick={logout}><LogOut size={16} /> Se déconnecter</Button>
           <Button variant="destructive" className="w-full" onClick={() => setConfirmDelete(true)}>Supprimer mon compte</Button>
         </Card>
       </section>
 
-      <p className="text-center text-[11px] text-muted-foreground">FollowYourMoney · v{__APP_VERSION__} · montants en EUR</p>
+      <p className="text-center text-[11px] text-muted-foreground">FollowYourMoney · v{__APP_VERSION__}</p>
 
       <ConfirmDialog open={confirmDelete} onOpenChange={setConfirmDelete}
         title="Supprimer ton compte ?" description="Tous tes portefeuilles, transactions et historiques seront définitivement supprimés."

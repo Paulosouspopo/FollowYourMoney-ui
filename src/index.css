@@ -56,95 +56,90 @@
   --color-warning: var(--warning);
 }
 
+/*
+ * Identité : neutres légèrement bleutés, un seul accent (indigo électrique),
+ * gain / perte lisibles dans les deux thèmes. Aucune couleur en dur ailleurs.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.985 0.003 270);
+  --foreground: oklch(0.19 0.02 270);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.19 0.02 270);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.19 0.02 270);
+  --primary: oklch(0.55 0.23 278);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --primary: oklch(0.55 0.2 264);
-  /* indigo accent */
-  --primary-foreground: oklch(0.985 0 0);
-  --ring: oklch(0.55 0.2 264);
-  --positive: oklch(0.62 0.17 150);
-  --positive-bg: oklch(0.62 0.17 150 / 12%);
-  --negative: oklch(0.6 0.22 25);
-  --negative-bg: oklch(0.6 0.22 25 / 12%);
-  --warning: oklch(0.7 0.16 70);
-  --chart-1: oklch(0.55 0.2 264);
-  --chart-2: oklch(0.7 0.15 190);
-  --chart-3: oklch(0.75 0.16 80);
+  --secondary: oklch(0.955 0.006 270);
+  --secondary-foreground: oklch(0.25 0.02 270);
+  --muted: oklch(0.955 0.006 270);
+  --muted-foreground: oklch(0.52 0.02 270);
+  --accent: oklch(0.955 0.01 278);
+  --accent-foreground: oklch(0.25 0.02 270);
+  --destructive: oklch(0.58 0.22 25);
+  --border: oklch(0.915 0.008 270);
+  --input: oklch(0.9 0.01 270);
+  --ring: oklch(0.55 0.23 278);
+  --radius: 0.75rem;
+  --positive: oklch(0.6 0.16 155);
+  --positive-bg: oklch(0.6 0.16 155 / 12%);
+  --negative: oklch(0.58 0.21 25);
+  --negative-bg: oklch(0.58 0.21 25 / 12%);
+  --warning: oklch(0.68 0.16 70);
+  --chart-1: oklch(0.55 0.23 278);
+  --chart-2: oklch(0.7 0.14 190);
+  --chart-3: oklch(0.76 0.16 80);
   --chart-4: oklch(0.65 0.2 340);
-  --chart-5: oklch(0.6 0.15 150);
+  --chart-5: oklch(0.62 0.15 155);
+  --sidebar: oklch(0.975 0.004 270);
+  --sidebar-foreground: oklch(0.19 0.02 270);
+  --sidebar-primary: oklch(0.55 0.23 278);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.94 0.012 278);
+  --sidebar-accent-foreground: oklch(0.19 0.02 270);
+  --sidebar-border: oklch(0.915 0.008 270);
+  --sidebar-ring: oklch(0.55 0.23 278);
+  /* Halo derrière le chiffre principal */
+  --glow: oklch(0.55 0.23 278 / 14%);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  --primary: oklch(0.7 0.18 264);
-  --primary-foreground: oklch(0.15 0 0);
-  --ring: oklch(0.7 0.18 264);
-  --positive: oklch(0.75 0.17 150);
-  --positive-bg: oklch(0.75 0.17 150 / 15%);
-  --negative: oklch(0.7 0.2 25);
-  --negative-bg: oklch(0.7 0.2 25 / 15%);
-  --warning: oklch(0.8 0.15 80);
+  --background: oklch(0.135 0.008 270);
+  --foreground: oklch(0.97 0.005 270);
+  --card: oklch(0.175 0.01 270);
+  --card-foreground: oklch(0.97 0.005 270);
+  --popover: oklch(0.2 0.012 270);
+  --popover-foreground: oklch(0.97 0.005 270);
+  --primary: oklch(0.72 0.19 278);
+  --primary-foreground: oklch(0.16 0.02 278);
+  --secondary: oklch(0.23 0.012 270);
+  --secondary-foreground: oklch(0.97 0.005 270);
+  --muted: oklch(0.23 0.012 270);
+  --muted-foreground: oklch(0.68 0.015 270);
+  --accent: oklch(0.25 0.03 278);
+  --accent-foreground: oklch(0.97 0.005 270);
+  --destructive: oklch(0.7 0.19 22);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 13%);
+  --ring: oklch(0.72 0.19 278);
+  --positive: oklch(0.78 0.17 155);
+  --positive-bg: oklch(0.78 0.17 155 / 14%);
+  --negative: oklch(0.72 0.19 22);
+  --negative-bg: oklch(0.72 0.19 22 / 14%);
+  --warning: oklch(0.82 0.15 80);
+  --chart-1: oklch(0.72 0.19 278);
+  --chart-2: oklch(0.78 0.13 190);
+  --chart-3: oklch(0.82 0.15 80);
+  --chart-4: oklch(0.74 0.18 340);
+  --chart-5: oklch(0.78 0.17 155);
+  --sidebar: oklch(0.155 0.009 270);
+  --sidebar-foreground: oklch(0.97 0.005 270);
+  --sidebar-primary: oklch(0.72 0.19 278);
+  --sidebar-primary-foreground: oklch(0.16 0.02 278);
+  --sidebar-accent: oklch(0.23 0.02 278);
+  --sidebar-accent-foreground: oklch(0.97 0.005 270);
+  --sidebar-border: oklch(1 0 0 / 7%);
+  --sidebar-ring: oklch(0.72 0.19 278);
+  --glow: oklch(0.72 0.19 278 / 16%);
 }
 
 @layer base {
@@ -154,10 +149,97 @@
 
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Aucun défilement horizontal de la page, quoi qu'il arrive (clip : ne casse pas sticky) */
+  html, body {
+    overflow-x: clip;
   }
 
   html {
     @apply font-sans antialiased;
     color-scheme: light dark;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 30%, transparent);
+  }
+
+  /* Chiffres alignés partout où l'on compare des montants */
+  .tabular-nums, table {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+
+  /* Halo discret derrière le patrimoine : une seule touche de couleur par écran */
+  .glow {
+    position: relative;
+    isolation: isolate;
+  }
+  .glow::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    /* Jamais au-delà du bord droit : un débordement élargit la page sur mobile
+       (la barre du bas se retrouve décalée et instable au défilement) */
+    inset: -6rem 0 auto -4rem;
+    height: 28rem;
+    pointer-events: none;
+    background: radial-gradient(50% 50% at 35% 40%, var(--glow), transparent 75%);
+  }
+
+  /* Apparition des pages et des blocs : courte, jamais bloquante.
+     « backwards » et non « both » : une animation qui garde son état final
+     fait de l'élément le repère des enfants en position fixe (fenêtres,
+     bouton +) : ils se retrouveraient en bas de la page au lieu de l'écran. */
+  .animate-rise {
+    animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .text-display {
+    font-size: clamp(2.5rem, 7vw + 1rem, 4.25rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Courbes : le tracé se dessine (pathLength = 1), l'aire apparaît ensuite */
+.chart-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.chart-fade {
+  animation: fade 0.6s ease-out 0.35s both;
+}
+
+/* Fin d'animation : plus aucun tiret. Le trait reste plein même si un moteur
+   de rendu ignore pathLength (sinon : pointillé de 1 px, presque invisible). */
+@keyframes draw {
+  99% { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  100% { stroke-dasharray: none; stroke-dashoffset: 0; }
+}
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
