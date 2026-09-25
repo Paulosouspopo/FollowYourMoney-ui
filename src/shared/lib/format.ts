@@ -4,15 +4,15 @@ const pct = new Intl.NumberFormat('fr-FR', { style: 'percent', minimumFractionDi
  * Devise d'affichage : les montants EUR du back sont convertis au taux du jour
  * (réglée par DisplayCurrencyScope). Les calculs restent en EUR.
  */
-let display = { currency: 'EUR', rate: 1, format: moneyFormat('EUR') };
+let display = { currency: 'EUR', rate: 1, format: moneyFormat('EUR'), rounded: moneyFormat('EUR', 0) };
 export function setDisplayCurrency(currency: string, rate: number) {
   if (display.currency !== currency || display.rate !== rate) {
-    display = { currency, rate, format: moneyFormat(currency) };
+    display = { currency, rate, format: moneyFormat(currency), rounded: moneyFormat(currency, 0) };
   }
 }
 
-function moneyFormat(currency: string) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 2 });
+function moneyFormat(currency: string, digits = 2) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
 /**
@@ -28,6 +28,9 @@ export function setAmountsHidden(hidden: boolean) {
 /** Montant EUR, affiché dans la devise d'affichage (masqué en mode confidentialité). */
 export const formatEur = (v: number | null | undefined) =>
   v == null ? '—' : amountsHidden ? MASK : display.format.format(v * display.rate);
+/** Même chose arrondi à l'unité : projections (les centimes n'y ont pas de sens). */
+export const formatEurRounded = (v: number | null | undefined) =>
+  v == null ? '—' : amountsHidden ? MASK : display.rounded.format(v * display.rate);
 /** Montant dans une devise donnée, tel quel (cours, saisie) : jamais masqué. */
 export const formatMoney = (v: number | null | undefined, currency: string) =>
   v == null ? '—' : new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format(v);

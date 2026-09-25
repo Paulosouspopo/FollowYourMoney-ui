@@ -9,7 +9,7 @@ import { ListSkeleton } from '@/shared/components/data/ListSkeleton';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { EditHint } from '@/shared/ui/EditHint';
 import { TimeSeriesChart, type ChartSeries } from '@/shared/charts/TimeSeriesChart';
-import { formatEur } from '@/shared/lib/format';
+import { formatEurRounded } from '@/shared/lib/format';
 import { useDashboard } from '@/features/dashboard/api/dashboard.api';
 import { useMyPlans } from '@/features/plans/api/plan.api';
 import { useGoals } from '../api/goal.api';
@@ -71,14 +71,14 @@ function Simulator({ start, defaultMonthly, rate, onRate }: {
     <section className="space-y-4">
       <div className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Dans {years} ans</p>
-        <p className="text-display mt-2">≈ {formatEur(final.median.value)}</p>
+        <p className="text-display mt-2">≈ {formatEurRounded(final.median.value)}</p>
         <p className="mt-3 text-sm text-muted-foreground">
-          entre <MoneyValue value={final.prudent} className="text-foreground font-medium" /> (prudent)
-          {' '}et <MoneyValue value={final.dynamic} className="text-foreground font-medium" /> (dynamique)
+          entre <span className="text-foreground font-medium tabular-nums">{formatEurRounded(final.prudent)}</span> (prudent)
+          {' '}et <span className="text-foreground font-medium tabular-nums">{formatEurRounded(final.dynamic)}</span> (dynamique)
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          dont <MoneyValue value={final.median.invested} className="text-foreground font-medium" /> versés
-          {' '}et <MoneyValue value={final.median.value - final.median.invested} className="text-gain font-medium" /> d'intérêts composés
+          dont <span className="text-foreground font-medium tabular-nums">{formatEurRounded(final.median.invested)}</span> versés
+          {' '}et <span className="text-gain font-medium tabular-nums">{formatEurRounded(final.median.value - final.median.invested)}</span> d'intérêts composés
         </p>
       </div>
 
@@ -103,7 +103,7 @@ function Simulator({ start, defaultMonthly, rate, onRate }: {
         <div className="grid gap-5 md:grid-cols-3">
           <Range label="Horizon" value={years} min={1} max={40} step={1} onChange={setYears} display={`${years} ans`} />
           <Range label="Versement mensuel" value={monthly} min={0} max={5000} step={25} onChange={setMonthly}
-            display={formatEur(monthly)} hint={defaultMonthly > 0 ? `Tes plans : ${formatEur(defaultMonthly)} / mois` : undefined} />
+            display={formatEurRounded(monthly)} hint={defaultMonthly > 0 ? `Tes plans : ${formatEurRounded(defaultMonthly)} / mois` : undefined} />
           <Range label="Rendement médian" value={rate} min={0} max={12} step={0.5} onChange={onRate}
             display={`${String(rate).replace('.', ',')} % / an`} hint="Actions monde ≈ 6-7 % sur longue période, livret ≈ 2-3 %" />
         </div>
@@ -193,7 +193,7 @@ function Range({ label, value, min, max, step, onChange, display, hint }: {
 function Row({ label, value }: { label: string; value: number }) {
   return (
     <p className="flex justify-between gap-2"><span className="text-muted-foreground">{label}</span>
-      <span className="font-medium tabular-nums">{formatEur(value)}</span></p>
+      <span className="font-medium tabular-nums">{formatEurRounded(value)}</span></p>
   );
 }
 

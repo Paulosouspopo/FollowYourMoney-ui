@@ -33,7 +33,7 @@ export function DataQualityBanner() {
               <div className="flex flex-wrap gap-2 text-xs">
                 <Link to={i.transactionId ? `/portfolios/${i.portfolioId}/positions/${encodeURIComponent(i.symbol)}` : `/portfolios/${i.portfolioId}`}
                   className="rounded-full bg-warning/20 px-2.5 py-1 font-medium text-warning hover:bg-warning/30">
-                  {i.transactionId ? "Corriger l'opération" : 'Voir le portefeuille'}
+                  {!i.transactionId ? 'Voir le portefeuille' : i.code === 'SPLIT_SUSPECTED' ? 'Voir la position' : "Corriger l'opération"}
                 </Link>
                 <button type="button" disabled={dismiss.isPending}
                   onClick={() => dismiss.mutate(i.key, { onError: e => toast.error(e.message) })}
