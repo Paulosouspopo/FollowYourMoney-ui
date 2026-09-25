@@ -16,6 +16,7 @@ import { PerformanceCard } from '@/features/performance/components/PerformanceCa
 import { DataQualityBanner } from '@/features/quality/components/DataQualityBanner';
 import { IncomeCard } from '@/features/income/components/IncomeCard';
 import { GoalsCard } from '@/features/goals/components/GoalsCard';
+import { TaxCard } from '@/features/tax/components/TaxCard';
 
 /**
  * Accueil. Mobile : une colonne, l'essentiel en haut. Grand écran : le
@@ -43,6 +44,7 @@ export default function DashboardPage() {
             <PortfolioList portfolios={d.portfolios} />
             <IncomeCard />
             <GoalsCard />
+            <TaxCard />
             <UpcomingPlansCard />
             <AllocationDonut slices={d.allocation} />
           </aside>
