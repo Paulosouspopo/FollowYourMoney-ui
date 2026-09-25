@@ -144,13 +144,22 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   Tracé animé via `pathLength` + `.chart-draw` ; l'animation se termine sans
   tirets (robuste si `pathLength` est ignoré). Mémoriser `series`/`dates`
   (`useMemo`) : le composant est `memo`.
-- Mise en page : mobile une colonne + dock flottant (`BottomNav`) ; ≥ lg
+- Mise en page : mobile une colonne + barre du bas collée (`BottomNav`) ; ≥ lg
   barre latérale (`Sidebar`, liste commune `app/layout/nav.ts`) et grille
   12 colonnes (8 + 4) sur l'accueil, un portefeuille, une fiche actif. Pages
   de formulaire bornées (`lg:max-w-2xl` / `3xl`). `BottomSheet` = fenêtre
   centrée sur grand écran.
 - Titres de page `text-2xl font-semibold tracking-tight`, de section
   `SectionHeader` ; tuiles de chiffres sans « 0,00 € » inutiles.
+- Éléments fixes (`BottomSheet`, `Fab`) rendus en portail dans `<body>` ;
+  `.animate-rise` en `backwards` (jamais `both`/`forwards`) : un ancêtre qui
+  garde une animation de transform devient le repère des `position: fixed`.
+  Rien ne doit déborder à droite (sinon la page s'élargit sur mobile et la
+  barre du bas se décale) : `overflow-x: clip` sur html/body en filet.
+- Lignes modifiables : `EditHint` (crayon) ; fenêtres de modification :
+  `onBack` + Annuler + Enregistrer.
+- Tuile de portefeuille : tendance 30 j (`trends` du dashboard), principales
+  lignes ou taux du livret.
 - Premier lancement (aucun portefeuille) : `Welcome`. Démarrage : écran de
   marque dans `index.html` puis `Splash` (même rendu).
 - Perf : pages préchargées à l'inactivité (`app/pages.ts`), données d'un
