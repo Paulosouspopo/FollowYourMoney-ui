@@ -144,7 +144,7 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   Tracé animé via `pathLength` + `.chart-draw` ; l'animation se termine sans
   tirets (robuste si `pathLength` est ignoré). Mémoriser `series`/`dates`
   (`useMemo`) : le composant est `memo`.
-- Mise en page : mobile une colonne + barre du bas collée (`BottomNav`) ; ≥ lg
+- Mise en page : mobile une colonne + barre du bas collée (`BottomNav`, `MOBILE_NAV_ITEMS`) ; ≥ lg
   barre latérale (`Sidebar`, liste commune `app/layout/nav.ts`) et grille
   12 colonnes (8 + 4) sur l'accueil, un portefeuille, une fiche actif. Pages
   de formulaire bornées (`lg:max-w-2xl` / `3xl`). `BottomSheet` = fenêtre
@@ -183,8 +183,10 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Objectifs (`/goals`, `features/goals`) : `projection.ts` pur et testé
   (taux mensuel équivalent, délai, effort) ; simulateur 3 scénarios,
   `GoalVerdict`, `GoalsCard`. Montants projetés arrondis (`formatEurRounded`).
-- Barre latérale : section « Analyse » (`SECONDARY_NAV_ITEMS`) ; sur mobile,
-  accès par les cartes de l'accueil. Clés de requête de ces features sous
+- Barre latérale : section « Analyse » (`SECONDARY_NAV_ITEMS`). Mobile :
+  barre du bas = 4 onglets + « Plus » (`/more`, `MorePage`) qui liste
+  `MORE_SECTIONS` (Analyse, Compte) ; « Plus » reste actif sur ses pages
+  (`isNavActive`). Nouvelle page secondaire = une entrée dans `nav.ts`. Clés de requête de ces features sous
   `dashboardKeys.all` (rafraîchies par toute mutation d'opération).
 
 ## Fiscalité et corrections
