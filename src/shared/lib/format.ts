@@ -4,21 +4,39 @@ const pct = new Intl.NumberFormat('fr-FR', { style: 'percent', minimumFractionDi
  * Devise d'affichage : les montants EUR du back sont convertis au taux du jour
  * (réglée par DisplayCurrencyScope). Les calculs restent en EUR.
  */
-let display = { currency: 'EUR', rate: 1, format: moneyFormat('EUR') };
+let display = { currency: 'EUR', rate: 1, format: moneyFormat('EUR'), rounded: moneyFormat('EUR', 0) };
 export function setDisplayCurrency(currency: string, rate: number) {
   if (display.currency !== currency || display.rate !== rate) {
-    display = { currency, rate, format: moneyFormat(currency) };
+    display = { currency, rate, format: moneyFormat(currency), rounded: moneyFormat(currency, 0) };
   }
 }
 
-function moneyFormat(currency: string) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 2 });
+function moneyFormat(currency: string, digits = 2) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
-/** Montant EUR, affiché dans la devise d'affichage. */
-export const formatEur = (v: number | null | undefined) => v == null ? '—' : display.format.format(v * display.rate);
+/**
+ * Mode confidentialité (réglé par DisplayCurrencyScope) : montants et quantités
+ * personnels masqués ; pourcentages, cours et dates restent visibles.
+ */
+let amountsHidden = false;
+export const MASK = '••••';
+export function setAmountsHidden(hidden: boolean) {
+  amountsHidden = hidden;
+}
+
+/** Montant EUR, affiché dans la devise d'affichage (masqué en mode confidentialité). */
+export const formatEur = (v: number | null | undefined) =>
+  v == null ? '—' : amountsHidden ? MASK : display.format.format(v * display.rate);
+/** Même chose arrondi à l'unité : projections (les centimes n'y ont pas de sens). */
+export const formatEurRounded = (v: number | null | undefined) =>
+  v == null ? '—' : amountsHidden ? MASK : display.rounded.format(v * display.rate);
+/** Montant dans une devise donnée, tel quel (cours, saisie) : jamais masqué. */
 export const formatMoney = (v: number | null | undefined, currency: string) =>
   v == null ? '—' : new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format(v);
+/** Montant personnel dans une devise donnée (courbe convertie, opération en devise) : masqué en mode confidentialité. */
+export const formatPrivateMoney = (v: number | null | undefined, currency: string) =>
+  v == null ? '—' : amountsHidden ? MASK : formatMoney(v, currency);
 /** Ton back renvoie des pourcentages en "12.34" et pas "0.1234" → on divise */
 export const formatPercent = (v: number | null | undefined) => v == null ? '—' : pct.format(v / 100);
 export const formatDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso));
@@ -30,5 +48,6 @@ export const formatShortDate = (iso: string) => new Intl.DateTimeFormat('fr-FR',
 /** Taux saisi en % (ex : 2.4 → « 2,4 % »), jusqu'à 3 décimales. */
 export const formatRate = (v: number) => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 }).format(v)} %`;
 
-export const formatQty = (v: number) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 8 }).format(v);
+/** Quantité détenue : révèle la taille d'une position, donc masquée en mode confidentialité. */
+export const formatQty = (v: number) => amountsHidden ? MASK : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 8 }).format(v);
 export const gainTone = (v: number) => v > 0 ? 'text-gain' : v < 0 ? 'text-loss' : 'text-muted-foreground';

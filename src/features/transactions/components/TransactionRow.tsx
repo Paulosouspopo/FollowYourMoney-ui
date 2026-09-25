@@ -30,7 +30,7 @@ export function TransactionRow({ tx, onClick, showAsset = false }: { tx: Transac
       </div>
       <div className="text-right shrink-0">
         <MoneyValue value={cashFlow} signed colored className="block text-sm font-medium" />
-        {tx.currency !== 'EUR' && <span className="text-[11px] text-muted-foreground"><MoneyValue value={tx.totalAmount} currency={tx.currency} /></span>}
+        {tx.currency !== 'EUR' && <span className="text-[11px] text-muted-foreground"><MoneyValue value={tx.totalAmount} currency={tx.currency} personal /></span>}
       </div>
       {onClick && <EditHint />}
     </button>

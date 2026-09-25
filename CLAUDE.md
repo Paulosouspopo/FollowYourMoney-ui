@@ -169,6 +169,24 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   est limitée (10 / email, 20 / IP par 15 min) et le cookie de session
   tourne à chaque renouvellement (ne pas le rejouer entre contextes).
 
+## Confort et analyse (v2)
+- Mode confidentialité (`shared/privacy`) : `formatEur`, `formatQty`,
+  `formatPrivateMoney`, `MoneyValue personal` masquent (••••) ;
+  pourcentages, cours et `formatMoney` (prix, saisie) restent visibles.
+  Appliqué par `DisplayCurrencyScope` (clé de remontage).
+- Qualité des saisies (`features/quality`) : `TransactionCheckHint` dans le
+  formulaire (débounce 500 ms, « Utiliser <cours> »), `DataQualityBanner`
+  sur l'accueil (corriger / « c'est normal »). Les tests du formulaire
+  simulent `useTransactionCheck`.
+- Revenus (`/income`, `features/income`) : `BarChart` maison, calendrier,
+  détail par ligne ; `IncomeCard` sur l'accueil.
+- Objectifs (`/goals`, `features/goals`) : `projection.ts` pur et testé
+  (taux mensuel équivalent, délai, effort) ; simulateur 3 scénarios,
+  `GoalVerdict`, `GoalsCard`. Montants projetés arrondis (`formatEurRounded`).
+- Barre latérale : section « Analyse » (`SECONDARY_NAV_ITEMS`) ; sur mobile,
+  accès par les cartes de l'accueil. Clés de requête de ces features sous
+  `dashboardKeys.all` (rafraîchies par toute mutation d'opération).
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

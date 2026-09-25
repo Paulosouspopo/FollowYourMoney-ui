@@ -1,4 +1,7 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ArrowLeftRight } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
+import { ReplaceAssetSheet } from '../components/ReplaceAssetSheet';
 import { useState } from 'react';
 import { usePortfolioDashboard } from '@/features/dashboard/api/dashboard.api';
 import { useTransactionsBySymbol } from '@/features/transactions/api/transaction.api';
@@ -22,12 +25,26 @@ export default function PositionDetailPage() {
   const dash = usePortfolioDashboard(portfolioId, 'all');
   const txs = useTransactionsBySymbol(portfolioId, symbol);
   const [editing, setEditing] = useState<TransactionResponse | null | 'new'>(null);
+  // « ?changer=1 » : ouverture directe depuis une alerte (actif mal choisi)
+  const [params, setParams] = useSearchParams();
+  const [replacing, setReplacing] = useState(params.get('changer') === '1');
+  const navigate = useNavigate();
 
   const position = dash.data?.portfolios[0]?.positions.find(p => p.symbol === symbol);
 
   return (
     <div className="space-y-4 lg:max-w-3xl">
-      <TopBar back title={position?.name ?? symbol} />
+      <TopBar back title={position?.name ?? symbol} right={position && (
+        <Button size="sm" variant="outline" onClick={() => setReplacing(true)}>
+          <ArrowLeftRight size={14} /> Changer d'actif
+        </Button>
+      )} />
+      {position && (
+        <ReplaceAssetSheet open={replacing} portfolioId={portfolioId} assetId={position.assetId} symbol={symbol}
+          name={position.name}
+          onClose={() => { setReplacing(false); if (params.has('changer')) setParams({}, { replace: true }); }}
+          onReplaced={s => navigate(`/portfolios/${portfolioId}/positions/${encodeURIComponent(s)}`, { replace: true })} />
+      )}
 
       <QueryBoundary query={dash}>
         {() => position ? (

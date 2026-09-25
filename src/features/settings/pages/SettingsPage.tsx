@@ -14,6 +14,8 @@ import type { UserUpdateRequest } from '@/features/settings/model/user.types';
 import { useLogout } from "@/features/auth/api/auth.api";
 import { SecuritySection } from "@/features/settings/components/SecuritySection";
 import { PushSettingsCard } from "@/features/notifications/components/PushSettingsCard";
+import { usePrivacyStore } from "@/shared/privacy/privacy.store";
+import { Switch } from "@/shared/ui/Switch";
 import { DISPLAY_CURRENCIES, DISPLAY_CURRENCY_LABEL, useDisplayCurrencyStore } from "@/shared/currency/displayCurrency.store";
 
 const THEME_ICON: Record<Theme, typeof Sun> = { system: Monitor, light: Sun, dark: Moon };
@@ -56,6 +58,14 @@ function CurrencyPicker() {
   );
 }
 
+function PrivacySwitch() {
+  const { hidden, setHidden } = usePrivacyStore();
+  return (
+    <Switch checked={hidden} onChange={setHidden} label="Mode confidentialité"
+      description="Montants et quantités masqués (••••) ; pourcentages et cours visibles. Aussi via l'œil à côté du patrimoine." />
+  );
+}
+
 export default function SettingsPage() {
   const me = useMe();
   const update = useUpdateMe();
@@ -80,7 +90,7 @@ export default function SettingsPage() {
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold tracking-tight">Apparence</h2>
-        <Card className="p-4 space-y-4"><ThemePicker /><CurrencyPicker /></Card>
+        <Card className="p-4 space-y-4"><ThemePicker /><CurrencyPicker /><PrivacySwitch /></Card>
       </section>
 
       <section className="space-y-2">
