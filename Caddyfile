@@ -1,0 +1,35 @@
+# Front (fichiers statiques) + API sur la même origine : le cookie de session
+# (SameSite=Strict) et le service worker fonctionnent sans CORS.
+# Certificat HTTPS Let's Encrypt obtenu et renouvelé automatiquement pour {$DOMAIN}.
+{$DOMAIN} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy api:8080 {
+			# Import de relevés et recalcul : réponses jusqu'à 2 min
+			transport http {
+				response_header_timeout 180s
+			}
+		}
+	}
+
+	handle {
+		root * /srv
+		# Fichiers à nom fixe : toujours revalidés (nouvelle version visible tout de suite)
+		@fixed path / /index.html /sw.js /manifest.webmanifest
+		header @fixed Cache-Control "no-cache"
+		# Fichiers de build horodatés : cache long
+		header /assets/* Cache-Control "public, max-age=31536000, immutable"
+		# Application monopage : toute route inconnue sert index.html
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		-Server
+	}
+}

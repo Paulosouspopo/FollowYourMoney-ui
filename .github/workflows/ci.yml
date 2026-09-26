@@ -29,3 +29,14 @@ jobs:
       - run: npm run build
         env:
           VITE_API_URL: /api
+
+  docker:
+    name: Image Docker de production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build de l'image
+        run: docker build -t fym-web .
+      - name: Caddyfile valide
+        run: docker run --rm -e DOMAIN=example.com fym-web caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
