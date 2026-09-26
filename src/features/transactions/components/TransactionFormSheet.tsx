@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertTriangle, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { BottomSheet } from '@/shared/ui/BottomSheet';
 import { Input } from '@/shared/ui/Input';
 import { Button } from '@/shared/ui/button';
@@ -24,6 +24,9 @@ import { isManualSymbol } from '@/shared/model/portfolioRules';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/features/transactions/api/transaction.api';
 import type { TransactionResponse } from '../model/transaction.types';
 import { TransactionCheckHint } from '@/features/quality/components/TransactionCheckHint';
+import { useMarketDetail } from '@/features/markets/api/market.api';
+import { useCreateCashMovement } from '@/features/cash/api/cash.api';
+import { formatEur } from '@/shared/lib/format';
 
 const num = (msg: string) => z.coerce.number({ error: msg }).min(0, msg);
 
@@ -48,6 +51,9 @@ const FORM_FIELDS = ['type', 'quantity', 'pricePerUnit', 'fees', 'currency', 'tr
 // datetime-local attend "YYYY-MM-DDTHH:mm" en heure LOCALE ; le back attend un
 // LocalDateTime sans fuseau (voir shared/lib/dates).
 const nowLocalInput = nowLocalDateTime;
+// Borne du sélecteur : fin de la journée (le contrôle « pas dans le futur » est fait par le schéma,
+// avec un message clair, plutôt que par la bulle du navigateur figée à l'heure d'ouverture)
+const endOfTodayInput = () => `${nowLocalDateTime().slice(0, 10)}T23:59`;
 const toLocalInput = (localDateTime: string) => localDateTime.slice(0, 16);
 const toIso = (local: string) => `${local}:00`;
 
@@ -66,6 +72,11 @@ interface Props {
   lockedAsset?: SelectedAsset & { currency?: string | null };    // pré-sélection depuis une page position
   /** Quantités détenues par symbole : avertit d'une vente supérieure (le back reste l'arbitre). */
   heldQuantities?: Record<string, number>;
+  /**
+   * Solde en euros d'un compte avec suivi des liquidités (hors multidevise) : un achat
+   * qui le dépasse propose d'enregistrer le versement manquant le même jour.
+   */
+  cashBalanceEur?: number;
 }
 
 /** Monté uniquement quand la feuille est ouverte : chaque ouverture repart d'un état neuf. */
@@ -90,14 +101,14 @@ function initialValues(initial?: TransactionResponse, currency?: string | null):
   return { type: 'BUY', quantity: '', pricePerUnit: '', fees: '', currency: currency ?? 'EUR', transactionDate: nowLocalInput(), notes: '' };
 }
 
-function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuantities }: Props) {
+function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuantities, cashBalanceEur }: Props) {
   const isEdit = !!initial;
   const [asset, setAsset] = useState<SelectedAsset | null>(
     initial ? { symbol: initial.symbol, name: initial.assetName }
       : lockedAsset ? { symbol: lockedAsset.symbol, name: lockedAsset.name } : null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const { register, handleSubmit, setError, setValue, control, formState: { errors } } = useForm<FormInput, unknown, FormOutput>({
+  const { register, handleSubmit, setError, clearErrors, setValue, getFieldState, control, formState: { errors } } = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema),
     defaultValues: initialValues(initial, lockedAsset?.currency),
   });
@@ -105,6 +116,8 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
   const create = useCreateTransaction(portfolioId);
   const update = useUpdateTransaction(portfolioId);
   const remove = useDeleteTransaction(portfolioId);
+  const deposit = useCreateCashMovement(portfolioId);
+  const [addDeposit, setAddDeposit] = useState(true);
   const mutation = isEdit ? update : create;
 
   const [type, quantity, price, fees, currency, transactionDate] = useWatch({ control, name: ['type', 'quantity', 'pricePerUnit', 'fees', 'currency', 'transactionDate'] });
@@ -112,6 +125,24 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
   const held = asset ? heldQuantities?.[asset.symbol] ?? 0 : 0;
   const oversell = !isEdit && type === 'SELL' && heldQuantities !== undefined && (Number(quantity) || 0) > held;
   const currencyOptions = [...new Set([...CURRENCIES, currency])].map(c => ({ value: c, label: c }));
+  // Achat en euros non couvert par le solde : versement manquant (arrondi au centime)
+  const shortfall = !isEdit && type === 'BUY' && currency === 'EUR' && cashBalanceEur !== undefined
+    ? Math.max(0, Math.round((total + (Number(fees) || 0) - Math.max(cashBalanceEur, 0)) * 100) / 100)
+    : 0;
+
+  // Une erreur du serveur (vente refusée…) ne reste pas affichée une fois la saisie corrigée
+  useEffect(() => { clearErrors('root.server'); }, [type, quantity, price, fees, currency, transactionDate, clearErrors]);
+
+  // Nouvel actif coté : devise de cotation par défaut (AAPL en USD), tant que l'utilisateur n'y a pas touché
+  const quoteSymbol = !isEdit && !lockedAsset?.currency && asset && !isManualSymbol(asset.symbol) ? asset.symbol : '';
+  const quote = useMarketDetail(quoteSymbol);
+  const appliedCurrencyFor = useRef<string | null>(null);
+  useEffect(() => {
+    const quoted = quote.data?.currency;
+    if (!quoteSymbol || !quoted || appliedCurrencyFor.current === quoteSymbol) return;
+    appliedCurrencyFor.current = quoteSymbol;
+    if (!getFieldState('currency').isDirty) setValue('currency', quoted.toUpperCase());
+  }, [quoteSymbol, quote.data, getFieldState, setValue]);
 
   const applyServerErrors = (e: ApiError) => {
     const unmapped: string[] = [];
@@ -132,8 +163,23 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
       notes: v.notes || undefined,
     };
     const onSuccess = () => { toast.success(isEdit ? 'Transaction modifiée' : 'Transaction ajoutée'); onClose(); };
-    if (isEdit) update.mutate({ id: initial!.id, body: common }, { onSuccess, onError: applyServerErrors });
-    else create.mutate({ ...common, symbol: asset.symbol, currency: v.currency }, { onSuccess, onError: applyServerErrors });
+    if (isEdit) {
+      update.mutate({ id: initial!.id, body: common }, { onSuccess, onError: applyServerErrors });
+      return;
+    }
+    const withDeposit = addDeposit && shortfall > 0;
+    create.mutate({ ...common, symbol: asset.symbol, currency: v.currency }, {
+      onSuccess: () => {
+        if (!withDeposit) return onSuccess();
+        // Versement du même jour : le solde ne passe pas en négatif
+        deposit.mutate({ type: 'DEPOSIT', amount: shortfall, movementDate: v.transactionDate.slice(0, 10),
+          notes: `Versement pour l'achat de ${asset.name}` }, {
+          onSuccess: () => { toast.success('Transaction et versement ajoutés'); onClose(); },
+          onError: e => { toast.error(`Transaction ajoutée, mais pas le versement : ${e.message}`); onClose(); },
+        });
+      },
+      onError: applyServerErrors,
+    });
   };
 
   const onDelete = () => {
@@ -173,7 +219,11 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
           <div className="grid grid-cols-2 gap-3">
             {type !== 'DIVIDEND' && (
               <Input label="Quantité" type="number" inputMode="decimal" step="any" min="0" placeholder="0"
-                {...register('quantity')} error={errors.quantity?.message} />
+                {...register('quantity')}
+                error={errors.quantity?.message ?? (oversell
+                  ? `Tu ne détiens que ${formatQty(held)} ${isManualSymbol(asset.symbol) ? 'parts' : asset.symbol} : la vente sera refusée.`
+                  : undefined)}
+                hint={type === 'SELL' && heldQuantities !== undefined ? `Détenu : ${formatQty(held)}` : undefined} />
             )}
             <Input label={type === 'DIVIDEND' ? 'Montant reçu' : 'Prix unitaire'} type="number" inputMode="decimal" step="any" min="0" placeholder="0"
               {...register('pricePerUnit')} error={errors.pricePerUnit?.message} />
@@ -185,14 +235,7 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
             )} />
           </div>
 
-          {oversell && (
-            <p className="flex items-start gap-1.5 text-xs text-warning">
-              <AlertTriangle size={14} className="shrink-0 mt-px" />
-              Tu ne détiens que {formatQty(held)} {isManualSymbol(asset.symbol) ? 'parts' : asset.symbol} : la vente sera refusée.
-            </p>
-          )}
-
-          <Input label="Date" type="datetime-local" max={nowLocalInput()} {...register('transactionDate')} error={errors.transactionDate?.message} />
+          <Input label="Date" type="datetime-local" max={endOfTodayInput()} {...register('transactionDate')} error={errors.transactionDate?.message} />
           <TransactionCheckHint portfolioId={portfolioId} symbol={asset.symbol} type={type} dateTime={transactionDate}
             price={String(price ?? '')} currency={currency} onUsePrice={p => setValue('pricePerUnit', String(p), { shouldValidate: true })} />
           <Input label="Notes (optionnel)" {...register('notes')} error={errors.notes?.message} />
@@ -201,6 +244,19 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
             <span className="text-muted-foreground">Total {type === 'BUY' ? 'à débourser' : 'perçu'}</span>
             <MoneyValue value={type === 'BUY' ? total + (Number(fees) || 0) : total - (Number(fees) || 0)} currency={currency} className="font-semibold" />
           </div>
+
+          {shortfall > 0 && (
+            <label className="flex items-start gap-2 rounded-xl bg-muted/60 p-3 text-xs">
+              <input type="checkbox" className="mt-0.5 h-4 w-4 accent-(--primary)" checked={addDeposit}
+                onChange={e => setAddDeposit(e.target.checked)} />
+              <span>
+                Enregistrer aussi le versement de <strong>{formatEur(shortfall)}</strong> le même jour
+                <span className="block text-muted-foreground">
+                  Solde disponible : {formatEur(Math.max(cashBalanceEur ?? 0, 0))}. Sans versement, le solde deviendra négatif.
+                </span>
+              </span>
+            </label>
+          )}
 
           {mutation.isPending && (
             <p className="text-xs text-muted-foreground">Mise à jour de l'historique des cours… cela peut prendre quelques secondes pour une opération ancienne.</p>
@@ -212,7 +268,7 @@ function TransactionForm({ portfolioId, onClose, initial, lockedAsset, heldQuant
               <Button type="button" variant="destructive" onClick={() => setConfirmDelete(true)} aria-label="Supprimer"><Trash2 size={18} /></Button>
             )}
             {isEdit && <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>}
-            <Button type="submit" className="flex-1" loading={mutation.isPending}>{isEdit ? 'Enregistrer' : 'Ajouter'}</Button>
+            <Button type="submit" className="flex-1" loading={mutation.isPending || deposit.isPending}>{isEdit ? 'Enregistrer' : 'Ajouter'}</Button>
           </div>
         </form>
       )}

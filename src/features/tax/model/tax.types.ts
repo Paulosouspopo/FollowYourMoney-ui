@@ -29,6 +29,8 @@ export interface TaxReport {
   lifeInsurances: LifeInsuranceStatus[];
   employeeSavings: EmployeeSavingsStatus[];
   reminders: string[];
+  /** Taux en % (ex. 31.4) : flat tax et prélèvements sociaux de l'année, retrait aujourd'hui, assurance-vie. */
+  rates: { flatTaxPct: number; socialChargesPct: number; currentSocialChargesPct: number; lifeInsuranceSocialChargesPct: number };
 }
 
 /** Tranches marginales d'imposition (barème de l'impôt sur le revenu). */
@@ -46,7 +48,7 @@ export interface LifeInsuranceStatus {
 export interface EmployeeSavingsStatus {
   portfolioId: string; name: string;
   depositsEur: number; employerContributionsEur: number; valueEur: number; gainEur: number;
-  /** Prélèvements sociaux (17,2 %) sur le gain au déblocage. */
+  /** Prélèvements sociaux (taux de l'année en cours) sur le gain au déblocage. */
   socialChargesIfWithdrawnEur: number;
 }
 
@@ -71,6 +73,6 @@ export interface PeaStatus {
   fiveYearsDate: string | null; fiveYearsReached: boolean;
   depositsEur: number; depositsEstimated: boolean; ceilingEur: number;
   valueEur: number;
-  /** Prélèvements sociaux (17,2 %) sur le gain en cas de retrait total aujourd'hui. */
+  /** Prélèvements sociaux (taux de l'année en cours) sur le gain en cas de retrait total aujourd'hui. */
   socialChargesIfWithdrawnEur: number;
 }

@@ -44,6 +44,13 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   heure LOCALE — jamais `toISOString()` (UTC, décale le jour).
 - Dividende : le formulaire saisit le montant total et envoie
   `quantity = 1` (le back calcule `totalAmount = quantity × pricePerUnit`).
+- « Investi » = apports nets (back) : gain = valeur - investi = gain total.
+- Formulaire d'opération : devise de cotation proposée pour un nouvel actif
+  (`useMarketDetail`), quantité détenue sous « Quantité » en vente, erreur
+  serveur effacée à la modification, achat EUR non couvert par le solde
+  (`cashBalanceEur`) → case « enregistrer aussi le versement » (cochée, créé
+  après l'achat). `FormSelect` ignore la valeur vide que Radix émet sur un
+  `setValue`.
 - La devise d'une transaction n'est pas modifiable après création.
 - `priceMissing` = pas de cours de marché, position estimée au prix de la
   dernière transaction (afficher « Prix estimé », pas 0).
@@ -190,6 +197,7 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
   `dashboardKeys.all` (rafraîchies par toute mutation d'opération).
 
 ## Fiscalité et corrections
+- Taux (flat tax, prélèvements sociaux) : `report.rates` du back, jamais en dur.
 - `/tax` (`features/tax`) : année (défaut : écoulée), impôt estimé, cases à
   reporter (copie du montant), cessions titres / crypto, PEA (5 ans, plafond),
   export CSV (`taxCsv.ts`, « ; » et virgule décimale), rappels. `TaxCard` sur

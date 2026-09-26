@@ -11,15 +11,23 @@ export function ContributionsCard({ report, periodLabel }: { report: Contributio
   const winners = report.lines.filter(l => l.gainEur > 0).slice(0, COUNT);
   const losers = report.lines.filter(l => l.gainEur < 0).slice(-COUNT).reverse();
   const max = Math.max(...report.lines.map(l => Math.abs(l.gainEur)), 1);
+  // Même actif dans plusieurs portefeuilles : le nom du portefeuille les distingue
+  const names = report.lines.map(l => l.name);
+  const repeated = new Set(names.filter((n, i) => names.indexOf(n) !== i));
 
   const Row = ({ l }: { l: ContributionReport['lines'][number] }) => (
     <li>
       <Link to={`/portfolios/${l.portfolioId}/positions/${encodeURIComponent(l.symbol)}`} className="block rounded-lg px-1 py-1 hover:bg-muted/50">
         <div className="flex items-baseline justify-between gap-3 text-sm">
-          <span className="min-w-0 truncate">{l.name}</span>
+          <span className="min-w-0 truncate">
+            {l.name}
+            {repeated.has(l.name) && <span className="ml-1.5 text-xs text-muted-foreground">· {l.portfolioName}</span>}
+          </span>
           <span className="shrink-0">
             <MoneyValue value={l.gainEur} signed colored className="font-semibold" />
-            {l.returnPct != null && <span className="ml-1.5 text-xs text-muted-foreground tabular-nums">{formatPercent(l.returnPct)}</span>}
+            {l.dataSuspect
+              ? <span className="ml-1.5 text-xs text-warning" title="Division d'actions probable : cours à vérifier dans « Saisies à vérifier »">à vérifier</span>
+              : l.returnPct != null && <span className="ml-1.5 text-xs text-muted-foreground tabular-nums">{formatPercent(l.returnPct)}</span>}
           </span>
         </div>
         <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">

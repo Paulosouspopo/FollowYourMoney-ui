@@ -14,7 +14,7 @@ import { FormSelect } from '@/shared/ui/form-select';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { toast } from '@/shared/ui/toast.store';
 import { cn } from '@/shared/lib/cn';
-import { formatDate, formatEur, formatMonthYear, formatQty } from '@/shared/lib/format';
+import { formatDate, formatEur, formatMonthYear, formatQty, formatRate } from '@/shared/lib/format';
 import { useSetMarginalTaxRate, useTaxReport } from '../api/tax.api';
 import { downloadCsv, salesCsv } from '../model/taxCsv';
 import { TAX_BRACKETS, type EmployeeSavingsStatus, type LifeInsuranceStatus, type PeaStatus, type TaxBox, type TaxReport } from '../model/tax.types';
@@ -61,7 +61,7 @@ function Report({ report: r }: { report: TaxReport }) {
           </p>
           <p className="text-display mt-2">{formatEur(total)}</p>
           <p className="mt-3 text-sm text-muted-foreground">
-            Flat tax 30 % (12,8 % d'impôt + 17,2 % de prélèvements sociaux), hors PEA, livrets, assurance-vie et épargne retraite.
+            Flat tax {formatRate(r.rates.flatTaxPct)} (12,8 % d'impôt + {formatRate(r.rates.socialChargesPct)} de prélèvements sociaux), hors PEA, livrets, assurance-vie et épargne retraite.
           </p>
           {perSaving > 0 && (
             <p className="mt-2 text-sm">
@@ -182,13 +182,13 @@ function Report({ report: r }: { report: TaxReport }) {
         {r.employeeSavings.length > 0 && (
           <section>
             <SectionHeader title="Épargne salariale" />
-            <div className="space-y-3">{r.employeeSavings.map(e => <EmployeeSavingsCard key={e.portfolioId} savings={e} />)}</div>
+            <div className="space-y-3">{r.employeeSavings.map(e => <EmployeeSavingsCard key={e.portfolioId} savings={e} socialChargesPct={r.rates.currentSocialChargesPct} />)}</div>
           </section>
         )}
         {r.peas.length > 0 && (
           <section data-tour="tax-pea">
             <SectionHeader title="PEA" />
-            <div className="space-y-3">{r.peas.map(p => <PeaCard key={p.portfolioId} pea={p} />)}</div>
+            <div className="space-y-3">{r.peas.map(p => <PeaCard key={p.portfolioId} pea={p} socialChargesPct={r.rates.currentSocialChargesPct} />)}</div>
           </section>
         )}
         <section>
@@ -223,7 +223,7 @@ function BoxRow({ box: b }: { box: TaxBox }) {
   );
 }
 
-function PeaCard({ pea: p }: { pea: PeaStatus }) {
+function PeaCard({ pea: p, socialChargesPct }: { pea: PeaStatus; socialChargesPct: number }) {
   const ceilingPct = Math.min(100, (p.depositsEur / p.ceilingEur) * 100);
   const progress = fiveYearsProgress(p.openedAt);
   return (
@@ -248,7 +248,7 @@ function PeaCard({ pea: p }: { pea: PeaStatus }) {
           </div>
         )}
         <p className="mt-1 text-[11px] text-muted-foreground">
-          {p.fiveYearsReached ? 'Seuls les prélèvements sociaux (17,2 %) s\'appliquent sur les gains retirés.'
+          {p.fiveYearsReached ? `Seuls les prélèvements sociaux (${formatRate(socialChargesPct)}) s'appliquent sur les gains retirés.`
             : 'Un retrait avant 5 ans clôture le PEA et rend les gains imposables.'}
         </p>
       </div>
@@ -351,7 +351,7 @@ function LifeInsuranceCard({ life: l, year }: { life: LifeInsuranceStatus; year:
   );
 }
 
-function EmployeeSavingsCard({ savings: e }: { savings: EmployeeSavingsStatus }) {
+function EmployeeSavingsCard({ savings: e, socialChargesPct }: { savings: EmployeeSavingsStatus; socialChargesPct: number }) {
   return (
     <Card className="p-4 gap-3">
       <p className="font-semibold">{e.name}</p>
@@ -362,7 +362,7 @@ function EmployeeSavingsCard({ savings: e }: { savings: EmployeeSavingsStatus })
       </div>
       <p className="text-xs text-muted-foreground">
         Gains exonérés d'impôt sur le revenu ; au déblocage, ≈ <MoneyValue value={e.socialChargesIfWithdrawnEur} className="font-medium text-foreground" /> de
-        prélèvements sociaux (17,2 %). Rien à déclarer tant que tu ne débloques pas.
+        prélèvements sociaux ({formatRate(socialChargesPct)}). Rien à déclarer tant que tu ne débloques pas.
       </p>
     </Card>
   );

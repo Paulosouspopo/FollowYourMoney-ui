@@ -47,6 +47,8 @@ export interface ContributionLine {
   /** Ce que la ligne a rapporté sur la période (plus-value, dividendes, frais déduits). */
   gainEur: number;
   returnPct: number | null;
+  /** Division d'actions probable non reflétée dans les cours : gain faussé, rendement non calculé. */
+  dataSuspect: boolean;
   /** Poids dans la valeur actuelle. */
   weightPct: number;
 }

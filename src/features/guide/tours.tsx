@@ -292,7 +292,7 @@ export const TOURS = {
         body: <p>Indique ton taux marginal (sur ton avis d'impôt) : l'app calcule l'impôt économisé grâce à tes versements sur un PER.</p> },
       { target: 'tax-hero', icon: Percent, title: 'L\'impôt estimé',
         body: <>
-          <p>La flat tax de 30 % : 12,8 % d'impôt + 17,2 % de prélèvements sociaux, sur tes plus-values et dividendes.</p>
+          <p>La flat tax de 31,4 % (depuis 2026) : 12,8 % d'impôt + 18,6 % de prélèvements sociaux, sur tes plus-values et dividendes.</p>
           <p>PEA, livrets, assurance-vie, PER et épargne salariale à part : ils ont leur propre fiscalité, détaillée plus bas.</p>
         </> },
       { target: 'tax-boxes', icon: ScrollText, title: 'Les cases à reporter',
@@ -300,7 +300,7 @@ export const TOURS = {
       { target: 'tax-export', icon: Download, title: 'Le détail pour tes archives',
         body: <p>Exporte toutes tes cessions en CSV, pour ton comptable ou en cas de question de l'administration.</p> },
       { target: 'tax-pea', icon: ShieldCheck, title: 'Ton PEA',
-        body: <p>Après 5 ans, tes gains n'ont plus d'impôt sur le revenu (seulement 17,2 % de prélèvements sociaux). Plafond de versements : 150 000 €.</p> },
+        body: <p>Après 5 ans, tes gains n'ont plus d'impôt sur le revenu (seulement les prélèvements sociaux, 18,6 % depuis 2026). Plafond de versements : 150 000 €.</p> },
       helpStep,
     ],
   },

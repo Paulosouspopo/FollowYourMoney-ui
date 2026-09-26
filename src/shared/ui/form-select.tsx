@@ -32,7 +32,8 @@ export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
     return (
       <div className="space-y-1.5">
         {label && <label className="text-sm font-medium text-foreground">{label}</label>}
-        <Select value={value} defaultValue={defaultValue} onValueChange={onChange} disabled={disabled}>
+        {/* Radix renvoie '' quand la valeur change par programme (setValue) : jamais une vraie option */}
+        <Select value={value} defaultValue={defaultValue} onValueChange={v => { if (v !== '') onChange?.(v); }} disabled={disabled}>
           <SelectTrigger ref={ref} className={cn('w-full', error && 'border-destructive', className)}>
             <SelectValue />
           </SelectTrigger>
