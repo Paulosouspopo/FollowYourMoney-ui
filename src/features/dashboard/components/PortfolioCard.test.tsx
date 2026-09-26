@@ -20,6 +20,7 @@ const pea: PortfolioValuation = {
   portfolioId: 'p1', name: 'PEA', type: 'PEA', currentValueEur: 10000, investedEur: 8000, unrealizedGainEur: 2000,
   unrealizedGainPercentage: 25, realizedGainEur: 0, dividendsEur: 0, interestEur: 0, totalFeesEur: 0,
   cashTracking: false, cashEur: 0, netDepositsEur: 0, annualInterestRate: null, openPositionCount: 4,
+  employerContributionsEur: 0, multiCurrencyCash: false, cashBalances: [],
   hasIncompletePrices: false,
   positions: [position('TTE.PA', 1000), position('CW8.PA', 6000), position('AI.PA', 2000), position('BNP.PA', 1000),
     position('OLD.PA', 5000, 0)],

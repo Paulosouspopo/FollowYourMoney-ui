@@ -1,3 +1,4 @@
+import { cashLabel } from '@/shared/model/portfolioRules';
 import { AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GainLine } from "@/shared/components/data/GainLine";
@@ -45,7 +46,7 @@ export function PortfolioCard({ valuation: v, trend, className }: {
               <GainLine amount={v.unrealizedGainEur} pct={v.unrealizedGainPercentage} size="xs" />
               <p className="text-[11px] text-muted-foreground mt-2">
                 {v.openPositionCount} position{v.openPositionCount > 1 ? 's' : ''}
-                {v.cashTracking && <> · liquidités <MoneyValue value={v.cashEur} /></>}
+                {v.cashTracking && <> · {cashLabel(v.type).toLowerCase()} <MoneyValue value={v.cashEur} /></>}
               </p>
             </>
           )}

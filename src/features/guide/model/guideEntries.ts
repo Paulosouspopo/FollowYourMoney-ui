@@ -27,6 +27,7 @@ export function guideEntries(portfolios: PortfolioValuation[]): GuideEntry[] {
       needs: "Ajoute d'abord une opération" },
     { tour: TOURS.markets, path: '/markets' },
     { tour: TOURS.alerts, path: '/alerts' },
+    { tour: TOURS.analysis, path: portfolios.length ? '/analysis' : null, needs: noPortfolio },
     { tour: TOURS.income, path: '/income' },
     { tour: TOURS.goals, path: '/goals' },
     { tour: TOURS.tax, path: '/tax' },

@@ -16,8 +16,11 @@ const Alerts = lazy(appPages.alerts);
 const Income = lazy(appPages.income);
 const Goals = lazy(appPages.goals);
 const Tax = lazy(appPages.tax);
+const Analysis = lazy(appPages.analysis);
 const More = lazy(appPages.more);
 const Guide = lazy(appPages.guide);
+const Trash = lazy(appPages.trash);
+const WrappedPage = lazy(appPages.wrapped);
 const Login = lazy(() => import('@/features/auth/pages/LoginPage'));
 const Register = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const ForgotPassword = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
@@ -60,8 +63,11 @@ export const router = createBrowserRouter([
         { path: 'income', element: <Income /> },
         { path: 'goals', element: <Goals /> },
         { path: 'tax', element: <Tax /> },
+        { path: 'analysis', element: <Analysis /> },
         { path: 'more', element: <More /> },
         { path: 'guide', element: <Guide /> },
+        { path: 'trash', element: <Trash /> },
+        { path: 'wrapped', element: <WrappedPage /> },
         { path: 'settings', element: <Settings /> },
       ],
     }],

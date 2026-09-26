@@ -1,19 +1,23 @@
-import { ArrowDownLeft, ArrowUpRight, Percent, Receipt } from 'lucide-react';
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Gift, Percent, Receipt } from 'lucide-react';
 import { MoneyValue } from '@/shared/components/data/MoneyValue';
 import { EditHint } from '@/shared/ui/EditHint';
 import { CASH_MOVEMENT_LABEL, CASH_MOVEMENT_SIGN } from '@/shared/model/enums';
-import { formatDate } from '@/shared/lib/format';
+import { formatDate, formatPrivateMoney } from '@/shared/lib/format';
 import { cn } from '@/shared/lib/cn';
 import type { CashMovementResponse } from '../model/cash.types';
 
-const ICON = { DEPOSIT: ArrowDownLeft, WITHDRAWAL: ArrowUpRight, INTEREST: Percent, FEE: Receipt } as const;
+const ICON = {
+  DEPOSIT: ArrowDownLeft, WITHDRAWAL: ArrowUpRight, INTEREST: Percent, FEE: Receipt, ABONDEMENT: Gift, CONVERSION: ArrowLeftRight,
+} as const;
 const TONE = {
   DEPOSIT: 'bg-primary/15 text-primary', WITHDRAWAL: 'bg-muted text-muted-foreground',
-  INTEREST: 'bg-gain/15 text-gain', FEE: 'bg-loss/15 text-loss',
+  INTEREST: 'bg-gain/15 text-gain', FEE: 'bg-loss/15 text-loss', ABONDEMENT: 'bg-gain/15 text-gain',
+  CONVERSION: 'bg-muted text-muted-foreground',
 } as const;
 
 export function CashMovementRow({ movement: m, onClick }: { movement: CashMovementResponse; onClick?: () => void }) {
   const Icon = ICON[m.type];
+  const euro = m.currency === 'EUR';
   return (
     <button type="button" onClick={onClick} disabled={!onClick}
       aria-label={onClick ? `Modifier : ${CASH_MOVEMENT_LABEL[m.type]} du ${formatDate(m.movementDate)}` : undefined}
@@ -23,7 +27,16 @@ export function CashMovementRow({ movement: m, onClick }: { movement: CashMoveme
         <p className="text-sm font-medium">{CASH_MOVEMENT_LABEL[m.type]}</p>
         <p className="text-xs text-muted-foreground truncate">{formatDate(m.movementDate)}{m.notes && ` · ${m.notes}`}</p>
       </div>
-      <MoneyValue value={CASH_MOVEMENT_SIGN[m.type] * m.amount} signed colored className="text-sm font-medium shrink-0" />
+      {m.type === 'CONVERSION' && m.counterAmount != null && m.counterCurrency ? (
+        <span className="text-sm font-medium shrink-0 tabular-nums">
+          {formatPrivateMoney(m.amount, m.currency)} → {formatPrivateMoney(m.counterAmount, m.counterCurrency)}
+        </span>
+      ) : euro ? (
+        <MoneyValue value={CASH_MOVEMENT_SIGN[m.type] * m.amount} signed colored className="text-sm font-medium shrink-0" />
+      ) : (
+        <MoneyValue value={CASH_MOVEMENT_SIGN[m.type] * m.amount} currency={m.currency} personal signed colored
+          className="text-sm font-medium shrink-0" />
+      )}
       {onClick && <EditHint />}
     </button>
   );

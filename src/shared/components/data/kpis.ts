@@ -2,6 +2,8 @@ export interface Kpi { label: string; value: number; signed?: boolean; colored?:
 
 interface PerformanceFields {
   realizedGainEur: number; dividendsEur: number; totalFeesEur: number; unrealizedGainEur: number; interestEur?: number;
+  /** Abondement de l'employeur (épargne salariale, PER). */
+  employerContributionsEur?: number;
 }
 
 /** Une seule fonction pour dériver les KPI, que ce soit d'un DashboardResponse ou d'un PortfolioValuation (ils partagent ces champs). */
@@ -11,6 +13,7 @@ export const performanceKpis = (d: PerformanceFields): Kpi[] => [
   ...(d.realizedGainEur ? [{ label: 'Réalisé', value: d.realizedGainEur, signed: true, colored: true }] : []),
   ...(d.dividendsEur ? [{ label: 'Dividendes', value: d.dividendsEur }] : []),
   ...(d.interestEur ? [{ label: 'Intérêts', value: d.interestEur }] : []),
+  ...(d.employerContributionsEur ? [{ label: 'Abondement', value: d.employerContributionsEur, hint: 'Versé par ton employeur' }] : []),
   ...(d.totalFeesEur ? [{ label: 'Frais', value: -d.totalFeesEur, signed: true, colored: true }] : []),
 ];
 

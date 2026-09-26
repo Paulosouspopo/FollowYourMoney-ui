@@ -219,6 +219,66 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Tests : `src/test/setup.ts` simule `tour.api` (tout vu, auto coupé) pour
   que les tests de pages n'aient pas besoin de QueryClient.
 
+## Enveloppes, actifs non cotés, devises (v5, lot A)
+- `shared/model/portfolioRules.ts` : miroir de `PortfolioRules` (enveloppes,
+  fonds euros, libellé du solde `cashLabel`, types de mouvement proposés,
+  `isManualSymbol` / `displaySymbol` / `iconLabel`). Le symbole interne « ~… »
+  d'un actif non coté ne s'affiche jamais (« non coté », initiales du nom).
+- Formulaire de portefeuille : phrase d'aide par type, taux du fonds euros
+  (AV, PER), suivi des liquidités forcé pour livret et enveloppes, « Compte
+  multidevise » si le suivi est actif, date d'ouverture = 8 ans d'une AV.
+- `CashMovementFormSheet` : types selon le compte (abondement, change),
+  devise et montant reçu (multidevise), `prefill` (intérêts à créditer).
+  `CashSection` : libellé du solde, soldes par devise, `InterestHint`
+  (intérêts courus de l'année + « Créditer les intérêts N-1 »).
+- Actifs non cotés : `ManualAssetPicker` sous la recherche du formulaire
+  d'opération (existants + création par nom), `ValuationsSection` sur la fiche
+  de la ligne (valeurs liquidatives). Clés sous `dashboardKeys.all`.
+- Fiscalité : `TaxBracketCard` (tranche marginale), économie PER dans l'en-tête,
+  case 6NS, cartes assurance-vie (8 ans, rachats) et épargne salariale.
+
+## Radiographie (v5, lot B)
+- Page `/analysis` (`features/analysis`, entrée « Radiographie » de la
+  section Analyse) : phrase-résumé (actions, pays, secteur dominants),
+  `ExposureBreakdown` (pays / secteurs / devises / classes), `RealExposures`
+  (concentration), `PositionsMap` (treemap : surface = poids, couleur =
+  performance de la période), `ContributionsCard`, `RiskCard`,
+  `PerformanceCalendar` (mois × années, depuis la série TWR « all »),
+  `FeesCard` (TER éditable). Filtre : patrimoine ou un portefeuille.
+- Graphiques : `shared/charts/squarify.ts` (disposition du treemap, pure et
+  testée ; nommé ainsi pour éviter le conflit de casse avec `Treemap.tsx` sous
+  Windows), `Treemap.tsx` (largeur mesurée). `model/calendar.ts` testé.
+- `formatShare` : parts arrondies (« 72 % », « < 0,1 % ») pour la lecture ;
+  drapeaux emoji dans la liste des pays (Windows affiche les lettres).
+- `ExposureTeaser` sur l'accueil. Clés sous `dashboardKeys.all`.
+
+## Confort (v5, lot C)
+- Recherche globale `app/search` : `CommandPalette` (cmdk, Ctrl+K / ⌘K / « / »)
+  pages, portefeuilles, lignes, actions (nouveau portefeuille via
+  `/portfolios?nouveau=1`, confidentialité, thème, guide), marchés Yahoo.
+  `SearchButton` (barre latérale, accueil mobile, Plus). NB : `CommandDialog`
+  n'inclut pas la racine `Command`, l'ajouter.
+- Corbeille `features/trash` : toast avec action « Annuler » (`toast.success(msg,
+  action)`, `undoAction(response)` lit l'en-tête `X-Trash-Id`), page `/trash`
+  (Plus → Compte).
+- Bilan `/wrapped` (`features/wrapped`) : diapositives au toucher/clavier,
+  carte PNG à partager en pourcentages seulement (`shareCard.ts`, testé),
+  `WrappedTeaser` sur l'accueil du 15/12 au 15/02.
+- Mode démo : « Essayer sans compte » sur la connexion (`useDemo`),
+  `DemoBanner` si `me.demo`.
+- Tests : délai porté à 15 s (`testTimeout`) — les tests de formulaires
+  dépassaient 5 s sur une machine chargée.
+
+## Sécurité du compte et RGPD (v5, lot D)
+- `features/account` : `TwoFactorCard` (QR code via `qrcode-generator`,
+  seule dépendance ajoutée, rendu en SVG noir sur blanc ; clé à saisir ;
+  codes de secours à copier/télécharger), `SessionsCard` (appareils,
+  `describeDevice` testé, déconnexion à distance), `ExportCard`
+  (téléchargement authentifié via `download`). Dans Réglages → Sécurité /
+  Mes données.
+- Connexion : réponse avec `twoFactorToken` → `TwoFactorStep` (code de
+  l'application ou code de secours, `useVerifyTwoFactor`).
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

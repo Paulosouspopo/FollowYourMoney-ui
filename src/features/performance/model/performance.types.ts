@@ -22,6 +22,18 @@ export interface PerformanceResponse {
   series: { date: string; valueEur: number; twrPct: number; benchmarkPct: number | null }[];
   /** Vue globale : détail par portefeuille sur la même période. */
   portfolios: PortfolioPerformance[];
+  /** Volatilité, pire baisse, Sharpe… (null sous 20 jours ouvrés). */
+  risk: RiskStats | null;
+}
+
+/** Indicateurs de risque sur la période, à partir de la performance (les versements n'y comptent pas). */
+export interface RiskStats {
+  volatilityPct: number;
+  maxDrawdownPct: number; drawdownPeak: string | null; drawdownTrough: string | null;
+  /** Seulement au-delà d'un an. */
+  sharpe: number | null;
+  bestDayPct: number; bestDay: string; worstDayPct: number; worstDay: string;
+  positiveDaysPct: number;
 }
 
 export interface PortfolioPerformance {

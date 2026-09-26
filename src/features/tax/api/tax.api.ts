@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/shared/api/client';
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.api';
 import type { TaxReport } from '../model/tax.types';
@@ -15,3 +15,12 @@ export const useTaxReport = (year: number | null) => useQuery({
   queryFn: () => api.get<TaxReport>('/tax', { params: { year: year ?? undefined } }).then(r => r.data),
   placeholderData: prev => prev,
 });
+
+/** Tranche marginale d'imposition (avantage fiscal du PER). */
+export const useSetMarginalTaxRate = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (marginalTaxRate: number) => api.put<TaxReport>('/tax/settings', { marginalTaxRate }).then(r => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: taxKeys.all }),
+  });
+};

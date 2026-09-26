@@ -7,7 +7,10 @@ export interface TaxReport {
     sales: TaxSale[];
     gainsEur: number; lossesEur: number; netEur: number;
     carriedLossesUsedEur: number; taxableGainEur: number; lossesCarryForwardEur: number;
-    dividendsEur: number; estimatedTaxEur: number;
+    dividendsEur: number;
+    /** Crédit d'impôt estimé sur les dividendes d'actions étrangères (case 2AB), déduit de l'impôt estimé. */
+    foreignTaxCreditEur: number;
+    estimatedTaxEur: number;
     boxes: TaxBox[];
   };
   crypto: {
@@ -19,7 +22,32 @@ export interface TaxReport {
     boxes: TaxBox[];
   };
   peas: PeaStatus[];
+  /** Tranche marginale d'imposition (%) de l'utilisateur. */
+  marginalTaxRate: number;
+  /** Versements PER de l'année : déductibles (case 6NS). */
+  retirementSavings: { depositsEur: number; estimatedSavingEur: number; boxes: TaxBox[] };
+  lifeInsurances: LifeInsuranceStatus[];
+  employeeSavings: EmployeeSavingsStatus[];
   reminders: string[];
+}
+
+/** Tranches marginales d'imposition (barème de l'impôt sur le revenu). */
+export const TAX_BRACKETS = [0, 11, 30, 41, 45] as const;
+
+export interface LifeInsuranceStatus {
+  portfolioId: string; name: string;
+  openedAt: string | null; openedAtEstimated: boolean;
+  eightYearsDate: string | null; eightYearsReached: boolean;
+  depositsEur: number; valueEur: number; gainEur: number;
+  /** Rachats de l'année et leur part de gains estimée (prorata gain / valeur). */
+  withdrawalsEur: number; withdrawalsGainEur: number;
+}
+
+export interface EmployeeSavingsStatus {
+  portfolioId: string; name: string;
+  depositsEur: number; employerContributionsEur: number; valueEur: number; gainEur: number;
+  /** Prélèvements sociaux (17,2 %) sur le gain au déblocage. */
+  socialChargesIfWithdrawnEur: number;
 }
 
 export interface TaxBox { code: string; label: string; amountEur: number; form: string; }

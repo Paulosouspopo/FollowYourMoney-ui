@@ -14,7 +14,36 @@ export const useLogin = (redirectTo = '/') => {
   const nav = useNavigate();
   return useMutation({
     mutationFn: (b: LoginRequest) => api.post<AuthResponse>('/auth/login', b, noRefresh).then(r => r.data),
+    // Double authentification : la page affiche l'étape du code (réponse sans session)
+    onSuccess: ({ accessToken, twoFactorToken }) => {
+      if (twoFactorToken) return;
+      setSession(accessToken);
+      nav(redirectTo, { replace: true });
+    },
+  });
+};
+
+/** Second facteur : code de l'application ou code de secours, avec le jeton reçu à la connexion. */
+export const useVerifyTwoFactor = (redirectTo = '/') => {
+  const setSession = useAuthStore(s => s.setSession);
+  const nav = useNavigate();
+  return useMutation({
+    mutationFn: (b: { token: string; code: string }) =>
+      api.post<AuthResponse>('/auth/2fa/verify', b, noRefresh).then(r => r.data),
     onSuccess: ({ accessToken }) => { setSession(accessToken); nav(redirectTo, { replace: true }); },
+  });
+};
+
+/**
+ * Mode démo : le back crée un compte invité rempli d'un patrimoine fictif
+ * (quelques secondes : cours téléchargés) et ouvre la session.
+ */
+export const useDemo = () => {
+  const setSession = useAuthStore(s => s.setSession);
+  const nav = useNavigate();
+  return useMutation({
+    mutationFn: () => api.post<AuthResponse>('/auth/demo', undefined, { ...noRefresh, timeout: 120_000 }).then(r => r.data),
+    onSuccess: ({ accessToken }) => { setSession(accessToken); nav('/', { replace: true }); },
   });
 };
 

@@ -1,3 +1,4 @@
+import { displaySymbol } from '@/shared/model/portfolioRules';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
 import { AssetIcon } from '@/shared/components/data/AssetIcon';
@@ -13,11 +14,11 @@ export function PositionRow({ portfolioId, position: p }: Props) {
   return (
     <Link to={`/portfolios/${portfolioId}/positions/${encodeURIComponent(p.symbol)}`}
           className="flex items-center gap-3 py-3 active:bg-muted/60 -mx-2 px-2 rounded-xl">
-      <AssetIcon symbol={p.symbol} type={p.assetType} />
+      <AssetIcon symbol={p.symbol} type={p.assetType} name={p.name} />
       <div className="min-w-0 flex-1">
         <p className="font-medium truncate">{p.name}</p>
         <p className="text-xs text-muted-foreground truncate">
-          {closed ? 'Clôturée' : <>{formatQty(p.quantity)} × <MoneyValue value={p.averageCostEur} /></>} · {p.symbol}
+          {closed ? 'Clôturée' : <>{formatQty(p.quantity)} × <MoneyValue value={p.averageCostEur} /></>} · {displaySymbol(p.symbol)}
         </p>
       </div>
       <div className="text-right shrink-0">
