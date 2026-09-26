@@ -91,7 +91,8 @@ export default function PortfolioDetailPage() {
       <Fab onClick={onFab} label={isLivret ? 'Ajouter un mouvement' : 'Ajouter'} />
       <AddEntrySheet open={sheet === 'choose'} onClose={() => setSheet(null)} onChoose={setSheet} />
       <TransactionFormSheet portfolioId={portfolioId} open={sheet === 'transaction'} onClose={() => setSheet(null)}
-        heldQuantities={heldQuantities} />
+        heldQuantities={heldQuantities}
+        cashBalanceEur={p?.cashTracking && !p.multiCurrencyCash ? p.cashEur : undefined} />
       <CashMovementFormSheet portfolioId={portfolioId} open={sheet === 'cash'} onClose={() => setSheet(null)}
         balance={p?.cashEur} noOverdraft={isLivret} portfolioType={p?.type} multiCurrency={p?.multiCurrencyCash} />
     </div>

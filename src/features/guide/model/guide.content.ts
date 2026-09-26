@@ -43,13 +43,13 @@ export const GLOSSARY: { title: string; entries: GlossaryEntry[] }[] = [
   {
     title: 'Comptes et fiscalité',
     entries: [
-      { term: 'PEA', definition: "Plan d'épargne en actions : actions européennes. Après 5 ans, les gains ne supportent plus que 17,2 % de prélèvements sociaux. Versements plafonnés à 150 000 €." },
+      { term: 'PEA', definition: "Plan d'épargne en actions : actions européennes. Après 5 ans, les gains ne supportent plus que les prélèvements sociaux (18,6 % depuis 2026). Versements plafonnés à 150 000 €." },
       { term: 'Compte-titres (CTO)', definition: 'Le compte sans limite : actions du monde entier, ETF, obligations. Gains et dividendes soumis à la flat tax.' },
       { term: 'Assurance-vie', definition: "Enveloppe souple : fonds euros + unités de compte. Après 8 ans, 4 600 € de gains retirés par an (9 200 € pour un couple) sont exonérés d'impôt." },
       { term: 'PER', definition: "Plan d'épargne retraite : tes versements se déduisent de ton revenu imposable (économie = versement × ta tranche), l'argent est bloqué jusqu'à la retraite (sauf achat de la résidence principale)." },
       { term: 'Épargne salariale et abondement', definition: "PEE, PERCO : ton employeur complète tes versements (l'abondement). Les gains sont exonérés d'impôt, seuls les prélèvements sociaux s'appliquent au déblocage." },
       { term: 'Tranche marginale (TMI)', definition: "Le taux d'imposition de ton dernier euro gagné : 0, 11, 30, 41 ou 45 %. Il figure sur ton avis d'impôt." },
-      { term: 'Flat tax (PFU)', definition: '30 % sur les plus-values et dividendes : 12,8 % d\'impôt + 17,2 % de prélèvements sociaux.' },
+      { term: 'Flat tax (PFU)', definition: '31,4 % sur les plus-values et dividendes depuis 2026 : 12,8 % d\'impôt + 18,6 % de prélèvements sociaux (30 % avant 2026, et toujours 30 % en assurance-vie).' },
       { term: 'Moins-value reportable', definition: 'Une perte sur un compte-titres vient réduire tes plus-values de la même année, puis des 10 années suivantes.' },
       { term: 'Crypto : franchise de 305 €', definition: "Si le total de tes ventes de crypto contre des euros ne dépasse pas 305 € dans l'année, rien n'est imposable. Échanger une crypto contre une autre n'est pas imposable." },
       { term: 'Symbole', definition: 'Le code d\'un actif sur une place de cotation (AI.PA = Air Liquide à Paris). Une même entreprise peut en avoir plusieurs, un par place.' },
@@ -83,7 +83,7 @@ export const QUIZ: QuizQuestion[] = [
   {
     question: 'Au bout de combien de temps les gains d\'un PEA échappent-ils à l\'impôt sur le revenu ?',
     options: ['2 ans', '5 ans', '8 ans'], answer: 1,
-    explanation: 'Après 5 ans, seuls les prélèvements sociaux (17,2 %) restent dus sur les gains.',
+    explanation: 'Après 5 ans, seuls les prélèvements sociaux (18,6 % depuis 2026) restent dus sur les gains.',
   },
 ];
 

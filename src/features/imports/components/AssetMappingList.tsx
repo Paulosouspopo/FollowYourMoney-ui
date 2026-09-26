@@ -59,6 +59,12 @@ export function AssetMappingList({ assets, choices, onChange }: Props) {
                   </Button>
                 )}
               </div>
+              {choice.result && (
+                <p className="text-[11px] text-muted-foreground">
+                  {choice.result.exchange && <>Cotation : {choice.result.exchange} · </>}
+                  Mauvais actif ou mauvaise place ? Touche-le pour en choisir un autre.
+                </p>
+              )}
             </div>
           );
         })}

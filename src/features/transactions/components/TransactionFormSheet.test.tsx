@@ -19,6 +19,12 @@ vi.mock('@/features/transactions/api/transaction.api', () => ({
 // Contrôle de cohérence du prix (réseau) : simulé, aucun avertissement par défaut
 const checkWarnings = vi.fn(() => [] as unknown[]);
 vi.mock('@/features/quality/api/quality.api', () => ({ useTransactionCheck: () => ({ data: checkWarnings() }) }));
+const depositMutate = vi.fn();
+vi.mock('@/features/cash/api/cash.api', () => ({ useCreateCashMovement: () => mutation(depositMutate) }));
+
+// Devise de cotation (fiche marché, réseau) : simulée
+const quoteCurrency = vi.fn(() => 'EUR');
+vi.mock('@/features/markets/api/market.api', () => ({ useMarketDetail: (symbol: string) => ({ data: symbol ? { currency: quoteCurrency() } : undefined }) }));
 
 const AAPL = { symbol: 'AAPL', name: 'Apple Inc.', currency: 'USD' };
 
@@ -116,6 +122,24 @@ describe('TransactionFormSheet', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('seulement 2 détenu(s)');
     expect(onClose).not.toHaveBeenCalled();
+
+    // Quantité corrigée : l'erreur du serveur disparaît
+    await user.clear(screen.getByLabelText('Quantité'));
+    await user.type(screen.getByLabelText('Quantité'), '2');
+    expect(screen.queryByText(/seulement 2 détenu/)).not.toBeInTheDocument();
+  });
+
+  it('vente : la quantité détenue est indiquée sous le champ', async () => {
+    const { user } = renderForm({ heldQuantities: { AAPL: 3 } });
+    await user.click(screen.getByRole('button', { name: 'Vente' }));
+    expect(screen.getByText('Détenu : 3')).toBeInTheDocument();
+  });
+
+  it("nouvel actif sans devise connue : la devise de cotation est proposée par défaut", async () => {
+    quoteCurrency.mockReturnValue('USD');
+    renderForm({ lockedAsset: { symbol: 'AAPL', name: 'Apple Inc.' } });
+    expect(await screen.findByDisplayValue('USD')).toBeInTheDocument();
+    quoteCurrency.mockReturnValue('EUR');
   });
 
   it('prévient avant envoi quand la vente dépasse la quantité détenue', async () => {
@@ -124,6 +148,23 @@ describe('TransactionFormSheet', () => {
     await user.type(screen.getByLabelText('Quantité'), '4');
 
     expect(screen.getByText(/Tu ne détiens que 3 AAPL/)).toBeInTheDocument();
+  });
+
+  it("achat non couvert par le solde : propose le versement manquant et l'enregistre après l'achat", async () => {
+    createMutate.mockImplementation((_body, opts) => opts?.onSuccess?.());
+    depositMutate.mockImplementation((_body, opts) => opts?.onSuccess?.());
+    const { user, onClose } = renderForm({ lockedAsset: { symbol: 'CW8.PA', name: 'Amundi MSCI World', currency: 'EUR' }, cashBalanceEur: 200 });
+    await user.type(screen.getByLabelText('Quantité'), '2');
+    await user.type(screen.getByLabelText('Prix unitaire'), '500');
+    await user.type(screen.getByLabelText('Frais'), '1');
+
+    expect(screen.getByRole('checkbox')).toBeChecked();
+    expect(screen.getByText(/versement de/)).toHaveTextContent('801,00');
+    await submit(user);
+
+    expect(depositMutate).toHaveBeenCalledWith(expect.objectContaining({ type: 'DEPOSIT', amount: 801, movementDate: '2026-03-15' }),
+      expect.anything());
+    expect(onClose).toHaveBeenCalled();
   });
 
   it('ferme le formulaire après un ajout réussi', async () => {

@@ -33,6 +33,7 @@ const report: TaxReport = {
   employeeSavings: [{ portfolioId: 'es1', name: 'PEE Amundi', depositsEur: 3000, employerContributionsEur: 1000,
     valueEur: 3500, gainEur: 500, socialChargesIfWithdrawnEur: 86 }],
   reminders: ['Estimation établie d\'après tes opérations.'],
+  rates: { flatTaxPct: 31.4, socialChargesPct: 18.6, currentSocialChargesPct: 18.6, lifeInsuranceSocialChargesPct: 17.2 },
 };
 
 const setRate = vi.fn();

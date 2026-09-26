@@ -26,7 +26,7 @@ const contributions: ContributionReport = {
   period: '1y', from: '2025-09-26', to: '2026-09-25', gainEur: 1500, endValueEur: 16000,
   lines: [
     { assetId: 'a', portfolioId: 'p', portfolioName: 'PEA', symbol: 'CW8.PA', name: 'Amundi MSCI World', assetType: 'ETF',
-      startValueEur: 12000, endValueEur: 14000, flowsEur: 500, gainEur: 1500, returnPct: 12, weightPct: 87 },
+      startValueEur: 12000, endValueEur: 14000, flowsEur: 500, gainEur: 1500, returnPct: 12, weightPct: 87, dataSuspect: false },
   ],
 };
 const setFee = vi.fn();
