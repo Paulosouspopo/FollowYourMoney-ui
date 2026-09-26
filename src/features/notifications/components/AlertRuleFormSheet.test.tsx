@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { AlertRuleFormSheet } from './AlertRuleFormSheet';
@@ -96,16 +96,31 @@ describe('AlertRuleFormSheet', () => {
 describe('InboxList', () => {
   beforeEach(() => { markReadMutate.mockReset(); navigate.mockReset(); });
 
-  it('ouvre une notification non lue : la marque comme lue et va sur la page liée', async () => {
+  it('ouvre une notification non lue : la marque comme lue, affiche le détail puis la page liée', async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><InboxList /></MemoryRouter>);
 
     expect(screen.getByLabelText('Non lue')).toBeInTheDocument();
     await user.click(screen.getByText("📉 CTO −3,4 % aujourd'hui"));
     expect(markReadMutate).toHaveBeenCalledWith('n1');
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Valeur : 10 000 €')).toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+
+    await user.click(within(dialog).getByRole('button', { name: /Voir le portefeuille/ }));
     expect(navigate).toHaveBeenCalledWith('/portfolios/pf1');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('un rapport (lien « / ») s’ouvre aussi en détail, sans le re-marquer comme lu', async () => {
+    const user = userEvent.setup();
+    render(<MemoryRouter><InboxList /></MemoryRouter>);
 
     await user.click(screen.getByText('Ton bilan du jour'));
-    expect(markReadMutate).toHaveBeenCalledTimes(1); // déjà lue
+    expect(markReadMutate).not.toHaveBeenCalled(); // déjà lue
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Patrimoine : 29 000 €')).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: /Voir mon patrimoine/ }));
+    expect(navigate).toHaveBeenCalledWith('/');
   });
 });

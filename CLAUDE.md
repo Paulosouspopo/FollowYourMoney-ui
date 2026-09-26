@@ -88,7 +88,7 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 
 ## Notifications
 - Onglet « Alertes » (`/alerts`, `features/notifications`) : notifications
-  reçues (`InboxList`, clic = lu + ouverture du lien), règles
+  reçues (`InboxList`, clic = lu + fenêtre de détail : texte complet et bouton vers le lien, `/` = patrimoine), règles
   (`AlertRulesList`, `AlertRuleFormSheet` : la phrase « Quand … » à
   compléter), rapport périodique (`ReportSettingsCard`, aperçu).
 - Compteur de non-lues dans la barre du bas (`useUnreadCount`, rafraîchi
