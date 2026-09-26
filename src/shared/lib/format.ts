@@ -1,4 +1,6 @@
 const pct = new Intl.NumberFormat('fr-FR', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** Intl écrit « -12 € » : on garde partout le signe moins typographique « − ». */
+const minus = (s: string) => s.replace('-', '−');
 
 /**
  * Devise d'affichage : les montants EUR du back sont convertis au taux du jour
@@ -27,18 +29,18 @@ export function setAmountsHidden(hidden: boolean) {
 
 /** Montant EUR, affiché dans la devise d'affichage (masqué en mode confidentialité). */
 export const formatEur = (v: number | null | undefined) =>
-  v == null ? '—' : amountsHidden ? MASK : display.format.format(v * display.rate);
+  v == null ? '—' : amountsHidden ? MASK : minus(display.format.format(v * display.rate));
 /** Même chose arrondi à l'unité : projections (les centimes n'y ont pas de sens). */
 export const formatEurRounded = (v: number | null | undefined) =>
-  v == null ? '—' : amountsHidden ? MASK : display.rounded.format(v * display.rate);
+  v == null ? '—' : amountsHidden ? MASK : minus(display.rounded.format(v * display.rate));
 /** Montant dans une devise donnée, tel quel (cours, saisie) : jamais masqué. */
 export const formatMoney = (v: number | null | undefined, currency: string) =>
-  v == null ? '—' : new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format(v);
+  v == null ? '—' : minus(new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format(v));
 /** Montant personnel dans une devise donnée (courbe convertie, opération en devise) : masqué en mode confidentialité. */
 export const formatPrivateMoney = (v: number | null | undefined, currency: string) =>
   v == null ? '—' : amountsHidden ? MASK : formatMoney(v, currency);
 /** Ton back renvoie des pourcentages en "12.34" et pas "0.1234" → on divise */
-export const formatPercent = (v: number | null | undefined) => v == null ? '—' : pct.format(v / 100);
+export const formatPercent = (v: number | null | undefined) => v == null ? '—' : minus(pct.format(v / 100));
 export const formatDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso));
 export const formatLongDate = (iso: string) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso));
 /** « août 2024 » : axes des longues périodes (le jour n'apporte rien, l'année est indispensable). */

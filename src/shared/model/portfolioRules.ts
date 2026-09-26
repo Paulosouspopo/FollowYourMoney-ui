@@ -42,4 +42,4 @@ export const displaySymbol = (symbol: string) => (isManualSymbol(symbol) ? 'non 
 
 /** Initiales d'une pastille : symbole Yahoo (sans « -EUR »), ou nom d'un actif non coté. */
 export const iconLabel = (symbol: string, name?: string) =>
-  isManualSymbol(symbol) ? (name ?? '?').replace(/[^\p{L}\p{N}]/gu, '').slice(0, 3).toUpperCase() : symbol.replace(/-.*$/, '').slice(0, 4);
+  isManualSymbol(symbol) ? (name ?? '?').replace(/[^\p{L}\p{N}]/gu, '').slice(0, 3).toUpperCase() : symbol.replace(/^\^/, '').replace(/-.*$/, '').slice(0, 4);

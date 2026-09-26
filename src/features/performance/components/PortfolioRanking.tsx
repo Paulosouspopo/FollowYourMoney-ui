@@ -14,7 +14,7 @@ export function PortfolioRanking({ portfolios }: { portfolios: PortfolioPerforma
   return (
     <Card className="p-0 gap-0">
       <div className="flex justify-between px-4 pt-3 pb-2 text-[11px] text-muted-foreground border-b border-border">
-        <span>Portefeuille</span><span>Performance · gain</span>
+        <span>Portefeuille</span><span title="Performance hors effet des versements (TWR), comparable entre portefeuilles">Performance (TWR) · gain</span>
       </div>
       <ul className="divide-y divide-border">
         {ranked.map((p, i) => (

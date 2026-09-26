@@ -4,7 +4,7 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import { SegmentedControl } from '@/shared/ui/SegmentedControl';
 import { PercentBadge } from '@/shared/components/data/PercentBadge';
 import { TimeSeriesChart, type ChartSeries } from '@/shared/charts/TimeSeriesChart';
-import { formatLongDate, formatMoney } from '@/shared/lib/format';
+import { formatLongDate, formatMoney, formatPercent } from '@/shared/lib/format';
 import { useMarketHistory } from '../api/market.api';
 import { MARKET_RANGES, type MarketRange } from '../model/market.types';
 
@@ -57,7 +57,7 @@ export function RangeBar({ low, high, price, currency }: { low: number; high: nu
     <div className="space-y-1.5">
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>Plus bas 1 an</span>
-        <span>{fromHigh < -0.05 ? `${fromHigh.toFixed(1).replace('.', ',')} % du plus haut` : 'Au plus haut'}</span>
+        <span>{fromHigh < -0.05 ? `${formatPercent(fromHigh)} du plus haut` : 'Au plus haut'}</span>
         <span>Plus haut 1 an</span>
       </div>
       <div className="relative h-1.5 rounded-full bg-muted" role="img"

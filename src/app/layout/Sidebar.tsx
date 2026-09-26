@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/shared/lib/cn';
 import { useUnreadCount } from '@/features/notifications/api/notification.api';
-import { GUIDE_NAV_ITEM, NAV_ITEMS, SECONDARY_NAV_ITEMS, unreadLabel } from './nav';
+import { GUIDE_NAV_ITEM, NAV_ITEMS, SECONDARY_NAV_ITEMS, TRASH_NAV_ITEM, unreadLabel } from './nav';
 import { Logo } from './Logo';
 import { SearchButton } from '../search/SearchButton';
 import { PrivacyToggle } from '@/shared/privacy/PrivacyToggle';
@@ -52,6 +52,12 @@ export function Sidebar() {
           isActive ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground')}>
         <GUIDE_NAV_ITEM.icon size={18} strokeWidth={1.8} />
         <span>{GUIDE_NAV_ITEM.label}</span>
+      </NavLink>
+      <NavLink to={TRASH_NAV_ITEM.to}
+        className={({ isActive }) => cn('flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+          isActive ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground')}>
+        <TRASH_NAV_ITEM.icon size={18} strokeWidth={1.8} />
+        <span>{TRASH_NAV_ITEM.label}</span>
       </NavLink>
       <PrivacyToggle withLabel className="justify-start rounded-xl" />
       <p className="mt-3 px-3 text-[11px] leading-relaxed text-muted-foreground">

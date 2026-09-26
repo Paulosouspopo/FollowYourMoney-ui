@@ -23,6 +23,11 @@ export const GUIDE_NAV_ITEM = {
   to: '/guide', icon: BookOpen, label: "Guide d'utilisation", description: 'Visites guidées, lexique, quiz, questions fréquentes',
 } as const;
 
+/** Corbeille : page « Plus », barre latérale et recherche. */
+export const TRASH_NAV_ITEM = {
+  to: '/trash', icon: Trash2, label: 'Corbeille', description: 'Opérations et portefeuilles supprimés (30 jours)',
+} as const;
+
 /**
  * Page « Plus » (mobile) : tout ce qui ne tient pas dans la barre du bas.
  * Ajouter une page ici suffit pour qu'elle soit accessible sur téléphone.
@@ -32,7 +37,7 @@ export const MORE_SECTIONS = [
   { title: 'Aide', items: [GUIDE_NAV_ITEM] },
   { title: 'Compte', items: [
     { to: '/settings', icon: Settings, label: 'Réglages', description: 'Apparence, devise, notifications, sécurité' },
-    { to: '/trash', icon: Trash2, label: 'Corbeille', description: 'Opérations et portefeuilles supprimés (30 jours)' },
+    TRASH_NAV_ITEM,
   ] },
 ] as const;
 

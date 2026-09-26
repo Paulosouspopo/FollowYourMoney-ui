@@ -5,6 +5,7 @@ import { FormSelect } from '@/shared/ui/form-select';
 import { CURRENCIES } from '@/shared/model/currencies';
 import { IMPORT_KINDS, IMPORT_KIND_LABEL } from '../model/import.presentation';
 import type { GenericMapping, ImportInspection, ImportKind } from '../model/import.types';
+import { guessKinds } from '../model/import.kinds';
 
 const NONE = '__none__';
 const IGNORE = '__ignore__';
@@ -43,17 +44,25 @@ function initialMapping(inspection: ImportInspection): GenericMapping {
   };
 }
 
+function withGuessedKinds(mapping: GenericMapping, inspection: ImportInspection): GenericMapping {
+  const values = mapping.typeColumn ? inspection.columnValues[mapping.typeColumn] ?? [] : [];
+  return { ...mapping, typeValues: guessKinds(values) };
+}
+
 interface Props { inspection: ImportInspection; onSubmit: (mapping: GenericMapping) => void; loading?: boolean; }
 
 /** Relevé non reconnu : l'utilisateur indique quelle colonne contient quoi. */
 export function ColumnMappingForm({ inspection, onSubmit, loading }: Props) {
-  const [mapping, setMapping] = useState<GenericMapping>(() => initialMapping(inspection));
+  const [mapping, setMapping] = useState<GenericMapping>(() => withGuessedKinds(initialMapping(inspection), inspection));
   const columnOptions = [{ value: NONE, label: '—' }, ...inspection.headers.map(h => ({ value: h, label: h }))];
   const typeValues = mapping.typeColumn ? inspection.columnValues[mapping.typeColumn] ?? [] : [];
   const ready = !!mapping.dateColumn && !!mapping.typeColumn && Object.keys(mapping.typeValues).length > 0;
 
   const setColumn = (key: ColumnField, value: string) =>
-    setMapping(m => ({ ...m, [key]: value === NONE ? null : value, ...(key === 'typeColumn' ? { typeValues: {} } : {}) }));
+    setMapping(m => {
+      const next = { ...m, [key]: value === NONE ? null : value };
+      return key === 'typeColumn' ? withGuessedKinds(next, inspection) : next;
+    });
   const setTypeValue = (raw: string, kind: string) => setMapping(m => {
     const typeValues = { ...m.typeValues };
     if (kind === IGNORE) delete typeValues[raw]; else typeValues[raw] = kind as ImportKind;

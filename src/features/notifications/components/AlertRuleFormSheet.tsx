@@ -76,10 +76,12 @@ function AlertRuleForm({ onClose, initial, preset }: Props) {
   const max = condition === 'WEIGHT_ABOVE' ? 100 : 1000;
   const subject = scope === 'GLOBAL' ? 'mon patrimoine total'
     : scope === 'PORTFOLIO' ? (portfolios.data?.find(p => p.id === portfolioId)?.name ?? 'le portefeuille')
-    : (asset?.symbol ?? "l'actif");
+    : (asset?.name ?? asset?.symbol ?? "l'actif");
   const summary = [
     'Quand', subject, CONDITION_LABEL[condition].replace(/ \(.*\)$/, ''),
-    withThreshold ? `${threshold || '…'} ${percent ? '%' : '€'}` : '',
+    withThreshold ? (threshold && Number.isFinite(value)
+      ? `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(value)} ${percent ? '%' : '€'}`
+      : `… ${percent ? '%' : '€'}`) : '',
     periods.length ? PERIOD_LABEL[period] : '',
   ].filter(Boolean).join(' ');
 

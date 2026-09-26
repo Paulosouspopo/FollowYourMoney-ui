@@ -25,7 +25,8 @@ export default function PortfoliosPage() {
       <QueryBoundary query={q} skeleton={<ListSkeleton rows={3} />}>
         {d => d.portfolios.length
           ? <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {d.portfolios.map(p => (
+              {/* Même ordre que l'accueil : du plus gros au plus petit */}
+              {[...d.portfolios].sort((a, b) => b.currentValueEur - a.currentValueEur).map(p => (
                 <PortfolioCard key={p.portfolioId} valuation={p} trend={d.trends?.find(t => t.portfolioId === p.portfolioId)} />
               ))}
             </div>

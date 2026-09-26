@@ -28,7 +28,8 @@ function ReportSettingsForm({ initial }: { initial: ReportSettings }) {
   const [settings, setSettings] = useState(initial);
   const [showPreview, setShowPreview] = useState(false);
   const save = useSaveReportSettings();
-  const preview = useReportPreview(showPreview);
+  // Aperçu de la fréquence choisie à l'écran, même non enregistrée
+  const preview = useReportPreview(showPreview, settings.frequency);
   const dirty = JSON.stringify(settings) !== JSON.stringify(initial);
 
   return (

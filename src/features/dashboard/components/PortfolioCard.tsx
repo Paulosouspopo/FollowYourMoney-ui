@@ -43,7 +43,7 @@ export function PortfolioCard({ valuation: v, trend, className }: {
             <p className="text-xs text-muted-foreground">Intérêts <MoneyValue value={v.interestEur} signed colored /></p>
           ) : (
             <>
-              <GainLine amount={v.unrealizedGainEur} pct={v.unrealizedGainPercentage} size="xs" />
+              <GainLine amount={v.unrealizedGainEur} pct={v.unrealizedGainPercentage} size="xs" label="latent" />
               <p className="text-[11px] text-muted-foreground mt-2">
                 {v.openPositionCount} position{v.openPositionCount > 1 ? 's' : ''}
                 {v.cashTracking && <> · {cashLabel(v.type).toLowerCase()} <MoneyValue value={v.cashEur} /></>}

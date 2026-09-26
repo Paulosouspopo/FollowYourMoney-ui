@@ -105,7 +105,7 @@ function InterestHint({ portfolioId, onCredit }: { portfolioId: string; onCredit
   const current = useInterestEstimate(portfolioId, year).data;
   const previous = useInterestEstimate(portfolioId, year - 1).data;
   const toCredit = previous && previous.estimatedEur > 0 && previous.creditedEur === 0 ? previous : null;
-  if (!current && !toCredit) return null;
+  if (!(current && current.estimatedEur > 0) && !toCredit) return null;
 
   return (
     <Card className="p-3.5 gap-2 bg-gain/5 ring-gain/20">

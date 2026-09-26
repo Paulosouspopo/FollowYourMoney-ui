@@ -71,7 +71,7 @@ export default function PortfolioDetailPage() {
                     : <>Investi <MoneyValue value={pf.investedEur} className="text-foreground font-medium" /></>}
                   controls={<PeriodSelector value={period} onChange={setPeriod} />} />
                 <KpiGrid items={livret ? livretKpis(pf) : performanceKpis(pf)} />
-                {d.curve.length > 0 && <PerformanceCard portfolioId={portfolioId} />}
+                {d.curve.length > 0 && <PerformanceCard portfolioId={portfolioId} compare={!livret} />}
                 {!livret && <PositionsList portfolioId={portfolioId} positions={pf.positions} />}
               </div>
               <aside className="space-y-6 lg:col-span-4 min-w-0">

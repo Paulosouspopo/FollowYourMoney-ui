@@ -58,9 +58,11 @@ function Simulator({ start, defaultMonthly, rate, onRate }: {
     const median = yearlySeries(start, monthly, s.median, years);
     const prudent = yearlySeries(start, monthly, s.prudent, years);
     const dynamic = yearlySeries(start, monthly, s.dynamic, years);
-    const now = new Date().getFullYear();
+    const today = new Date();
+    const monthDay = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     return {
-      dates: median.map(p => `${now + p.year}-01-01`),
+      // Axe à partir d'aujourd'hui (pas du 1er janvier)
+      dates: median.map(p => `${today.getFullYear() + p.year}-${monthDay}`),
       series: [
         { key: 'median', values: median.map(p => p.value), color: 'var(--primary)', variant: 'area' },
         { key: 'dynamic', values: dynamic.map(p => p.value), color: 'var(--positive)', variant: 'line' },
@@ -81,7 +83,8 @@ function Simulator({ start, defaultMonthly, rate, onRate }: {
           {' '}et <span className="text-foreground font-medium tabular-nums">{formatEurRounded(final.dynamic)}</span> (dynamique)
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          dont <span className="text-foreground font-medium tabular-nums">{formatEurRounded(final.median.invested)}</span> versés
+          dont <span className="text-foreground font-medium tabular-nums">{formatEurRounded(start)}</span> déjà placés,
+          {' '}<span className="text-foreground font-medium tabular-nums">{formatEurRounded(final.median.invested - start)}</span> de versements
           {' '}et <span className="text-gain font-medium tabular-nums">{formatEurRounded(final.median.value - final.median.invested)}</span> d'intérêts composés
         </p>
       </div>

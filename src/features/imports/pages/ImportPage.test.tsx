@@ -125,8 +125,8 @@ describe('ImportPage', () => {
     await uploadAndPreview();
     expect(screen.getByText('Quelle colonne contient quoi ?')).toBeInTheDocument();
     expect(screen.getByText('Que signifie chaque type ?')).toBeInTheDocument();
-    // Aucune valeur de type associée : l'aperçu n'est pas encore possible
-    expect(screen.getByRole('button', { name: "Voir l'aperçu" })).toBeDisabled();
+    // « Achat » et « Versement » reconnus d'office : l'aperçu est possible sans rien associer
+    expect(screen.getByRole('button', { name: "Voir l'aperçu" })).toBeEnabled();
     expect(previewMutate).not.toHaveBeenCalled();
   });
 });

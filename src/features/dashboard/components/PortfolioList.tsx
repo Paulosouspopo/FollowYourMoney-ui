@@ -44,7 +44,8 @@ export function PortfolioList({ portfolios }: { portfolios: PortfolioValuation[]
                   <div className="text-right">
                     <MoneyValue value={p.currentValueEur} className="block text-sm font-semibold" />
                     {!livret && (
-                      <span className={cn('text-[11px] font-medium tabular-nums', gainTone(p.unrealizedGainPercentage))}>
+                      <span className={cn('text-[11px] font-medium tabular-nums', gainTone(p.unrealizedGainPercentage))}
+                        title="Plus-value latente (lignes détenues)">
                         {p.unrealizedGainPercentage >= 0 ? '+' : '−'}{formatPercent(Math.abs(p.unrealizedGainPercentage))}
                       </span>
                     )}

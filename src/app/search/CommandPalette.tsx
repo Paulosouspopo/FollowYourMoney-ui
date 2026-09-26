@@ -11,10 +11,11 @@ import { usePrivacyStore } from '@/shared/privacy/privacy.store';
 import { useThemeStore } from '@/shared/theme/theme.store';
 import { PORTFOLIO_TYPE_LABEL } from '@/shared/model/enums';
 import { displaySymbol } from '@/shared/model/portfolioRules';
-import { GUIDE_NAV_ITEM, NAV_ITEMS, SECONDARY_NAV_ITEMS } from '../layout/nav';
+import { GUIDE_NAV_ITEM, NAV_ITEMS, SECONDARY_NAV_ITEMS, TRASH_NAV_ITEM } from '../layout/nav';
 import { useSearchStore } from './search.store';
+import { commandFilter } from './commandFilter';
 
-const PAGES = [...NAV_ITEMS, ...SECONDARY_NAV_ITEMS, GUIDE_NAV_ITEM];
+const PAGES = [...NAV_ITEMS, ...SECONDARY_NAV_ITEMS, GUIDE_NAV_ITEM, TRASH_NAV_ITEM];
 
 /**
  * Recherche globale (Ctrl+K, ⌘K ou « / ») : pages, portefeuilles, lignes,
@@ -54,12 +55,14 @@ export function CommandPalette() {
   const go = (to: string) => { setOpen(false); setQuery(''); navigate(to); };
   const run = (action: () => void) => { setOpen(false); setQuery(''); action(); };
   const dark = theme === 'dark' || (theme === 'system' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
+  // Résultats Yahoo : gardés tels quels pour un code (ISIN, ticker avec chiffres) que leur nom ne contient pas
+  const marketTail = /\d/.test(debounced) ? debounced : '';
   const positions = portfolios.flatMap(p => p.positions.filter(pos => pos.quantity > 0).map(pos => ({ ...pos, portfolio: p })));
 
   return (
     <CommandDialog open={open} onOpenChange={o => { setOpen(o); if (!o) setQuery(''); }}
       title="Rechercher" description="Pages, portefeuilles, lignes, actions et marchés">
-      <Command>
+      <Command filter={commandFilter}>
         <CommandInput placeholder="Rechercher une page, une ligne, un actif…" value={query} onValueChange={setQuery} />
         <CommandList className="max-h-[60vh]">
           <CommandEmpty>Aucun résultat.</CommandEmpty>
@@ -110,7 +113,7 @@ export function CommandPalette() {
           {market.length > 0 && (
             <CommandGroup heading="Marchés">
               {market.slice(0, 6).map(m => (
-                <CommandItem key={m.symbol} value={`marché ${m.symbol} ${m.name} ${query}`} onSelect={() => go(marketPath(m.symbol))}>
+                <CommandItem key={m.symbol} value={`marché ${m.symbol} ${m.name} ${marketTail}`} onSelect={() => go(marketPath(m.symbol))}>
                   <Globe /> <span className="min-w-0 flex-1 truncate">{m.name}</span>
                   <CommandShortcut>{m.symbol}</CommandShortcut>
                 </CommandItem>

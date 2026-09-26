@@ -104,9 +104,9 @@ export const useSaveReportSettings = () => {
 };
 
 /** Chargé à la demande (bouton « Voir un exemple ») : calcule la valorisation. */
-export const useReportPreview = (enabled: boolean) => useQuery({
-  queryKey: notificationKeys.reportPreview(),
-  queryFn: () => api.get<ReportPreview>('/report-settings/preview').then(r => r.data),
+export const useReportPreview = (enabled: boolean, frequency?: ReportSettings['frequency']) => useQuery({
+  queryKey: [...notificationKeys.reportPreview(), frequency ?? 'saved'] as const,
+  queryFn: () => api.get<ReportPreview>('/report-settings/preview', { params: { frequency } }).then(r => r.data),
   enabled,
   staleTime: 0,
 });
