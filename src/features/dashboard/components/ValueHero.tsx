@@ -64,15 +64,18 @@ export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', perio
       </p>
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm min-h-6">
         {delta != null && (
-          <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-medium tabular-nums',
-            delta >= 0 ? 'bg-positive-bg text-gain' : 'bg-negative-bg text-loss')}>
-            {delta >= 0 ? '▲' : '▼'} {delta >= 0 ? '+' : '−'}{formatPrivateMoney(Math.abs(delta), curveCurrency)}
-            {deltaPct != null && <span className="opacity-80">({formatPercent(Math.abs(deltaPct))})</span>}
-          </span>
+          <>
+            <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-medium tabular-nums',
+              Math.abs(delta) < 0.005 ? 'bg-muted text-muted-foreground'
+                : delta > 0 ? 'bg-positive-bg text-gain' : 'bg-negative-bg text-loss')}>
+              {Math.abs(delta) < 0.005 ? '' : delta > 0 ? '▲ +' : '▼ −'}{formatPrivateMoney(Math.abs(delta), curveCurrency)}
+              {deltaPct != null && <span className="opacity-80">({formatPercent(Math.abs(deltaPct))})</span>}
+            </span>
+            <span className="text-muted-foreground">
+              {scrub != null && first ? `de gain depuis le ${formatLongDate(first.date)}` : `de gain ${periodLabel}`}
+            </span>
+          </>
         )}
-        <span className="text-muted-foreground">
-          {scrub != null && first ? `de gain depuis le ${formatLongDate(first.date)}` : `de gain ${periodLabel}`}
-        </span>
         {aside && scrub == null && <span className="text-muted-foreground md:ml-auto">{aside}</span>}
       </div>
       </div>

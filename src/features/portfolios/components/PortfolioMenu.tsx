@@ -27,7 +27,7 @@ export function PortfolioMenu({ portfolioId }: { portfolioId: string }) {
       {data && <PortfolioFormSheet open={edit} onClose={() => setEdit(false)} initial={data} />}
       <ConfirmDialog open={confirmDelete} onOpenChange={setConfirmDelete}
         title={`Supprimer « ${data?.name ?? 'ce portefeuille'} » ?`}
-        description="Toutes ses transactions et son historique seront définitivement supprimés."
+        description="Il ira dans la corbeille avec ses opérations : tu pourras le restaurer pendant 30 jours."
         onConfirm={onDelete} loading={del.isPending} />
     </>
   );

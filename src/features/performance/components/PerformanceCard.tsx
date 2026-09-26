@@ -23,10 +23,12 @@ const signedPercent = (v: number | null | undefined) =>
  * comparable à un indice) et rendement de ton argent (versements compris).
  *
  * @param portfolioId null = tout le patrimoine (avec le classement des portefeuilles)
+ * @param compare     false = pas de comparaison à un indice (livret : taux fixe)
  */
-export function PerformanceCard({ portfolioId }: { portfolioId: string | null }) {
+export function PerformanceCard({ portfolioId, compare = true }: { portfolioId: string | null; compare?: boolean }) {
   const [period, setPeriod] = useState<PerformancePeriod>('1y');
-  const benchmark = useBenchmarkStore(s => s.benchmark);
+  const chosen = useBenchmarkStore(s => s.benchmark);
+  const benchmark = compare ? chosen : null;
   const q = usePerformance(portfolioId, period, benchmark?.symbol ?? null);
   const [help, setHelp] = useState(false);
 
@@ -59,7 +61,7 @@ export function PerformanceCard({ portfolioId }: { portfolioId: string | null })
           <Card className={cn('p-4 space-y-4 transition-opacity', q.isFetching && 'opacity-60')}>
             <Kpis data={q.data} />
             <ComparisonChart data={q.data} />
-            <BenchmarkPicker />
+            {compare && <BenchmarkPicker />}
           </Card>
           {portfolioId == null && q.data.portfolios.length > 1 && <PortfolioRanking portfolios={q.data.portfolios} />}
         </>
@@ -89,7 +91,8 @@ function useBenchmarkName(d: PerformanceResponse) {
 }
 
 function Kpis({ data: d }: { data: PerformanceResponse }) {
-  const vsIndex = d.benchmark?.returnPct != null ? d.twrPct - d.benchmark.returnPct : null;
+  // Comparaison seulement avec un historique (portefeuille vide : pas de « devant de 0,00 % »)
+  const vsIndex = d.benchmark?.returnPct != null && d.series.length > 1 ? d.twrPct - d.benchmark.returnPct : null;
   const benchmarkName = useBenchmarkName(d);
   // Sur 1 an pile, l'annualisé répète le cumulé : on ne l'affiche que s'il diffère
   const annualized = d.twrAnnualizedPct != null && Math.abs(d.twrAnnualizedPct - d.twrPct) >= 0.05

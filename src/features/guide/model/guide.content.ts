@@ -8,7 +8,7 @@ export const GLOSSARY: { title: string; entries: GlossaryEntry[] }[] = [
     entries: [
       { term: 'Patrimoine', definition: 'La valeur de tous tes comptes au dernier cours connu, convertie en euros.' },
       { term: 'Investi', definition: "L'argent que tu as mis dans tes lignes actuelles, frais compris. La ligne en pointillés sur les courbes." },
-      { term: 'PRU (prix de revient unitaire)', definition: 'Le prix moyen payé pour une action, frais compris, pondéré par les quantités. Une vente ne le change pas.',
+      { term: 'PRU (prix de revient unitaire)', definition: 'Le prix moyen payé pour une action, frais compris, pondéré par les quantités. Une vente ne le change pas. Aussi appelé PMP (prix moyen pondéré, le terme fiscal) ou CUMP.',
         example: '10 actions à 50 € puis 10 à 70 € → PRU = 60 €.' },
       { term: 'Plus-value latente', definition: 'Le gain (ou la perte) sur ce que tu détiens encore : valeur actuelle − prix de revient. Il bouge avec les cours.',
         example: '10 actions de PRU 50 € qui valent 60 € → +100 € latents.' },

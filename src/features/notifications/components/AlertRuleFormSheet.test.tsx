@@ -72,7 +72,7 @@ describe('AlertRuleFormSheet', () => {
       description: 'Bitcoin EUR (BTC-EUR) passe au-dessus de 70 000,00 €',
     }} />);
     expect(screen.getByLabelText('Seuil (€)')).toHaveValue(70000);
-    expect(screen.getByText('Quand BTC-EUR passe au-dessus de 70000 €')).toBeInTheDocument();
+    expect(screen.getByText('Quand Bitcoin EUR passe au-dessus de 70 000 €')).toBeInTheDocument();
     expect(screen.getByLabelText('Nom (facultatif)')).toHaveValue('Objectif BTC');
   });
 
@@ -83,7 +83,7 @@ describe('AlertRuleFormSheet', () => {
     }} />);
 
     expect(screen.queryByLabelText(/Seuil/)).not.toBeInTheDocument();
-    expect(screen.getByText('Quand CW8.PA atteint un nouveau plus haut sur 1 an')).toBeInTheDocument();
+    expect(screen.getByText('Quand MSCI World atteint un nouveau plus haut sur 1 an')).toBeInTheDocument();
     await user.type(screen.getByLabelText('Nom (facultatif)'), 'Record MSCI');
     await user.click(screen.getByRole('button', { name: "Créer l'alerte" }));
 
