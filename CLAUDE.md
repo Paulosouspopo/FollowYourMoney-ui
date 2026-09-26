@@ -327,5 +327,14 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - Ne pas proposer de composants nécessitant des libs non installées
   (vérifier `package.json` avant de suggérer `cmdk`, `Combobox` shadcn, etc.)
 
+## Déploiement
+- `Dockerfile` : build Vite (sans `VITE_API_URL` : le client appelle `/api`,
+  même origine) puis image Caddy. `Caddyfile` : HTTPS automatique pour
+  `{$DOMAIN}`, `/api/*` → `api:8080`, repli SPA sur `index.html`, `sw.js` /
+  `index.html` / manifeste en `no-cache`, `/assets/*` en cache long.
+- `.dockerignore` exclut `.env.local` (sinon Vite l'injecterait dans le build
+  de production avec l'URL de dev).
+- Orchestration (compose, `.env`, guide) : dépôt back, dossier `deploy/`.
+
 ## Repo
 https://github.com/Paulosouspopo/FollowYourMoney-ui
