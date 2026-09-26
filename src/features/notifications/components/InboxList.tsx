@@ -1,6 +1,8 @@
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BellRing, CalendarClock, FileText } from 'lucide-react';
+import { ArrowRight, BellRing, CalendarClock, FileText } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { BottomSheet } from '@/shared/ui/BottomSheet';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { QueryBoundary } from '@/shared/ui/QueryBoundary';
 import { ListSkeleton } from '@/shared/components/data/ListSkeleton';
@@ -14,17 +16,28 @@ const when = (iso: string) => new Intl.DateTimeFormat('fr-FR', {
   day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
 }).format(new Date(iso));
 
-/** Notifications reçues ; un clic marque comme lu et ouvre la page concernée. */
+/** Libellé du bouton qui ouvre la page liée à la notification. */
+const linkLabel = (link: string) =>
+  link === '/' ? 'Voir mon patrimoine'
+    : link.startsWith('/portfolios/') ? 'Voir le portefeuille'
+      : link.startsWith('/markets/') ? "Voir la fiche de l'actif"
+        : 'Ouvrir';
+
+/** Notifications reçues ; un clic marque comme lu et affiche le détail (texte complet + lien). */
 export function InboxList() {
   const q = useInbox();
   const markRead = useMarkRead();
   const markAll = useMarkAllRead();
   const nav = useNavigate();
+  const [selected, setSelected] = useState<NotificationItem | null>(null);
+  const close = useCallback(() => setSelected(null), []);
 
   const open = (n: NotificationItem) => {
     if (!n.read) markRead.mutate(n.id);
-    if (n.link && n.link !== '/') nav(n.link);
+    setSelected(n);
   };
+
+  const Detail = selected ? ICON[selected.type] : null;
 
   return (
     <QueryBoundary query={q} skeleton={<ListSkeleton rows={3} />}>
@@ -50,7 +63,7 @@ export function InboxList() {
                         <p className={cn('text-sm truncate', !n.read && 'font-semibold')}>{n.title}</p>
                         {!n.read && <span className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" aria-label="Non lue" />}
                       </div>
-                      <p className="text-xs text-muted-foreground whitespace-pre-line line-clamp-6">{n.body}</p>
+                      <p className="text-xs text-muted-foreground whitespace-pre-line line-clamp-2">{n.body}</p>
                       <p className="text-[11px] text-muted-foreground/70 mt-0.5">{when(n.createdAt)}</p>
                     </div>
                   </button>
@@ -58,6 +71,21 @@ export function InboxList() {
               );
             })}
           </ul>
+          <BottomSheet open={selected != null} onClose={close} title={selected?.title ?? ''}>
+            {selected && Detail && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Detail size={14} /> {when(selected.createdAt)}
+                </div>
+                <p className="text-sm whitespace-pre-line leading-relaxed">{selected.body}</p>
+                {selected.link && (
+                  <Button className="w-full" onClick={() => { const link = selected.link!; close(); nav(link); }}>
+                    {linkLabel(selected.link)} <ArrowRight size={16} />
+                  </Button>
+                )}
+              </div>
+            )}
+          </BottomSheet>
         </div>
       )}
     </QueryBoundary>
