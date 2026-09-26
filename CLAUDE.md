@@ -197,6 +197,28 @@ alors que les apps bancaires/investissement existantes manquent de clarté.
 - « Changer d'actif » sur la fiche d'une position (`ReplaceAssetSheet`) ;
   l'alerte PEA ouvre la fenêtre directement (`?changer=1`).
 
+## Visites guidées et guide (v4)
+- Moteur maison `shared/tour` (sans librairie) : `TourOverlay` (portail,
+  dans AppShell) éclaire l'élément `[data-tour="…"]` (première visée visible :
+  barre du bas OU barre latérale), bulle placée par `placement.ts` (testé),
+  suivi à chaque image (défilement, animations). Étapes dont la visée manque
+  au lancement : sautées. `interactive` : l'élément reste utilisable.
+  Échap / flèches ; changement de page = arrêt sans compter comme vue.
+- État par compte (`tour.api.ts`, `/api/tutorials`) : visite terminée OU
+  fermée = vue ; case « Ne plus afficher » coupe l'affichage automatique.
+- `usePageTour(tour, ready)` : lance la visite à la 1re ouverture d'une page
+  (après 900 ms, une fois par session) ou via `?tour=<clé>` (page Guide).
+  `ready` = données chargées et aucune fenêtre ouverte. `TourButton` (« ? »)
+  dans l'en-tête de chaque page.
+- Contenu : `features/guide/tours.tsx` (une visite par page, textes
+  tutoyés, exemples chiffrés `Example`/`Def`). Nouvelle fonction importante =
+  un attribut `data-tour` + une étape. Page `/guide` : visites (progression,
+  lancement selon les données du compte, `guideEntries`), quiz, lexique, FAQ
+  (`model/guide.content.ts`), préférences. Accès : « Plus » → Aide, barre
+  latérale, Réglages.
+- Tests : `src/test/setup.ts` simule `tour.api` (tout vu, auto coupé) pour
+  que les tests de pages n'aient pas besoin de QueryClient.
+
 ## Authentification
 - Jeton d'accès (JWT 15 min) **en mémoire uniquement** (`shared/auth/auth.store`,
   jamais de localStorage). Session longue = cookie HttpOnly `fym_refresh`

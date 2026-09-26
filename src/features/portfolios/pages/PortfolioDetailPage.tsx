@@ -24,6 +24,9 @@ import { PortfolioMenu } from "@/features/portfolios/components/PortfolioMenu";
 import { AddEntrySheet, type EntryKind } from "@/features/portfolios/components/AddEntrySheet";
 import { PERIOD_SENTENCE, type DashboardPeriod } from "@/features/dashboard/model/dashboard.types";
 import { PerformanceCard } from "@/features/performance/components/PerformanceCard";
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 
 type Sheet = EntryKind | 'choose' | null;
 
@@ -43,11 +46,13 @@ export default function PortfolioDetailPage() {
   const isLivret = p?.type === 'LIVRET';
   const heldQuantities = Object.fromEntries((p?.positions ?? []).map(pos => [pos.symbol, pos.quantity]));
 
+  usePageTour(TOURS.portfolio, q.isSuccess && sheet === null);
+
   const onFab = () => setSheet(isLivret ? 'cash' : p?.cashTracking ? 'choose' : 'transaction');
 
   return (
     <div>
-      <TopBar back title={p?.name ?? 'Portefeuille'} right={<PortfolioMenu portfolioId={portfolioId} />} />
+      <TopBar back title={p?.name ?? 'Portefeuille'} right={<><TourButton tour={TOURS.portfolio} /><PortfolioMenu portfolioId={portfolioId} /></>} />
       <QueryBoundary query={q} skeleton={<DashboardSkeleton />}>
         {d => {
           const pf = d.portfolios[0];

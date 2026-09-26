@@ -15,7 +15,7 @@ export function PortfolioList({ portfolios }: { portfolios: PortfolioValuation[]
   const total = portfolios.reduce((s, p) => s + Math.max(p.currentValueEur, 0), 0);
   const sorted = [...portfolios].sort((a, b) => b.currentValueEur - a.currentValueEur);
   return (
-    <section>
+    <section data-tour="portfolios">
       <SectionHeader title="Portefeuilles" action={<Link to="/portfolios" className="text-xs font-medium text-primary">Tout voir</Link>} />
       <Card className="p-0 gap-0">
         <ul className="divide-y divide-border">

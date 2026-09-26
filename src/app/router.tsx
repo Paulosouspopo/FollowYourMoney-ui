@@ -17,6 +17,7 @@ const Income = lazy(appPages.income);
 const Goals = lazy(appPages.goals);
 const Tax = lazy(appPages.tax);
 const More = lazy(appPages.more);
+const Guide = lazy(appPages.guide);
 const Login = lazy(() => import('@/features/auth/pages/LoginPage'));
 const Register = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const ForgotPassword = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
         { path: 'goals', element: <Goals /> },
         { path: 'tax', element: <Tax /> },
         { path: 'more', element: <More /> },
+        { path: 'guide', element: <Guide /> },
         { path: 'settings', element: <Settings /> },
       ],
     }],

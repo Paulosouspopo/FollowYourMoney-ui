@@ -21,7 +21,7 @@ export function FileDrop({ onFile, loading, error }: Props) {
 
   return (
     <div>
-      <button type="button" disabled={loading}
+      <button type="button" disabled={loading} data-tour="import-drop"
         onClick={() => input.current?.click()}
         onDragOver={e => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}

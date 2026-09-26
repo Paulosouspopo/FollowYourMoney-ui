@@ -20,6 +20,8 @@ interface Props {
   controls?: ReactNode;
   /** Ligne d'information sous la variation (investi, liquidités…). */
   aside?: ReactNode;
+  /** Bouton d'aide (visite guidée), à côté de l'œil. */
+  help?: ReactNode;
 }
 
 /**
@@ -28,7 +30,7 @@ interface Props {
  * période. La variation suit la plus-value : un versement ne compte pas comme
  * un gain ; son % est rapporté à l'argent engagé (`periodChange`).
  */
-export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', periodLabel, controls, aside }: Props) {
+export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', periodLabel, controls, aside, help }: Props) {
   const [scrub, setScrub] = useState<number | null>(null);
   const onScrub = useCallback((i: number | null) => setScrub(i), []);
   const animated = useCountUp(valueEur);
@@ -51,8 +53,12 @@ export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', perio
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
           {scrub != null && point ? formatLongDate(point.date) : label}
         </p>
-        <PrivacyToggle className="-mr-1.5" />
+        <span className="-mr-1.5 flex items-center">
+          {help}
+          <span data-tour="privacy" className="flex"><PrivacyToggle /></span>
+        </span>
       </div>
+      <div data-tour="hero-value">
       <p className="text-display mt-2" aria-live="polite">
         {scrub != null && point ? formatPrivateMoney(point.totalValueEur, curveCurrency) : formatEur(animated)}
       </p>
@@ -69,8 +75,9 @@ export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', perio
         </span>
         {aside && scrub == null && <span className="text-muted-foreground md:ml-auto">{aside}</span>}
       </div>
+      </div>
 
-      <div className="mt-5">
+      <div className="mt-5" data-tour="hero-chart">
         {curve.length >= 2 ? (
           <TimeSeriesChart dates={dates} series={series} height={240} onScrub={onScrub}
             ariaLabel={`Évolution de la valeur ${periodLabel}. Flèches gauche et droite pour parcourir.`} />
@@ -87,7 +94,7 @@ export function ValueHero({ label, valueEur, curve, curveCurrency = 'EUR', perio
           <span className="flex items-center gap-1.5"><span className="h-0.5 w-4 rounded bg-primary" /> Valeur</span>
           <span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t border-dashed border-muted-foreground" /> Investi</span>
         </span>
-        {controls}
+        {controls && <div data-tour="hero-periods">{controls}</div>}
       </div>
     </section>
   );

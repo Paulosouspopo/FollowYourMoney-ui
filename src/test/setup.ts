@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { afterEach } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
 afterEach(() => cleanup());
@@ -15,3 +15,13 @@ window.matchMedia ??= ((query: string) => ({
   addEventListener: () => {}, removeEventListener: () => {},
   addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false,
 })) as unknown as typeof window.matchMedia;
+
+// Visites guidées : état « tout vu, affichage automatique coupé » pour les tests de pages
+// (sans QueryClient). tour.test.tsx remplace ce simulacre par le sien.
+vi.mock('@/shared/tour/tour.api', () => ({
+  tutorialKeys: { all: ['tutorials'] },
+  useTutorials: () => ({ data: { autoEnabled: false, completed: [] } }),
+  useCompleteTutorial: () => ({ mutate: () => {} }),
+  useTutorialAutoDisplay: () => ({ mutate: () => {}, isPending: false }),
+  useResetTutorials: () => ({ mutate: () => {}, isPending: false }),
+}));

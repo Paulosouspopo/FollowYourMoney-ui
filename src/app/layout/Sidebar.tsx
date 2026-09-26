@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/shared/lib/cn';
 import { useUnreadCount } from '@/features/notifications/api/notification.api';
-import { NAV_ITEMS, SECONDARY_NAV_ITEMS, unreadLabel } from './nav';
+import { GUIDE_NAV_ITEM, NAV_ITEMS, SECONDARY_NAV_ITEMS, unreadLabel } from './nav';
 import { Logo } from './Logo';
 import { PrivacyToggle } from '@/shared/privacy/PrivacyToggle';
 
@@ -35,7 +35,7 @@ export function Sidebar() {
         ))}
       </nav>
       <p className="mt-8 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Analyse</p>
-      <nav aria-label="Pages d'analyse" className="mt-2 flex flex-col gap-1">
+      <nav aria-label="Pages d'analyse" data-tour="nav-analysis" className="mt-2 flex flex-col gap-1">
         {SECONDARY_NAV_ITEMS.map(t => (
           <NavLink key={t.to} to={t.to}
             className={({ isActive }) => cn('flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
@@ -45,7 +45,13 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <PrivacyToggle withLabel className="mt-auto justify-start rounded-xl" />
+      <NavLink to={GUIDE_NAV_ITEM.to}
+        className={({ isActive }) => cn('mt-auto flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+          isActive ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground')}>
+        <GUIDE_NAV_ITEM.icon size={18} strokeWidth={1.8} />
+        <span>{GUIDE_NAV_ITEM.label}</span>
+      </NavLink>
+      <PrivacyToggle withLabel className="justify-start rounded-xl" />
       <p className="mt-3 px-3 text-[11px] leading-relaxed text-muted-foreground">
         Cours mis à jour chaque heure · Yahoo Finance
       </p>

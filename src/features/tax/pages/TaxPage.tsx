@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Copy, Download, Info, Landmark } from 'lucide-react';
 import { TopBar } from '@/app/layout/TopBar';
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 import { Card } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { SectionHeader } from '@/shared/ui/SectionHeader';
@@ -24,12 +27,18 @@ import { fiveYearsProgress } from '../model/pea';
 export default function TaxPage() {
   const [year, setYear] = useState<number | null>(null);
   const q = useTaxReport(year);
+  usePageTour(TOURS.tax, q.isSuccess);
   return (
     <div className="lg:max-w-5xl">
-      <TopBar back title="Fiscalité" right={q.data && (
-        <FormSelect className="w-28" value={String(q.data.year)} onChange={v => setYear(Number(v))}
-          options={q.data.years.map(y => ({ value: String(y), label: String(y) }))} />
-      )} />
+      <TopBar back title="Fiscalité" right={<>
+        <TourButton tour={TOURS.tax} />
+        {q.data && (
+          <span data-tour="tax-year" className="flex">
+            <FormSelect className="w-28" value={String(q.data.year)} onChange={v => setYear(Number(v))}
+              options={q.data.years.map(y => ({ value: String(y), label: String(y) }))} />
+          </span>
+        )}
+      </>} />
       <QueryBoundary query={q} skeleton={<Skeleton className="h-96 w-full rounded-2xl" />}>
         {r => <Report report={r} />}
       </QueryBoundary>
@@ -45,7 +54,7 @@ function Report({ report: r }: { report: TaxReport }) {
   return (
     <div className="space-y-6 lg:grid lg:grid-cols-12 lg:gap-8 lg:space-y-0">
       <div className="space-y-6 lg:col-span-7 min-w-0">
-        <section className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
+        <section data-tour="tax-hero" className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
             Impôt estimé sur {r.year} · à déclarer en {r.year + 1}
           </p>
@@ -55,7 +64,7 @@ function Report({ report: r }: { report: TaxReport }) {
           </p>
         </section>
 
-        <section>
+        <section data-tour="tax-boxes">
           <SectionHeader title="Cases à reporter" action={<span className="text-[11px] text-muted-foreground">déclaration de revenus</span>} />
           {boxes.length === 0 ? (
             <Card className="p-4 text-sm text-muted-foreground">
@@ -148,7 +157,7 @@ function Report({ report: r }: { report: TaxReport }) {
         </section>
 
         {hasSales && (
-          <Button variant="outline" className="w-full"
+          <Button variant="outline" className="w-full" data-tour="tax-export"
             onClick={() => downloadCsv(`cessions-${r.year}.csv`, salesCsv(r))}>
             <Download size={16} /> Exporter les cessions {r.year} (CSV)
           </Button>
@@ -157,7 +166,7 @@ function Report({ report: r }: { report: TaxReport }) {
 
       <aside className="space-y-6 lg:col-span-5 min-w-0 lg:pt-2">
         {r.peas.length > 0 && (
-          <section>
+          <section data-tour="tax-pea">
             <SectionHeader title="PEA" />
             <div className="space-y-3">{r.peas.map(p => <PeaCard key={p.portfolioId} pea={p} />)}</div>
           </section>

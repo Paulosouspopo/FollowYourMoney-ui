@@ -14,6 +14,9 @@ import { AssetSearchCombobox } from '@/features/assets/components/AssetSearchCom
 import { useAddToWatchlist, useWatchlist } from '../api/market.api';
 import { Sparkline } from '../components/Sparkline';
 import { marketPath, type WatchlistItem } from '../model/market.types';
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 
 /** Suggestions pour démarrer : indices et cryptos courants (symboles Yahoo). */
 const SUGGESTIONS = [
@@ -26,6 +29,7 @@ export default function MarketsPage() {
   const q = useWatchlist();
   const add = useAddToWatchlist();
   const [adding, setAdding] = useState(false);
+  usePageTour(TOURS.markets, q.isSuccess && !adding);
 
   const follow = (symbol: string) => add.mutate(symbol, {
     onSuccess: item => { toast.success(`${item.name} ajouté à ta liste`); setAdding(false); },
@@ -38,12 +42,15 @@ export default function MarketsPage() {
     <div className="space-y-4 pt-4 lg:max-w-3xl">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Marchés</h1>
-        <Button size="sm" onClick={() => setAdding(true)}><Plus size={16} /> Suivre</Button>
+        <div className="flex items-center gap-1">
+          <TourButton tour={TOURS.markets} />
+          <Button size="sm" onClick={() => setAdding(true)} data-tour="markets-follow"><Plus size={16} /> Suivre</Button>
+        </div>
       </header>
 
       <QueryBoundary query={q} skeleton={<ListSkeleton rows={4} />}>
         {items => items.length ? (
-          <ul className="divide-y divide-border">
+          <ul data-tour="markets-list" className="divide-y divide-border">
             {items.map(item => <WatchRow key={item.id} item={item} />)}
           </ul>
         ) : (
@@ -53,7 +60,7 @@ export default function MarketsPage() {
       </QueryBoundary>
 
       {suggestions.length > 0 && (
-        <section className="space-y-2">
+        <section data-tour="markets-suggestions" className="space-y-2">
           <h2 className="text-xs font-medium text-muted-foreground">Suggestions</h2>
           <div className="flex flex-wrap gap-2">
             {suggestions.map(s => (

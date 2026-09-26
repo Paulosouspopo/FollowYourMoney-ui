@@ -14,7 +14,7 @@ export function BottomNav() {
         {MOBILE_NAV_ITEMS.map(t => {
           const active = isNavActive(pathname, t.matches);
           return (
-            <Link key={t.to} to={t.to} aria-current={active ? 'page' : undefined}
+            <Link key={t.to} to={t.to} aria-current={active ? 'page' : undefined} data-tour={t.to === '/more' ? 'nav-more' : undefined}
               className={cn('relative flex flex-col items-center gap-0.5 pt-1.5 pb-1.5 text-[10px] font-medium transition-colors',
                 active ? 'text-primary' : 'text-muted-foreground active:text-foreground')}>
               <span className={cn('grid h-7 w-12 place-items-center rounded-full transition-colors', active && 'bg-primary/12')}>

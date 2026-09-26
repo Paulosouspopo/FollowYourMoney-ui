@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FileSpreadsheet } from 'lucide-react';
 import { TopBar } from '@/app/layout/TopBar';
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 import { Card } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Switch } from '@/shared/ui/Switch';
@@ -37,6 +40,7 @@ export default function ImportPage() {
   const commit = useCommitImport();
 
   const [step, setStep] = useState<Step>('upload');
+  usePageTour(TOURS.import, step === 'upload');
   const [file, setFile] = useState<File | null>(null);
   const [inspection, setInspection] = useState<ImportInspection | null>(null);
   const [preview, setPreview] = useState<ImportPreview | null>(null);
@@ -120,13 +124,13 @@ export default function ImportPage() {
 
   return (
     <div className="space-y-4 pb-24 lg:max-w-3xl">
-      <TopBar back title={title} />
+      <TopBar back title={title} right={<TourButton tour={TOURS.import} />} />
 
       {step === 'upload' && (
         <>
           <FileDrop onFile={onFile} loading={inspect.isPending || previewMutation.isPending}
             error={inspect.error?.message ?? previewMutation.error?.message} />
-          <Card className="p-4 space-y-2 text-xs text-muted-foreground">
+          <Card data-tour="import-where" className="p-4 space-y-2 text-xs text-muted-foreground">
             <p className="text-sm font-medium text-foreground flex items-center gap-2"><FileSpreadsheet size={16} /> Où trouver l'export ?</p>
             <p><span className="text-foreground">Fortuneo</span> : Bourse → Historique des opérations → Exporter (CSV).</p>
             <p><span className="text-foreground">Trade Republic</span> : Profil → Activité → Exporter les transactions.</p>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { LogOut, Monitor, Moon, Sun } from 'lucide-react';
+import { ChevronRight, LogOut, Monitor, Moon, Sun } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { GUIDE_NAV_ITEM } from '@/app/layout/nav';
 import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/Input';
@@ -114,6 +116,20 @@ export default function SettingsPage() {
       </section>
 
       <SecuritySection />
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold tracking-tight">Aide</h2>
+        <Card className="p-0 gap-0">
+          <Link to={GUIDE_NAV_ITEM.to} className="group flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/12 text-primary"><GUIDE_NAV_ITEM.icon size={18} /></span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">{GUIDE_NAV_ITEM.label}</p>
+              <p className="truncate text-xs text-muted-foreground">{GUIDE_NAV_ITEM.description}</p>
+            </div>
+            <ChevronRight size={16} className="text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </Card>
+      </section>
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold tracking-tight">Compte</h2>

@@ -16,7 +16,7 @@ const stats = (d: DashboardResponse): Stat[] => [
 /** Chiffres clés : défilement horizontal sur mobile, grille sur grand écran. */
 export function StatStrip({ data }: { data: DashboardResponse }) {
   return (
-    <div className="-mx-4 px-4 md:mx-0 md:px-0 flex md:grid md:grid-cols-3 gap-2 overflow-x-auto scrollbar-none snap-x">
+    <div data-tour="stats" className="-mx-4 px-4 md:mx-0 md:px-0 flex md:grid md:grid-cols-3 gap-2 overflow-x-auto scrollbar-none snap-x">
       {stats(data).map(s => (
         <div key={s.label} className="min-w-[42%] md:min-w-0 snap-start rounded-2xl bg-card ring-1 ring-border px-3.5 py-3">
           <p className="text-[11px] text-muted-foreground">{s.label}</p>

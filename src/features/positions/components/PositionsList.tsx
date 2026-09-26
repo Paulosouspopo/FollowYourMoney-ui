@@ -26,7 +26,7 @@ export function PositionsList({ portfolioId, positions }: Props) {
   }
 
   return (
-    <section>
+    <section data-tour="positions">
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-sm font-semibold tracking-tight">Positions ({rows.length})</h2>
         <SegmentedControl value={sort} onChange={setSort}

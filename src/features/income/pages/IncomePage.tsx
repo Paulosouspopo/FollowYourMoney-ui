@@ -2,6 +2,9 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarClock, Coins, Landmark } from 'lucide-react';
 import { TopBar } from '@/app/layout/TopBar';
+import { TOURS } from '@/features/guide/tours';
+import { usePageTour } from '@/shared/tour/usePageTour';
+import { TourButton } from '@/shared/tour/TourButton';
 import { Card } from '@/shared/ui/card';
 import { SectionHeader } from '@/shared/ui/SectionHeader';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -24,9 +27,10 @@ const monthTitle = (ym: string) => new Intl.DateTimeFormat('fr-FR', { month: 'lo
  */
 export default function IncomePage() {
   const q = useIncome();
+  usePageTour(TOURS.income, q.isSuccess);
   return (
     <div className="lg:max-w-5xl">
-      <TopBar back title="Revenus passifs" />
+      <TopBar back title="Revenus passifs" right={<TourButton tour={TOURS.income} />} />
       <QueryBoundary query={q} skeleton={<Skeleton className="h-96 w-full rounded-2xl" />}>
         {d => d.positions.length === 0 && d.receivedLast12mEur === 0 ? (
           <EmptyState title="Pas encore de revenus"
@@ -51,7 +55,7 @@ function Income({ data: d }: { data: IncomeResponse }) {
   return (
     <div className="space-y-6 lg:grid lg:grid-cols-12 lg:gap-8 lg:space-y-0">
       <div className="space-y-6 lg:col-span-7 min-w-0">
-        <section className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
+        <section data-tour="income-hero" className="glow -mx-4 px-4 md:mx-0 md:px-0 pt-2">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Revenus attendus</p>
           <p className="text-display mt-2">{formatEur(d.monthlyProjectedEur)}<span className="text-2xl text-muted-foreground font-medium"> / mois</span></p>
           <p className="mt-3 text-sm text-muted-foreground">
@@ -65,7 +69,7 @@ function Income({ data: d }: { data: IncomeResponse }) {
           <Stat label="Reçu sur 12 mois" value={d.receivedLast12mEur} />
         </div>
 
-        <section>
+        <section data-tour="income-chart">
           <SectionHeader title="Reçu par mois" action={
             <span className="flex gap-3 text-[11px] text-muted-foreground">
               <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-chart-5" /> Dividendes</span>
@@ -84,7 +88,7 @@ function Income({ data: d }: { data: IncomeResponse }) {
           <p className="mt-2 text-[11px] text-muted-foreground">D'après les dividendes et intérêts saisis ou importés.</p>
         </section>
 
-        <section>
+        <section data-tour="income-lines">
           <SectionHeader title="Par ligne" />
           <Card className="p-0 gap-0">
             <ul className="divide-y divide-border">
@@ -115,7 +119,7 @@ function Income({ data: d }: { data: IncomeResponse }) {
       </div>
 
       <aside className="space-y-6 lg:col-span-5 min-w-0 lg:pt-2">
-        <section>
+        <section data-tour="income-upcoming">
           <SectionHeader title="Prochains versements" action={<span className="text-[11px] text-muted-foreground">estimés</span>} />
           {upcomingByMonth.length === 0 ? (
             <Card className="p-4 text-sm text-muted-foreground">Aucun versement attendu dans les 12 prochains mois.</Card>

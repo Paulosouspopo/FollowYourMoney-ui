@@ -15,7 +15,7 @@ export function RecentTransactions({ portfolioId, heldQuantities }: { portfolioI
   const [editing, setEditing] = useState<TransactionResponse | null>(null);
 
   return (
-    <section>
+    <section data-tour="recent">
       <h2 className="text-sm font-semibold tracking-tight mb-1">Transactions</h2>
       <QueryBoundary query={q} skeleton={<ListSkeleton rows={3} />}>
         {list => list.length ? (
